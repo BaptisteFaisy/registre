@@ -2,12 +2,13 @@ name: CI
 
 # Registre CI — verdict in under 5 minutes (rule: CI-BUDGET-5MIN).
 #
-# Single always-running job named `ci` (the check name required by the `main`
-# ruleset and by the Mergify queue). Steps that only matter for a sub-app are
-# gated on the changed paths, so a backend PR never pays for the portal build.
+# The work is split into parallel jobs (typecheck / tests / guards / apps) and a
+# final gate job named `ci` — the check name required by the `main` ruleset and
+# by the Mergify queue. The gate only aggregates conclusions, so the wall clock
+# is the slowest job, not their sum.
 #
 # Self-hosted runners are persistent: `node_modules` and the npm cache survive
-# between runs, which is what keeps `npm ci` inside the budget.
+# between runs, which is what keeps the install inside the budget.
 
 on:
   pull_request:
@@ -23,8 +24,8 @@ permissions:
   pull-requests: read
 
 jobs:
-  ci:
-    name: ci
+  typecheck:
+    name: typecheck
     runs-on: [self-hosted, linux, x64, registre-worker]
     timeout-minutes: 5
     env:
@@ -35,18 +36,11 @@ jobs:
           fetch-depth: 1
           persist-credentials: false
           clean: false
-
-      # Keep build artefacts (node_modules) between runs on persistent runners:
-      # a blind `git clean -ffdx` would reinstall every dependency each time.
       - name: Clean workspace (keep node_modules)
         shell: bash
         run: git clean -ffdx -e /node_modules -e '*/node_modules' -e /portal/node_modules -e /infra/node_modules -e .tsbuildinfo
-
       - name: Node version
         run: node --version && npm --version
-
-      # Persistent runners keep node_modules between runs: reinstall only when
-      # the lockfile actually moved (a blind `npm ci` costs ~30 s every run).
       - name: Install backend dependencies
         shell: bash
         run: |
@@ -57,55 +51,41 @@ jobs:
           else
             npm ci --prefer-offline --no-audit --no-fund
           fi
-
       - name: Typecheck (tsc --noEmit)
         run: npm run typecheck
-
-      - name: Unit tests (node --test)
-        run: npm test
-
       - name: Code size guard (< 500 lines / file, < 50 lines / function)
         run: npm run check:sizes
-
       - name: Wording guard (ENF-IA-01, no "compliant")
         run: npm run check:wording
 
-      - name: CI guards self-test (couche0, fireworks)
-        run: |
-          python3 .github/couche0/test_check_couche0.py
-          python3 .github/fireworks/test_conflict_agent.py
-          python3 .github/fireworks/test_test_agent.py
-          python3 .github/fireworks/test_scope_agent.py
-          python3 .github/fireworks/test_union_journal.py
-          python3 .github/fireworks/test_quota.py
-
-      - name: Changed areas (path-gated steps)
-        id: paths
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          EVENT_PAYLOAD: ${{ toJSON(github.event) }}
-        run: python3 .github/ci/changed_paths.py
-
-      - name: Portal typecheck and build
-        if: steps.paths.outputs.portal == 'yes'
+  tests:
+    name: tests
+    runs-on: [self-hosted, linux, x64, registre-worker]
+    timeout-minutes: 5
+    env:
+      PATH: /home/baptiste/.local/node22/bin:/home/baptiste/.local/bin:/usr/local/bin:/usr/bin:/bin
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+          clean: false
+      - name: Clean workspace (keep node_modules)
+        shell: bash
+        run: git clean -ffdx -e /node_modules -e '*/node_modules' -e /portal/node_modules -e /infra/node_modules -e .tsbuildinfo
+      - name: Install backend dependencies
         shell: bash
         run: |
-          cd portal
-          npm ci --prefer-offline --no-audit --no-fund
-          npm run typecheck
-          npm run build
-
-      - name: Infrastructure typecheck and synth
-        if: steps.paths.outputs.infra == 'yes'
-        shell: bash
-        run: |
-          cd infra
-          npm ci --prefer-offline --no-audit --no-fund
-          npm run typecheck
-          npm run synth
-
+          if [ ! -f package-lock.json ]; then
+            npm install --prefer-offline --no-audit --no-fund
+          elif cmp -s package-lock.json node_modules/.package-lock.json; then
+            echo "node_modules is already in sync with package-lock.json"
+          else
+            npm ci --prefer-offline --no-audit --no-fund
+          fi
+      - name: Unit tests (node --test)
+        run: npm test
       - name: Offline end-to-end demo
-        if: steps.paths.outputs.demo == 'yes'
         shell: bash
         run: |
           # The demo runner lands with the demo module; until then, say so
@@ -115,3 +95,82 @@ jobs:
           else
             echo "::notice::tools/demo/main.ts is not in this revision - demo step skipped"
           fi
+
+  guards:
+    name: guards
+    runs-on: [self-hosted, linux, x64, registre-worker]
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+          clean: false
+      - name: CI guards self-test (couche0, fireworks)
+        run: |
+          python3 .github/couche0/test_check_couche0.py
+          python3 .github/fireworks/test_conflict_agent.py
+          python3 .github/fireworks/test_test_agent.py
+          python3 .github/fireworks/test_scope_agent.py
+          python3 .github/fireworks/test_union_journal.py
+          python3 .github/fireworks/test_quota.py
+
+  apps:
+    name: apps
+    runs-on: [self-hosted, linux, x64, registre-worker]
+    timeout-minutes: 5
+    env:
+      PATH: /home/baptiste/.local/node22/bin:/home/baptiste/.local/bin:/usr/local/bin:/usr/bin:/bin
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+          clean: false
+      - name: Changed areas (path-gated steps)
+        id: paths
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          EVENT_PAYLOAD: ${{ toJSON(github.event) }}
+        run: python3 .github/ci/changed_paths.py
+      - name: Portal typecheck and build
+        if: steps.paths.outputs.portal == 'yes'
+        shell: bash
+        run: |
+          cd portal
+          npm ci --prefer-offline --no-audit --no-fund
+          npm run typecheck
+          npm run build
+      - name: Infrastructure typecheck and synth
+        if: steps.paths.outputs.infra == 'yes'
+        shell: bash
+        run: |
+          cd infra
+          npm ci --prefer-offline --no-audit --no-fund
+          npm run typecheck
+          npm run synth
+
+  ci:
+    name: ci
+    runs-on: [self-hosted, linux, x64, registre-worker]
+    timeout-minutes: 5
+    needs: [typecheck, tests, guards, apps]
+    if: always()
+    steps:
+      - name: Aggregate the conclusions of the parallel jobs
+        run: |
+          status=0
+          check() {
+            if [ "$2" != "success" ]; then
+              echo "::error::job $1 finished with '$2'"
+              status=1
+            fi
+          }
+          check typecheck "${{ needs.typecheck.result }}"
+          check tests "${{ needs.tests.result }}"
+          check guards "${{ needs.guards.result }}"
+          if [ "${{ needs.apps.result }}" != "success" ] && [ "${{ needs.apps.result }}" != "skipped" ]; then
+            echo "::error::job apps finished with '${{ needs.apps.result }}'"
+            status=1
+          fi
+          exit $status
