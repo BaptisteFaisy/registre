@@ -66,7 +66,7 @@ MAX_TOKENS = 8_000
 TEMPERATURE = 0.2
 LABEL_OK = "agent-conflit"
 LABEL_HUMAN = "intervention-humaine"
-COMMENT_PREFIX = "_fireworks · agent de conflit (MiniMax M3.1 Flash)_"
+COMMENT_PREFIX = "_hermes · agent de conflit (InferHub combo/cheap)"
 REFUSED_PREFIXES = (".github/", ".mergify.yml")
 
 

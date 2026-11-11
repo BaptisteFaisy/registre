@@ -43,7 +43,7 @@ MAX_EXCERPT_LINES = 5
 MAX_TOKENS = 3_000
 TEMPERATURE = 0.1
 CALL_TIMEOUT_S = 90
-COMMENT_PREFIX = "_fireworks · agent de périmètre (MiniMax M3.1 Flash)_"
+COMMENT_PREFIX = "_hermes · agent de périmètre (InferHub combo/cheap)"
 MARKER = "<!-- automerge-scope sha=%s -->"
 LABEL_HUMAN = "intervention-humaine"
 PUCE = re.compile(r"^\s*(?:[-*+]|\d+[.)])\s+`?([^`\s]+)`?"
