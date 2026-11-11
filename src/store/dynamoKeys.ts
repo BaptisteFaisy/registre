@@ -48,7 +48,7 @@ export const TABLE_ENV = 'REGISTRE_TABLE';
 export const REGION_ENV = 'REGISTRE_REGION';
 export const ENDPOINT_ENV = 'REGISTRE_DYNAMO_ENDPOINT';
 export const DEFAULT_TABLE = 'registre';
-export const DEFAULT_REGION = 'eu-west-3';
+export const DEFAULT_REGION = 'eu-central-1';
 
 export interface DynamoConfig {
   table: string;

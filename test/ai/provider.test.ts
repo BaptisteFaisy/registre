@@ -65,10 +65,10 @@ test('createAi builds the Bedrock services without loading the SDK', () => {
 
 test('the Data Automation target comes from the environment', () => {
   const target = dataAutomationTarget(
-    { REGISTRE_BDA_PROJECT_ARN: 'arn:aws:bedrock:eu-west-3:1:data-automation-project/x', REGISTRE_BDA_BLUEPRINT_ARN: 'arn:bp' },
+    { REGISTRE_BDA_PROJECT_ARN: 'arn:aws:bedrock:eu-central-1:1:data-automation-project/x', REGISTRE_BDA_BLUEPRINT_ARN: 'arn:bp' },
     'bedrock-data-automation'
   );
-  assert.equal(target.modelId, 'arn:aws:bedrock:eu-west-3:1:data-automation-project/x');
+  assert.equal(target.modelId, 'arn:aws:bedrock:eu-central-1:1:data-automation-project/x');
   assert.equal(target.blueprintArn, 'arn:bp');
   assert.equal(target.outputS3Uri, '');
   assert.equal(dataAutomationTarget({}, 'bedrock-data-automation').modelId, 'bedrock-data-automation');

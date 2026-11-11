@@ -120,7 +120,7 @@ export interface S3InventoryFetcherOptions {
 export function s3InventoryReportFetcher(options: S3InventoryFetcherOptions): ReportFetcher {
   return async (window) => {
     const { S3Client, ListObjectsV2Command } = await import('@aws-sdk/client-s3');
-    const client = new S3Client({ region: options.region ?? 'eu-west-3' });
+    const client = new S3Client({ region: options.region ?? 'eu-central-1' });
     try {
       const response = await client.send(
         new ListObjectsV2Command({

@@ -1,0 +1,115 @@
+/* Registre portal — design tokens.
+   Dark, dense, sober: built to stay legible in a 1080p screen recording. */
+
+:root {
+  --bg: #0b0f14;
+  --bg-elev: #131920;
+  --bg-elev-2: #1a222b;
+  --bg-hover: #202a35;
+  --border: #263340;
+  --border-strong: #35465a;
+
+  --text: #e8eef5;
+  --text-dim: #9aa9ba;
+  --text-faint: #6f7f92;
+
+  --accent: #58a6ff;
+  --accent-dim: #1f6feb;
+  --accent-soft: rgba(88, 166, 255, 0.12);
+
+  --ok: #3fb950;
+  --warn: #d29922;
+  --alert: #db6d28;
+  --bad: #f85149;
+  --critical: #da3633;
+
+  --radius: 8px;
+  --radius-sm: 5px;
+  --gap: 16px;
+  --gap-sm: 8px;
+
+  --font: 'Inter', 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif;
+  --mono: 'JetBrains Mono', 'SFMono-Regular', ui-monospace, Menlo, Consolas, monospace;
+
+  --shadow: 0 1px 0 rgba(255, 255, 255, 0.03), 0 8px 24px rgba(0, 0, 0, 0.35);
+  --sidebar-width: 232px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 14px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  margin: 0;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+h1 {
+  font-size: 20px;
+}
+
+h2 {
+  font-size: 16px;
+}
+
+h3 {
+  font-size: 14px;
+}
+
+p {
+  margin: 0;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+code,
+.mono {
+  font-family: var(--mono);
+  font-size: 12px;
+}
+
+::selection {
+  background: rgba(88, 166, 255, 0.3);
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}

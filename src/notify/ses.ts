@@ -53,7 +53,7 @@ export function sesOptionsFromEnv(
   const configurationSetName = env[SES_CONFIG_SET_ENV];
   return {
     from,
-    region: env.REGISTRE_REGION ?? env.AWS_REGION ?? 'eu-west-3',
+    region: env.REGISTRE_REGION ?? env.AWS_REGION ?? 'eu-central-1',
     ...(configurationSetName === undefined ? {} : { configurationSetName })
   };
 }
@@ -104,7 +104,7 @@ export class SesNotifier implements Notifier {
 
   private transport(): EmailTransport {
     if (this.options.transport !== undefined) return this.options.transport;
-    this.cached ??= sesTransportFromSdk(this.options.region ?? 'eu-west-3');
+    this.cached ??= sesTransportFromSdk(this.options.region ?? 'eu-central-1');
     return this.cached;
   }
 }

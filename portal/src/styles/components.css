@@ -1,0 +1,199 @@
+/* Registre portal — shared components: cards, tables, badges, charts, forms. */
+
+/* --------------------------------------------------------------- cards */
+
+.card {
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gap-sm);
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.card-title {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.card-subtitle {
+  font-size: 11.5px;
+  color: var(--text-faint);
+}
+
+.card-body {
+  padding: 14px 16px;
+}
+
+.card-body.tight {
+  padding: 0;
+}
+
+.card-footer {
+  padding: 10px 16px;
+  border-top: 1px solid var(--border);
+  font-size: 11.5px;
+  color: var(--text-faint);
+}
+
+/* --------------------------------------------------------------- stats */
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: var(--gap-sm);
+}
+
+@media (max-width: 1200px) {
+  .stat-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.stat {
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-elev);
+  border-top: 2px solid var(--border-strong);
+}
+
+.stat-value {
+  font-size: 26px;
+  font-weight: 650;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.stat-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  font-size: 11.5px;
+  color: var(--text-dim);
+}
+
+.stat-hint {
+  margin-top: 2px;
+  font-size: 11px;
+  color: var(--text-faint);
+}
+
+/* -------------------------------------------------------------- badges */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid currentColor;
+  font-size: 11.5px;
+  font-weight: 600;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+.badge-soft {
+  border-color: var(--border);
+  background: transparent;
+  color: var(--text-faint);
+  font-weight: 500;
+}
+
+.badge-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+}
+
+.tag {
+  display: inline-block;
+  padding: 1px 7px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-elev-2);
+  border: 1px solid var(--border);
+  font-size: 11px;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+
+/* -------------------------------------------------------------- tables */
+
+.table-wrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+}
+
+.table th {
+  position: sticky;
+  top: 0;
+  padding: 8px 12px;
+  background: var(--bg-elev);
+  border-bottom: 1px solid var(--border);
+  color: var(--text-faint);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-align: left;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.table td {
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+
+.table tbody tr:hover {
+  background: var(--bg-hover);
+}
+
+.table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.table tr.clickable {
+  cursor: pointer;
+}
+
+.cell-title {
+  font-weight: 550;
+  color: var(--text);
+}
+
+.cell-sub {
+  margin-top: 1px;
+  font-size: 11px;
+  color: var(--text-faint);
+}
+
+.num {
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
