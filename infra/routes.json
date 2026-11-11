@@ -1,0 +1,267 @@
+{
+  "generatedBy": "tools/quality/exportRoutes.ts",
+  "routes": [
+    {
+      "path": "/healthz",
+      "methods": [
+        "GET"
+      ],
+      "public": true
+    },
+    {
+      "path": "/openapi.json",
+      "methods": [
+        "GET"
+      ],
+      "public": true
+    },
+    {
+      "path": "/v1/ask",
+      "methods": [
+        "POST"
+      ],
+      "public": false
+    },
+    {
+      "path": "/v1/audit-log",
+      "methods": [
+        "GET"
+      ],
+      "public": false
+    },
+    {
+      "path": "/v1/auth/accounts",
+      "methods": [
+        "GET"
+      ],
+      "public": true
+    },
+    {
+      "path": "/v1/auth/logout",
+      "methods": [
+        "POST"
+      ],
+      "public": true
+    },
+    {
+      "path": "/v1/auth/session",
+      "methods": [
+        "POST"
+      ],
+      "public": true
+    },
+    {
+      "path": "/v1/controls/{id}",
+      "methods": [
+        "GET"
+      ],
+      "public": false
+    },
+    {
+      "path": "/v1/controls/{id}/draft",
+      "methods": [
+        "POST"
+      ],
+      "public": false
+    },
+    {
+      "path": "/v1/controls/{id}/evidence",
+      "methods": [
+        "GET"
+      ],
+      "public": false
+    },
+    {
+      "path": "/v1/controls/{id}/remind",
+      "methods": [
+        "POST"
+      ],
+      "public": false
+    },
+    {
+      "path": "/v1/drifts",
+      "methods": [
+        "GET"
+      ],
+      "public": false
+    },
+    {
+      "path": "/v1/drifts/{id}/acknowledge",
+      "methods": [
+        "POST"
+      ],
+      "public": false
+    },
+    {
+      "path": "/v1/drifts/summary",
+      "methods": [
+        "GET"
+      ],
+      "public": false
+    },
+    {
+      "path": "/v1/evidence",
+      "methods": [
+        "POST"
+      ],
+      "public": false
+    },
+    {
+      "path": "/v1/evidence/{id}",
+      "methods": [
+        "GET"
+      ],
+      "public": false
+    },
+    {
+      "path": "/v1/frameworks",
+      "methods": [
+        "GET",
+        "POST"
+      ],
+      "public": false
+    },
+    {
+      "path": "/v1/frameworks/{id}/controls",
+      "methods": [
+        "GET"
+      ],
+      "public": false
+    },
+    {
+      "path": "/v1/frameworks/{id}/diff",
+      "methods": [
+        "GET"
+      ],
+      "public": false
+    },
+    {
+      "path": "/v1/frameworks/{id}/packs",
+      "methods": [
+        "POST"
+      ],
+      "public": false
+    },
+    {
+      "path": "/v1/frameworks/{id}/readiness",
+      "methods": [
+        "GET"
+      ],
+      "public": false
+    },
+    {
+      "path": "/v1/frameworks/{id}/reuse",
+      "methods": [
+        "GET"
+      ],
+      "public": false
+    },
+    {
+      "path": "/v1/mappings",
+      "methods": [
+        "GET"
+      ],
+      "public": false
+    },
+    {
+      "path": "/v1/mappings/{id}/decision",
+      "methods": [
+        "POST"
+      ],
+      "public": false
+    },
+    {
+      "path": "/v1/mappings/propose",
+      "methods": [
+        "POST"
+      ],
+      "public": false
+    },
+    {
+      "path": "/v1/packs",
+      "methods": [
+        "GET"
+      ],
+      "public": false
+    },
+    {
+      "path": "/v1/packs/{id}",
+      "methods": [
+        "GET"
+      ],
+      "public": false
+    },
+    {
+      "path": "/v1/packs/{id}/archive",
+      "methods": [
+        "GET"
+      ],
+      "public": false
+    },
+    {
+      "path": "/v1/packs/{id}/verify",
+      "methods": [
+        "POST"
+      ],
+      "public": false
+    },
+    {
+      "path": "/v1/quality",
+      "methods": [
+        "GET"
+      ],
+      "public": false
+    },
+    {
+      "path": "/v1/reminders",
+      "methods": [
+        "GET"
+      ],
+      "public": false
+    },
+    {
+      "path": "/v1/settings",
+      "methods": [
+        "GET",
+        "PUT"
+      ],
+      "public": false
+    },
+    {
+      "path": "/v1/shares",
+      "methods": [
+        "GET",
+        "POST"
+      ],
+      "public": false
+    },
+    {
+      "path": "/v1/shares/{token}/revoke",
+      "methods": [
+        "POST"
+      ],
+      "public": false
+    },
+    {
+      "path": "/v1/shares/{token}/verify",
+      "methods": [
+        "POST"
+      ],
+      "public": true
+    },
+    {
+      "path": "/v1/validations",
+      "methods": [
+        "GET"
+      ],
+      "public": false
+    },
+    {
+      "path": "/v1/validations/{id}/decision",
+      "methods": [
+        "POST"
+      ],
+      "public": false
+    }
+  ]
+}

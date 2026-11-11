@@ -138,8 +138,11 @@ export function resolveAccount(env: NodeJS.ProcessEnv = process.env): string {
  */
 function resolveModels(env: NodeJS.ProcessEnv): ModelIds {
   return {
-    reasoning: env.REGISTRE_REASONING_MODEL ?? 'eu.anthropic.claude-sonnet-4-5-v1:0',
-    answer: env.REGISTRE_ANSWER_MODEL ?? 'eu.anthropic.claude-sonnet-4-5-v1:0'
+    // `eu.anthropic.claude-sonnet-4-5-v1:0` does not exist: the real profile
+    // identifiers carry the model date (checked with `aws bedrock
+    // list-inference-profiles` in eu-central-1 on 2026-11-11).
+    reasoning: env.REGISTRE_REASONING_MODEL ?? 'eu.anthropic.claude-haiku-4-5-20251001-v1:0',
+    answer: env.REGISTRE_ANSWER_MODEL ?? 'eu.anthropic.claude-haiku-4-5-20251001-v1:0'
   };
 }
 

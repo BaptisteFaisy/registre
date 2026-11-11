@@ -12,7 +12,7 @@
 # Prerequisites: awscli v2, a profile allowed to call cognito-idp:Admin*.
 set -euo pipefail
 
-REGION="${REGISTRE_REGION:-eu-west-3}"
+REGION="${REGISTRE_REGION:-eu-central-1}"
 STACK="${REGISTRE_STACK:-Registre-Api}"
 
 pool_id="$(aws cloudformation describe-stacks \
@@ -24,17 +24,19 @@ if [[ -z "$pool_id" || "$pool_id" == "None" ]]; then
   exit 1
 fi
 
-# login:role:email, one per role of the specification (chapter 6).
+# login:role:email, one per role of the specification (chapter 6). The user pool
+# signs in by e-mail (`signInAliases: { email: true }`), so the e-mail IS the
+# username - Cognito refuses anything else ("Username should be an email").
 USERS=(
-  "quality.lead:QUALITY_LEAD:quality.lead@example.com"
-  "control.owner:CONTROL_OWNER:control.owner@example.com"
-  "executive:EXECUTIVE:executive@example.com"
-  "internal.auditor:INTERNAL_AUDITOR:internal.auditor@example.com"
-  "admin:ADMIN:admin@example.com"
+  "quality.lead:QUALITY_LEAD:quality.lead@msp.demo"
+  "control.owner:CONTROL_OWNER:control.owner@msp.demo"
+  "executive:EXECUTIVE:executive@msp.demo"
+  "internal.auditor:INTERNAL_AUDITOR:internal.auditor@msp.demo"
+  "admin:ADMIN:admin@msp.demo"
 )
 
 echo "User pool: $pool_id ($REGION)"
-printf '%-18s %-18s %s\n' "LOGIN" "ROLE" "PASSWORD"
+printf '%-28s %-18s %s\n' "LOGIN (e-mail)" "ROLE" "PASSWORD"
 
 for entry in "${USERS[@]}"; do
   IFS=':' read -r login role email <<<"$entry"
@@ -42,14 +44,14 @@ for entry in "${USERS[@]}"; do
   password="$(openssl rand -base64 24 | tr -dc 'A-Za-z0-9' | cut -c1-20)Aa1!"
   aws cognito-idp admin-create-user \
     --region "$REGION" --user-pool-id "$pool_id" \
-    --username "$login" --message-action SUPPRESS \
+    --username "$email" --message-action SUPPRESS \
     --user-attributes "Name=email,Value=$email" "Name=email_verified,Value=true" >/dev/null
   aws cognito-idp admin-set-user-password \
-    --region "$REGION" --user-pool-id "$pool_id" --username "$login" \
+    --region "$REGION" --user-pool-id "$pool_id" --username "$email" \
     --password "$password" --permanent >/dev/null
   aws cognito-idp admin-add-user-to-group \
-    --region "$REGION" --user-pool-id "$pool_id" --username "$login" --group-name "$role" >/dev/null
-  printf '%-18s %-18s %s\n' "$login" "$role" "$password"
+    --region "$REGION" --user-pool-id "$pool_id" --username "$email" --group-name "$role" >/dev/null
+  printf '%-28s %-18s %s\n' "$email" "$role" "$password"
 done
 
 echo

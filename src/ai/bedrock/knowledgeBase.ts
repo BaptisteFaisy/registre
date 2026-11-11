@@ -217,7 +217,11 @@ async function retrieve(client: BedrockAgentRuntimeClient, request: RetrieveRequ
         knowledgeBaseId: request.knowledgeBaseId,
         retrievalQuery: { text: request.query.slice(0, 4000) },
         retrievalConfiguration: {
-          vectorSearchConfiguration: {
+          // A MANAGED knowledge base rejects `vectorSearchConfiguration`
+          // ("Incompatible configuration ... Use managedSearchConfiguration
+          // instead", seen on a real Retrieve in eu-central-1). The inner fields
+          // are identical, so only the wrapper name changes.
+          managedSearchConfiguration: {
             numberOfResults: request.limit,
             ...(filter ? { filter } : {})
           }

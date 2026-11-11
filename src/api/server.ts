@@ -20,6 +20,7 @@ import { defaultPipeline } from './pipeline.ts';
 import type { PipelineApi } from './pipeline.ts';
 import { ROUTES, describeRoutes } from './routes/index.ts';
 import { resolveServices } from './services.ts';
+import { isGatewayHeader } from './cognito.ts';
 
 /** Default port of the local server. */
 export const DEFAULT_PORT = 8787;
@@ -53,7 +54,11 @@ function headersOf(request: IncomingMessage): Record<string, string> {
   const headers: Record<string, string> = {};
   for (const [name, value] of Object.entries(request.headers)) {
     if (value === undefined) continue;
-    headers[name.toLowerCase()] = Array.isArray(value) ? value.join(', ') : value;
+    const key = name.toLowerCase();
+    // The local server has no gateway in front of it: an identity header coming
+    // from a client would be an impersonation, so it is dropped.
+    if (isGatewayHeader(key)) continue;
+    headers[key] = Array.isArray(value) ? value.join(', ') : value;
   }
   return headers;
 }

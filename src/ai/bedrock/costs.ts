@@ -33,6 +33,13 @@ export interface TokenPrice {
  * `default` covers any model id that is not listed (conservative estimate).
  */
 export const MODEL_PRICES: Readonly<Record<string, TokenPrice>> = {
+  // Real identifiers are inference profiles such as
+  // `eu.anthropic.claude-haiku-4-5-20251001-v1:0`, hence the `claude-*` keys;
+  // the legacy `anthropic.*` keys are kept for the bare model ids.
+  'claude-haiku': { inputPer1k: 0.0008, outputPer1k: 0.004 },
+  'claude-sonnet': { inputPer1k: 0.003, outputPer1k: 0.015 },
+  'claude-opus': { inputPer1k: 0.015, outputPer1k: 0.075 },
+  'nova-micro': { inputPer1k: 0.000035, outputPer1k: 0.00014 },
   'anthropic.haiku': { inputPer1k: 0.0008, outputPer1k: 0.004 },
   'anthropic.sonnet': { inputPer1k: 0.003, outputPer1k: 0.015 },
   'anthropic.opus': { inputPer1k: 0.015, outputPer1k: 0.075 },

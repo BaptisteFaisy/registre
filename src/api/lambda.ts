@@ -14,6 +14,7 @@ import { DEFAULT_MAX_BODY_BYTES } from './router.ts';
 import type { Router } from './router.ts';
 import { createRouter } from './server.ts';
 import { servicesSingleton } from './services.ts';
+import { claimsFromEvent, headersFromClaims, stripGatewayHeaders } from './cognito.ts';
 
 /** One record of an API Gateway HTTP API v2 event. */
 export interface LambdaHttpEvent {
@@ -26,7 +27,10 @@ export interface LambdaHttpEvent {
   cookies?: string[];
   body?: string | null;
   isBase64Encoded?: boolean;
-  requestContext?: { http?: { method?: string; path?: string; sourceIp?: string } };
+  requestContext?: {
+    http?: { method?: string; path?: string; sourceIp?: string };
+    authorizer?: { jwt?: { claims?: Record<string, unknown> } };
+  };
 }
 
 /** The slice of the Lambda context this handler uses. */
@@ -88,14 +92,21 @@ function bodyOf(event: LambdaHttpEvent): Uint8Array {
     : new TextEncoder().encode(event.body);
 }
 
-/** Adapts an API Gateway v2 event to the internal request. */
+/**
+ * Adapts an API Gateway v2 event to the internal request.
+ *
+ * Client-sent `x-registre-*` headers are dropped first, then the claims the
+ * gateway validated are re-injected: an identity can only come from Cognito.
+ */
 export function toApiRequestFromEvent(event: LambdaHttpEvent): ApiRequest {
   const method = (event.requestContext?.http?.method ?? 'GET').toUpperCase() as HttpMethod;
+  const claims = claimsFromEvent(event);
+  const headers = stripGatewayHeaders(headersOf(event));
   return {
     method: HTTP_METHODS.includes(method) ? method : 'GET',
     path: event.rawPath ?? event.requestContext?.http?.path ?? '/',
     query: queryOf(event),
-    headers: headersOf(event),
+    headers: claims === null ? headers : { ...headers, ...headersFromClaims(claims) },
     body: bodyOf(event)
   };
 }

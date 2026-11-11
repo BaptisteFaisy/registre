@@ -105,11 +105,12 @@ export class CollectorsStack extends cdk.Stack {
       timeout: Duration.minutes(15),
       description: spec.description,
       environment: {
+        REGISTRE_PROVIDER: 'bedrock',
         REGISTRE_REGION: config.region,
-        TABLE_NAME: props.table.tableName,
-        VAULT_BUCKET: props.vaultBucket.bucketName,
-        SOURCE_BUCKET: props.sourceBucketName,
-        DEFAULT_PERIODICITY: config.defaultPeriodicity
+        REGISTRE_TABLE: props.table.tableName,
+        REGISTRE_VAULT_BUCKET: props.vaultBucket.bucketName,
+        REGISTRE_SOURCE_BUCKET: props.sourceBucketName,
+        REGISTRE_RETENTION_MONTHS: String(config.retentionMonths)
       }
     });
     props.table.grantReadWriteData(fn);

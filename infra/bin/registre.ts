@@ -88,6 +88,7 @@ function buildProcessing(
     key: base.vault.key,
     stateMachine: pipeline.stateMachine,
     evidenceKnowledgeBaseId: base.bedrock.evidenceKnowledgeBaseId,
+    frameworksKnowledgeBaseId: base.bedrock.frameworksKnowledgeBaseId,
     guardrailId: base.bedrock.guardrailId,
     signingKey: base.vault.signingKey,
     description: 'HTTP API, Cognito, the endpoints of chapter 15 plus verification and sharing'
