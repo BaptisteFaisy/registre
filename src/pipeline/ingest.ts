@@ -15,6 +15,7 @@
 
 import type { Evidence } from '../domain/types.ts';
 import type { Services } from '../ports/index.ts';
+import { observeAttestation } from './drift.ts';
 import { unreadable } from '../support/errors.ts';
 import { evidenceReviewItem, needsReview } from './queue.ts';
 import { fingerprintStep, readStep, attachStep, sufficiencyStep, statesStep } from './steps.ts';
@@ -38,7 +39,9 @@ export async function ingestEvidence(
     kind: input.kind,
     ...(input.fileName === undefined ? {} : { fileName: input.fileName }),
     fileDate: input.fileDate ?? null,
-    suggestedControlId: input.suggestedControlId ?? null
+    suggestedControlId: input.suggestedControlId ?? null,
+    ...(input.provenance === undefined ? {} : { provenance: input.provenance }),
+    ...(input.attestedState === undefined ? {} : { attestedState: input.attestedState })
   };
   const fingerprint = await fingerprintStep(services, payload, actor);
   if (fingerprint.duplicate) return duplicateResult(services, fingerprint.duplicateOf!);
@@ -50,6 +53,19 @@ export async function ingestEvidence(
   const withAttachments = { ...staged, evidence, attachments: attached.attachments };
   const assessed = await sufficiencyStep(services, withAttachments);
   const states = await statesStep(services, withAttachments);
+  // A machine attestation is watched: a changed or failed state is reported the
+  // same day, not at the next audit (axis 3a).
+  if (input.provenance === 'MACHINE_ATTESTATION' && input.attestedState) {
+    for (const attachment of attached.attachments.filter((item) => item.supports)) {
+      await observeAttestation(services, {
+        controlId: attachment.controlId,
+        evidenceId: evidence.id,
+        attestedState: input.attestedState,
+        actor,
+        ...(input.refreshPolicy === undefined ? {} : { policy: input.refreshPolicy })
+      });
+    }
+  }
   const review = needsReview(evidence) ? await queueReview(services, evidence) : null;
   return {
     evidence,

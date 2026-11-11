@@ -7,6 +7,7 @@ import { Button } from '../../components/Form.tsx';
 import { formatBytes, formatDateTime } from '../../lib/format.ts';
 import { stateColor } from '../../lib/states.ts';
 import { downloadPackIndex } from '../../lib/download.ts';
+import { navigate } from '../../lib/router.ts';
 
 export function ArchiveCard({ pack }: { pack: Pack }) {
   return (
@@ -33,6 +34,9 @@ export function ArchiveCard({ pack }: { pack: Pack }) {
         />
         <div className="row" style={{ marginTop: 12 }}>
           <Button onClick={() => downloadPackIndex(pack)}>Download index</Button>
+          <Button variant="primary" onClick={() => navigate(`/verify/${pack.id}`)}>
+            Verify
+          </Button>
           <Button
             variant="ghost"
             onClick={() => window.open(pack.archive.uri, '_blank')}

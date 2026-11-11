@@ -23,7 +23,7 @@ import {
   MemoryNotifier
 } from './store/index.ts';
 import { createMemoryExtensions } from './store/extensionsMemory.ts';
-import { signerFromEnv } from './crypto/localSigner.ts';
+import { signerFromEnvAsync } from './crypto/localSigner.ts';
 import type { ExtensionStore, Signer } from './ports/index.ts';
 
 export interface BootstrapOptions {
@@ -65,7 +65,7 @@ export async function createServices(options: BootstrapOptions = {}): Promise<Bo
   const audit = new InMemoryAuditSink({ clock });
   const evidenceStore = new LocalEvidenceStore({ clock, root: options.vaultRoot });
   const notifier = new MemoryNotifier({ clock });
-  const signer = options.signer ?? signerFromEnv(env);
+  const signer = options.signer ?? (await signerFromEnvAsync(env));
   const extensions = options.extensions ?? createMemoryExtensions({ clock });
 
   const settings = await state.getSettings();

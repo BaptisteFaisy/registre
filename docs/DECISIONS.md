@@ -337,3 +337,157 @@ instead of sending an empty model name.
 cosmetic and would touch guarded files for no behavioural gain. The kill switch
 is `INFERHUB_AGENT_RESOLVE=0`. Without any key the agent skips cleanly and the
 pull request waits for a human rebase — it never merges on its own.
+
+---
+
+## ADR-16 — The pack signing key is separate from the encryption key, and does not rotate
+
+**Date.** 2026-11-11. **Status.** accepted.
+
+**Context.** A frozen audit pack must stay verifiable by a third party months
+after it was assembled (`docs/SECURITY.md` §5). The vault already has a
+customer-managed symmetric KMS key for encryption, with rotation enabled.
+
+**Decision.** A second, asymmetric KMS key signs pack manifests:
+`ECC_NIST_P256`, usage `SIGN_VERIFY`, `enableKeyRotation: false`, `RETAIN` on
+stack destroy (`infra/lib/vault-stack.ts`). `signManifest` (`src/pipeline/pack.ts`)
+signs the canonical manifest bytes through the `Signer` port (`src/ports/index.ts`);
+production uses `REGISTRE_SIGNER=kms` with `REGISTRE_SIGNING_KEY_ARN`
+(`infra/lib/api-stack.ts`, granting `kms:Sign` and `kms:GetPublicKey` only), the
+offline demo and the tests use a local Ed25519 key (`src/crypto/localSigner.ts`,
+`REGISTRE_SIGNING_KEY` / `REGISTRE_SIGNING_KEY_FILE`).
+
+**Consequences.** A `SIGN_VERIFY` key cannot encrypt or decrypt anything: its
+blast radius is signatures, and a policy change on the encryption key never
+touches verification. No rotation means a pack frozen today verifies under the
+same key id in five years — verifiability of a frozen artefact requires key
+stability, while confidentiality benefits from rotation; the two goals get two
+keys. A deployment without a key is honest rather than fake: `NullSigner`
+returns algorithm `NONE`, no signature is stored, and `signatureOk` is `null`;
+an ephemeral local key publishes a key id that says it cannot be verified after
+the process exits. Cost: one asymmetric KMS key more (§7 of
+`docs/OPERATIONS.md`).
+
+**Rejected.** (a) Reusing the symmetric vault key: one compromise or one policy
+change would break both confidentiality and authenticity, and a key that can
+decrypt the vault would sit in the signing path. (b) Automatic rotation: it
+would orphan the signatures of every pack frozen under the previous key — the
+exact artefacts an auditor re-checks later. (c) Signature-only-in-the-portal:
+an offline archive must be verifiable with `scripts/verify-pack.sh`, without our
+API.
+
+---
+
+## ADR-17 — Mappings are proposals, never decisions
+
+**Date.** 2026-11-11. **Status.** accepted.
+
+**Context.** An MSP passes several audits a year; the same evidence supports
+equivalent controls of different frameworks. Letting the tool carry an
+attachment across frameworks by itself would multiply the reach of one wrong
+equivalence — and the second framework's auditor never saw the first decision.
+
+**Decision.** A cross-framework mapping (`src/domain/mapping.ts`) is persisted
+`PROPOSED` with **two quotes**, one per requirement text, **both verified by
+code**; a human validates or rejects it (`decideMapping` in
+`src/pipeline/crossmap.ts`, journalled `MAPPING_DECIDED`). A validated mapping
+only **proposes**: `propagateAttachment` creates `PROPOSED` attachments on the
+mapped controls of the other framework — never `APPLIED` — reusing the same
+verified quote, and those proposals go through that framework's own validation
+queue. Candidate pairs are scored by the code-side `similarity()` of
+`src/support/normalize.ts`; no new model call is introduced.
+
+**Consequences.** The discipline of attachments (ADR-03, ADR-04) extends
+unchanged to equivalences: quote verified by code, human decides, doubt resolves
+downwards. Reuse stays measurable: `reuseMetric` reports evidence carried,
+attachments proposed and deposits avoided, computed by code from stored
+mappings and attachments. The demonstration target is a second, 12-control
+fictional framework written for this project (`eval/catalogue-iso.ts`), never a
+protected standard. Cost: a few human validations per quarter — the cheap side
+of the trade.
+
+**Rejected.** Auto-applying propagated attachments above a confidence threshold:
+an equivalence links two abstractions, is harder to spot-check than a quote in a
+document, and an error would propagate silently into every future audit of the
+second framework.
+
+---
+
+## ADR-18 — Machine attestations have their own cadence
+
+**Date.** 2026-11-11. **Status.** accepted.
+
+**Context.** Collectors can produce a dated statement about a real state every
+day (last night's backups, this month's access review). Judging such a statement
+by the control's annual periodicity would hide a broken backup for eleven
+months; reusing the control's periodicity for everything was the status quo.
+
+**Decision.** An evidence carries `provenance: 'HUMAN_DOCUMENT' |
+'MACHINE_ATTESTATION'` and, for attestations, an `attestedState`
+(`src/domain/types.ts`, `src/domain/verification.ts`). Freshness of an
+attestation uses the refresh **cadence**, not the control periodicity:
+`DEFAULT_REFRESH_POLICY` is 24 h plus 6 h of grace, and `cadencePeriodicity()`
+converts it to an ISO-8601 duration, exposed as the single helper
+`machinePeriodicityFor()` (`src/domain/freshness.ts`) that the state engine
+uses (`src/domain/states.ts`) — one freshness implementation, two
+periodicities. Successive attestations are compared by code:
+`STATE_CHANGED`, `MISSING_RUN` (nothing arrived within cadence plus grace,
+scanned by the drift watch — `missingRuns`, `src/pipeline/drift.ts`),
+`THRESHOLD_CROSSED` and `RECOVERED` drift events
+move the control within the day and ride the existing reminder to the owner, who
+acknowledges with author and date (`src/pipeline/drift.ts`, journalled
+`DRIFT_DETECTED` / `DRIFT_ACKNOWLEDGED`).
+
+**Consequences.** A silent collector becomes visible as a `MISSING_RUN` drift
+instead of freezing a control in a reassuring state; a state change is reflected
+the day it is observed, not at the next audit. Drift kinds and dates are computed
+by code (ENF-IA-04) and the deterministic `driftId` keeps one drift per control,
+kind and day. A missing human document gets a pre-filled **draft** built from the
+expected elements and the partner's own previous version — watermarked, never
+fingerprinted, never attached (`attachable: false` at type level,
+`src/domain/draft.ts`): the cadence of machines must not become a way for the
+tool to write the proof itself.
+
+**Rejected.** (a) One periodicity per control for every evidence: wrong by a
+factor of 365 for daily attestations. (b) A forked `evaluateControl` for machine
+evidence: two freshness engines would drift apart — the cadence is expressed in
+the same ISO-8601 vocabulary instead.
+
+---
+
+## ADR-19 — Measured quality overrides the configured threshold
+
+**Date.** 2026-11-11. **Status.** accepted.
+
+**Context.** The confidence threshold (ADR-04, default 0.85) assumes the model
+and the prompt stay what they were when it was chosen. Prompts change, providers
+version models, corpora drift. A fixed threshold fails silently: a degraded
+model keeps auto-applying until a human spots a wrong link in a pack.
+
+**Decision.** Every proposal is stamped with its prompt version
+(`PROMPT_VERSIONS` per family in `src/ai/versioning.ts`, persisted on
+`Attachment.promptVersion`). Every evaluation run — local scorer or Bedrock
+evaluation task — is recorded as `QualityRecord`s per subject
+`(kind, model, promptVersion)` by `recordEvaluation` (`src/pipeline/quality.ts`,
+journalled `QUALITY_RECORDED`, conversion in `tools/eval/lib/qualityRecords.ts`,
+runner `tools/eval/runAndRecord.ts` with a `--check` gate). The attachment
+pipeline reads `attachmentThreshold()`, which applies
+`effectiveConfidenceThreshold` (`src/domain/quality.ts`): the configured setting
+while the latest `ACCEPTED_WITHOUT_CORRECTION` measurement passes, **1.01 —
+unreachable — while it fails**, so nothing is auto-applied and everything goes
+to the human validation queue until a passing measurement restores the setting.
+
+**Consequences.** Degradation is automatic, noisy and safe: the queue grows, the
+quality report displays the threshold in force (`qualityReport.thresholdInEffect`)
+and the trend per subject shows which metric fell. Recovery is automatic too.
+The tool never claims an accuracy it cannot prove — the claim on screen is the
+measurement. The two zero-target metrics (`WRONG_HIGH_CONFIDENCE`,
+`INVENTED_ANSWERS`) keep their absolute meaning: any occurrence is a failure.
+Cost: evaluation runs must be repeated after every prompt or model change — the
+discipline `docs/EVALUATION.md` already required, now with teeth.
+
+**Rejected.** (a) A fixed threshold with periodic manual review: the review is
+the silent failure this removes. (b) Lowering or raising the configured setting
+by hand when quality moves: unauditable and reversible by accident; the override
+is computed, journalled and self-restoring.
+

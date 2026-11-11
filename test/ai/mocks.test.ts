@@ -12,6 +12,7 @@ import { MemoryControlRetriever, MemoryEvidenceRetriever } from '../../src/ai/mo
 import { MockGuardrail } from '../../src/ai/mock/mockGuardrail.ts';
 import { MockComposer } from '../../src/ai/mock/mockComposer.ts';
 import { ScriptedReasoner, heuristicProposals } from '../../src/ai/mock/scriptedReasoner.ts';
+import { ATTACHMENT_PROMPT_VERSION } from '../../src/ai/versioning.ts';
 import { isProposedAttachment } from '../../src/ai/schemas.ts';
 import { NO_EVIDENCE_ANSWER } from '../../src/domain/types.ts';
 import type { Passage, SufficiencyElement } from '../../src/domain/types.ts';
@@ -222,7 +223,11 @@ test('scripted proposals are returned as-is and conform to Annex C', async () =>
     evidence: { id: 'ev-1', fields: makeFields(), textPages: makePages(POLICY), accessLevel: 'INTERNAL' },
     candidates: [{ control: makeControl(), score: 0.9, matchedOn: 'title' }]
   });
-  assert.deepEqual(proposals, scripted);
+  // The reasoner returns the scripted answers, stamped with the prompt version.
+  assert.deepEqual(
+    proposals,
+    scripted.map((proposal) => ({ ...proposal, promptVersion: ATTACHMENT_PROMPT_VERSION }))
+  );
   for (const proposal of proposals) assert.equal(isProposedAttachment(proposal), true);
 });
 

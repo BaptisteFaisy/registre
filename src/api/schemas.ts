@@ -14,6 +14,7 @@ import { stringSchema } from './schemaPrimitives.ts';
 import { FRAMEWORK_SCHEMAS } from './schemasFrameworks.ts';
 import { EVIDENCE_SCHEMAS } from './schemasEvidence.ts';
 import { OUTPUT_SCHEMAS } from './schemasOutput.ts';
+import { EXTENSION_SCHEMAS } from './schemasExt.ts';
 
 /** Schemas shared by several operations: errors, health and settings. */
 const SHARED = {
@@ -132,7 +133,8 @@ export const COMPONENT_SCHEMAS: Record<string, unknown> = {
   ...SHARED,
   ...FRAMEWORK_SCHEMAS,
   ...EVIDENCE_SCHEMAS,
-  ...OUTPUT_SCHEMAS
+  ...OUTPUT_SCHEMAS,
+  ...EXTENSION_SCHEMAS
 };
 
 /** The single error body, reused by every operation. */

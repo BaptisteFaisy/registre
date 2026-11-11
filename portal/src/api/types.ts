@@ -301,6 +301,16 @@ export type AuditAction =
   | 'REMINDER_SENT'
   | 'QUESTION_ASKED'
   | 'PACK_ASSEMBLED'
+  | 'PACK_VERIFIED'
+  | 'SHARE_CREATED'
+  | 'SHARE_REVOKED'
+  | 'SHARE_USED'
+  | 'MAPPING_PROPOSED'
+  | 'MAPPING_DECIDED'
+  | 'DRIFT_DETECTED'
+  | 'DRIFT_ACKNOWLEDGED'
+  | 'DRAFT_GENERATED'
+  | 'QUALITY_RECORDED'
   | 'PACK_DOWNLOADED'
   | 'SETTINGS_UPDATED'
   | 'ACCESS_DENIED';
@@ -397,3 +407,6 @@ export interface EvidenceUploadInput {
   accessLevel?: AccessLevel;
   fileDate?: string | null;
 }
+
+/* Verification, sharing, mappings, drift, drafts and measured quality. */
+export * from './typesExt.ts';

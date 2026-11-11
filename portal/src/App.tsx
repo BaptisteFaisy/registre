@@ -15,6 +15,9 @@ import { EvidenceScreen } from './screens/Evidence.tsx';
 import { ValidationScreen } from './screens/Validation.tsx';
 import { AskScreen } from './screens/Ask.tsx';
 import { PacksScreen } from './screens/Packs.tsx';
+import { VerifyScreen } from './screens/Verify.tsx';
+import { MappingsScreen } from './screens/Mappings.tsx';
+import { QualityScreen } from './screens/Quality.tsx';
 import { RemindersScreen } from './screens/Reminders.tsx';
 import { AuditLogScreen } from './screens/AuditLog.tsx';
 import { SettingsScreen } from './screens/Settings.tsx';
@@ -35,6 +38,12 @@ export function capabilityOf(route: Route): Capability {
       return 'ask';
     case 'packs':
       return 'packs';
+    case 'verify':
+      return 'verify';
+    case 'mappings':
+      return 'mappings';
+    case 'quality':
+      return 'quality';
     case 'reminders':
       return 'reminders';
     case 'audit':
@@ -134,6 +143,12 @@ function Guarded({ route }: { route: Route }): ReactNode {
       return <AskScreen />;
     case 'packs':
       return <PacksScreen />;
+    case 'verify':
+      return <VerifyScreen packId={route.packId ?? null} />;
+    case 'mappings':
+      return <MappingsScreen />;
+    case 'quality':
+      return <QualityScreen />;
     case 'reminders':
       return <RemindersScreen />;
     case 'audit':

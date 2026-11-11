@@ -139,12 +139,43 @@ export class NullSigner implements Signer {
   }
 }
 
-/** Chooses the signer from the environment: `REGISTRE_SIGNER=local|kms|none`. */
-export function signerFromEnv(env: NodeJS.ProcessEnv = process.env): Signer {
+/**
+ * Chooses the signer from the environment: `REGISTRE_SIGNER=local|kms|none`.
+ *
+ * The KMS branch is loaded lazily so the offline demo never touches the SDK.
+ * `kms` without a key configured is a hard error, never a silent fallback: an
+ * operator who asked for KMS signing must not get an unverifiable local key.
+ */
+export async function signerFromEnvAsync(env: NodeJS.ProcessEnv = process.env): Promise<Signer> {
+  const wanted = signerKind(env);
+  if (wanted === 'kms') {
+    const { kmsSignerFromEnv } = await import('./kmsSigner.ts');
+    const signer = kmsSignerFromEnv(env);
+    if (signer === null) {
+      throw configError('REGISTRE_SIGNER=kms but no signing key is configured', {
+        expected: 'REGISTRE_SIGNING_KEY_ARN or REGISTRE_SIGNING_KEY_ID'
+      });
+    }
+    return signer;
+  }
+  return signerFromEnv(env);
+}
+
+/** The configured signer kind, validated. */
+export function signerKind(env: NodeJS.ProcessEnv = process.env): 'local' | 'kms' | 'none' {
   const wanted = (env.REGISTRE_SIGNER ?? 'local').trim().toLowerCase();
+  if (wanted === 'local' || wanted === 'kms' || wanted === 'none') return wanted;
+  throw configError(`REGISTRE_SIGNER must be "local", "kms" or "none", got "${wanted}"`, {
+    REGISTRE_SIGNER: wanted
+  });
+}
+
+/** Synchronous choice, for the offline paths (local or none only). */
+export function signerFromEnv(env: NodeJS.ProcessEnv = process.env): Signer {
+  const wanted = signerKind(env);
   if (wanted === 'none') return new NullSigner();
   if (wanted === 'local') return new LocalSigner(env);
-  throw configError(`REGISTRE_SIGNER must be "local", "kms" or "none", got "${wanted}"`, {
+  throw configError('REGISTRE_SIGNER=kms needs the asynchronous factory signerFromEnvAsync()', {
     REGISTRE_SIGNER: wanted
   });
 }

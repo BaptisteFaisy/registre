@@ -1,0 +1,126 @@
+/* Styles of the extension screens: verify & share, mappings, measured quality, drift panel and draft modal. */
+/* ------------------------------------- verify, share, mappings, quality, draft */
+
+.verdict-list {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 12px;
+}
+
+.verdict-row {
+  display: grid;
+  grid-template-columns: 190px 120px 1fr;
+  gap: 12px;
+  align-items: baseline;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.verdict-row:last-child {
+  border-bottom: none;
+}
+
+.root-hash {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 10px 0 14px;
+}
+
+.share-form {
+  align-items: flex-end;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.mapping-head {
+  margin-bottom: 10px;
+}
+
+.mapping-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.mapping-side {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  background: var(--bg-elev);
+}
+
+.mapping-side .quote {
+  margin: 6px 0 0;
+}
+
+.mapping-reason {
+  margin: 10px 0;
+}
+
+.draft-watermark {
+  border: 1px dashed var(--warn);
+  border-radius: var(--radius);
+  padding: 8px 12px;
+  color: var(--warn);
+  font-size: 12px;
+}
+
+.draft-sections {
+  margin-top: 12px;
+}
+
+.draft-section {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  margin-bottom: 8px;
+}
+
+.draft-section p {
+  margin: 6px 0 0;
+  color: var(--text-dim);
+}
+
+.draft-todo {
+  border-color: var(--warn);
+  background: rgba(210, 153, 34, 0.08);
+}
+
+.draft-flag {
+  margin-left: 8px;
+  color: var(--warn);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.trend-svg {
+  width: 100%;
+  height: 160px;
+}
+
+.trend-label {
+  fill: var(--text-faint);
+  font-size: 11px;
+}
+
+.trend-cell {
+  font-size: 16px;
+}
+
+.linkish {
+  background: none;
+  border: none;
+  color: var(--accent);
+  cursor: pointer;
+  padding: 0;
+  font-size: 12px;
+}
+
+@media (max-width: 900px) {
+  .mapping-grid,
+  .verdict-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

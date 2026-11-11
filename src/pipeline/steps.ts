@@ -12,6 +12,7 @@
  * what it produced. The payload is what travels from one task to the next.
  */
 
+import type { EvidenceProvenance } from '../domain/verification.ts';
 import type {
   Attachment,
   CollectorKind,
@@ -41,6 +42,9 @@ export interface PipelinePayload {
   fileName?: string;
   fileDate?: string | null;
   suggestedControlId?: string | null;
+  /** Machine attestation and the state it reports (axis 3a). */
+  provenance?: EvidenceProvenance;
+  attestedState?: string | null;
   /** Fingerprint, set by the fingerprint step — EF-COL-05. */
   sha256?: string;
   /** Id of the evidence, set by the fingerprint step. */
@@ -162,6 +166,10 @@ function assemble(
     contentType: payload.contentType,
     ingestedAt: services.clock.now(),
     reader: services.reader.id,
+    ...(payload.provenance === undefined ? {} : { provenance: payload.provenance }),
+    ...(payload.attestedState === undefined || payload.attestedState === null
+      ? {}
+      : { attestedState: payload.attestedState }),
     ...(read.cost === undefined ? {} : { cost: read.cost })
   };
 }

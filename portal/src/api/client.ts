@@ -11,17 +11,27 @@ import type {
   Answer,
   AuditEvent,
   Control,
+  ControlMapping,
   ControlWithRelations,
+  Draft,
+  DriftEvent,
   Evidence,
   EvidenceUploadInput,
   Framework,
   FrameworkImport,
+  MappingDecision,
+  MappingFilter,
   Pack,
+  QualityReport,
   ReadinessOverview,
   Reminder,
+  ReuseMetric,
   Settings,
+  ShareGrant,
+  ShareInput,
   ValidationDecision,
-  ValidationItem
+  ValidationItem,
+  VerificationResult
 } from './types.ts';
 import { buildEvidencePayload } from './evidencePayload.ts';
 
@@ -87,6 +97,30 @@ export interface RegistreApi {
   /* settings (extension of chapter 15, required by EF-ADM-01) */
   getSettings(): Promise<Settings>;
   updateSettings(patch: Partial<Settings>): Promise<Settings>;
+
+  /* axis 1 — verification and sharing (CONTRACTS-EXT §2) */
+  verifyPack(packId: string): Promise<VerificationResult>;
+  verifyByToken(token: string): Promise<VerificationResult>;
+  createShare(packId: string, input: ShareInput): Promise<ShareGrant>;
+  listShares(): Promise<ShareGrant[]>;
+  revokeShare(token: string): Promise<ShareGrant>;
+
+  /* axis 2 — cross-framework mappings (CONTRACTS-EXT §3) */
+  listMappings(filter?: MappingFilter): Promise<ControlMapping[]>;
+  proposeMappings(input: {
+    sourceFrameworkId: string;
+    targetFrameworkId: string;
+  }): Promise<ControlMapping[]>;
+  decideMapping(id: string, decision: MappingDecision, note?: string): Promise<ControlMapping>;
+  getReuse(frameworkId: string): Promise<ReuseMetric>;
+
+  /* axis 3 — drift and drafts (CONTRACTS-EXT §4) */
+  listDrifts(frameworkId?: string): Promise<DriftEvent[]>;
+  ackDrift(id: string): Promise<DriftEvent>;
+  generateDraft(controlId: string): Promise<Draft>;
+
+  /* bonus — measured quality (CONTRACTS-EXT §5) */
+  getQuality(): Promise<QualityReport>;
 }
 
 /** Injected by the session layer so every call carries the bearer token. */
@@ -298,5 +332,91 @@ export class HttpRegistreApi implements RegistreApi {
       method: 'PUT',
       body: JSON.stringify(patch)
     });
+  }
+
+  verifyPack(packId: string): Promise<VerificationResult> {
+    return this.http.request<VerificationResult>(
+      `/v1/packs/${encodeURIComponent(packId)}/verify`,
+      { method: 'POST' }
+    );
+  }
+
+  verifyByToken(token: string): Promise<VerificationResult> {
+    return this.http.request<VerificationResult>(
+      `/v1/shares/${encodeURIComponent(token)}/verify`,
+      { method: 'POST' }
+    );
+  }
+
+  createShare(packId: string, input: ShareInput): Promise<ShareGrant> {
+    return this.http.request<ShareGrant>('/v1/shares', {
+      method: 'POST',
+      body: JSON.stringify({ packId, ...input })
+    });
+  }
+
+  listShares(): Promise<ShareGrant[]> {
+    return this.http.request<ShareGrant[]>('/v1/shares');
+  }
+
+  revokeShare(token: string): Promise<ShareGrant> {
+    return this.http.request<ShareGrant>(
+      `/v1/shares/${encodeURIComponent(token)}/revoke`,
+      { method: 'POST' }
+    );
+  }
+
+  listMappings(filter?: MappingFilter): Promise<ControlMapping[]> {
+    const params = new URLSearchParams();
+    if (filter?.status) params.set('status', filter.status);
+    if (filter?.sourceFrameworkId) params.set('sourceFrameworkId', filter.sourceFrameworkId);
+    if (filter?.targetFrameworkId) params.set('targetFrameworkId', filter.targetFrameworkId);
+    const query = params.toString();
+    return this.http.request<ControlMapping[]>(`/v1/mappings${query ? `?${query}` : ''}`);
+  }
+
+  proposeMappings(input: {
+    sourceFrameworkId: string;
+    targetFrameworkId: string;
+  }): Promise<ControlMapping[]> {
+    return this.http.request<ControlMapping[]>('/v1/mappings/propose', {
+      method: 'POST',
+      body: JSON.stringify(input)
+    });
+  }
+
+  decideMapping(id: string, decision: MappingDecision, note?: string): Promise<ControlMapping> {
+    return this.http.request<ControlMapping>(
+      `/v1/mappings/${encodeURIComponent(id)}/decision`,
+      { method: 'POST', body: JSON.stringify({ decision, note }) }
+    );
+  }
+
+  getReuse(frameworkId: string): Promise<ReuseMetric> {
+    return this.http.request<ReuseMetric>(
+      `/v1/frameworks/${encodeURIComponent(frameworkId)}/reuse`
+    );
+  }
+
+  listDrifts(frameworkId?: string): Promise<DriftEvent[]> {
+    const query = frameworkId ? `?frameworkId=${encodeURIComponent(frameworkId)}` : '';
+    return this.http.request<DriftEvent[]>(`/v1/drifts${query}`);
+  }
+
+  ackDrift(id: string): Promise<DriftEvent> {
+    return this.http.request<DriftEvent>(
+      `/v1/drifts/${encodeURIComponent(id)}/acknowledge`,
+      { method: 'POST' }
+    );
+  }
+
+  generateDraft(controlId: string): Promise<Draft> {
+    return this.http.request<Draft>(`/v1/controls/${encodeURIComponent(controlId)}/draft`, {
+      method: 'POST'
+    });
+  }
+
+  getQuality(): Promise<QualityReport> {
+    return this.http.request<QualityReport>('/v1/quality');
   }
 }

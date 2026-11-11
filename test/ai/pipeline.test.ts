@@ -59,7 +59,8 @@ async function readSample() {
 /** Checks that one Annex C proposal is well formed and quotes the document. */
 function assertProposal(proposal: ProposedAttachment, text: string): void {
   assert.equal(isProposedAttachment(proposal), true);
-  assert.deepEqual(Object.keys(proposal).sort(), [...ANNEX_C_KEYS].sort());
+  // The reasoner stamps the prompt version on top of the Annex C keys.
+  assert.deepEqual(Object.keys(proposal).sort(), [...ANNEX_C_KEYS, 'promptVersion'].sort());
   assert.ok(proposal.confidence >= 0 && proposal.confidence <= 1);
   if (proposal.supports) assert.ok(containsNormalized(text, proposal.quote), 'the quote exists in the document');
 }

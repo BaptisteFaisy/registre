@@ -1,8 +1,10 @@
 # Evaluation
 
-Quality is measured, not asserted. Four datasets, four targets, one local scorer
-that fails CI when a target is missed, and two Bedrock evaluation tasks that
-replay the two most fragile measures on every prompt or model change.
+Quality is measured, not asserted. Five datasets, one local scorer that fails CI
+when a target is missed, two Bedrock evaluation tasks that replay the two most
+fragile measures on every prompt or model change — and, since the quality bonus,
+a **recording loop**: every measurement is stored per prompt version, shown as a
+trend, and a failing metric automatically stops auto-application (§8).
 
 ## 1. The four measures
 
@@ -87,7 +89,36 @@ receive the refusal sentence; any answer naming a document is a failure, even a
 plausible one. The threshold for "the answer is anchored" is the guardrail's
 grounding filter plus the code-side citation check — both must pass.
 
-## 6. Bedrock evaluation tasks
+## 6. The fifth set — cross-framework mappings
+
+The mapping axis brings a fifth evaluated artefact: a **second, fictional
+framework**, `demo-iso` — 12 controls in 4 domains, written for this project,
+never ISO normative text (`eval/catalogue-iso.ts` and `eval/catalogue-iso/**`,
+exporting `ISO_CONTROLS`, `ISO_FRAMEWORK` and `toIsoFrameworkImport()`; the same
+licensing rule as `demo-msp`, ENF-CONF-03).
+
+What is checked, by tests rather than by a scorer (`test/mapping/**`, contract
+in `docs/CONTRACTS-EXT.md` §3):
+
+- **Catalogue invariants** — 12 controls, 4 domains, unique ids, and every
+  `equivalents` entry names an existing `demo-msp` control.
+- **Quote discipline** — a proposed mapping whose quotes are not found in the
+  two requirement texts is refused: equivalences are scored by the code-side
+  `similarity()`, and **both** quotes are verified by code before the mapping is
+  persisted `PROPOSED` (`src/pipeline/crossmap.ts`).
+- **Propagation stays a proposal** — a validated mapping propagates an applied
+  attachment as `PROPOSED` only, never `APPLIED`; a rejected mapping propagates
+  nothing.
+- **Reuse arithmetic** — `reuseMetric` is verified on a hand-built store:
+  evidence carried, attachments proposed, deposits avoided, reuse factor
+  (`attachmentCount / evidenceCount`, two decimals; `src/domain/mapping.ts`).
+
+There is no acceptance-rate target for mappings, and that is deliberate: a
+mapping is never applied by the tool, so the measured quantity is the *queue of
+proposals a human validates*, not an accuracy the system could degrade on its
+own (ADR-17).
+
+## 7. Bedrock evaluation tasks
 
 Two tasks, prepared by `tools/eval/bedrockEval.ts`, which writes every payload to
 `eval/bedrock/` so it can be reviewed and versioned. It performs no network call
@@ -99,7 +130,7 @@ node tools/eval/bedrockEval.ts --model <model-id> --kb-id <knowledge-base-id>
 node tools/eval/bedrockEval.ts --submit            # create the jobs (needs AWS credentials)
 ```
 
-### 6.1 Model-as-judge — attachments
+### 7.1 Model-as-judge — attachments
 
 | Item | Value |
 |---|---|
@@ -114,7 +145,7 @@ The reference responses are generated from the catalogue, so the judge compares
 against the same truth the local scorer uses. A prompt change is accepted only
 if both metrics hold.
 
-### 6.2 Knowledge-base evaluation — questions
+### 7.2 Knowledge-base evaluation — questions
 
 | Item | Value |
 |---|---|
@@ -129,24 +160,76 @@ it scores whether the answer is supported by the retrieved passages. The five
 trap questions must score as refusals; a trap answered with a citation is a
 regression even if the other four metrics look good.
 
-## 7. When each measure runs
+## 8. The continuous measurement loop
 
-| Trigger | Reading | Attachment | Sufficiency | Questions |
-|---|---|---|---|---|
-| Every commit (CI, offline) | local scorer on the fixture run | local scorer | local scorer | local scorer |
-| Prompt change | — | Bedrock judge task | — | Bedrock KB evaluation task |
-| Model change | local scorer + spot check | Bedrock judge task | local scorer | Bedrock KB evaluation task |
-| Before the submission | full run on the deployed stack | full run | full run | full run |
+Evaluation used to end at the scorer's exit code. The quality bonus closes the
+loop: measures are **recorded, attributable, trended, and enforced**.
+
+**Attributable.** Every prompt family carries a version constant
+(`PROMPT_VERSIONS` — reading, attachment, sufficiency, answer — in
+`src/ai/versioning.ts`), and both reasoners stamp it on every proposal; the
+stamp is persisted on `Attachment.promptVersion`. A metric is therefore always
+attached to a subject `(kind, model, promptVersion)`: a template change without
+a version bump would poison the trend, which is why the version constants are
+code, not prose.
+
+**Recorded.** `tools/eval/runAndRecord.ts` runs the existing scorer on the four
+datasets and converts its six metrics into `QualityRecord`s through
+`tools/eval/lib/qualityRecords.ts`, then persists them with `recordEvaluation`
+(`src/pipeline/quality.ts`, journalled `QUALITY_RECORDED`, stored in the
+extension store and written to `eval/results/quality-records.json`). Each record
+carries value, target, sample size, a deterministic dataset version
+(`ds-<hash>`) and the Bedrock job id when it came from an evaluation task:
+
+| `QualityMetric` | Comes from | Target |
+|---|---|---|
+| `FIELD_ACCURACY` | reading accuracy (§2) | ≥ 0.90 |
+| `ACCEPTED_WITHOUT_CORRECTION` | attachment acceptance (§3) | ≥ 0.85 |
+| `WRONG_HIGH_CONFIDENCE` | wrong links above threshold (§3) | must be 0 |
+| `GAPS_DETECTED` | detected / expected gaps (§4) | ≥ 1 |
+| `CITATION_ACCURACY` | correct citations (§5) | ≥ 0.90 |
+| `INVENTED_ANSWERS` | answers on the five traps (§5) | must be 0 |
+
+Verdicts are computed by code (`metricVerdict`): ratios pass at or above target,
+the two zero-target metrics pass only at exactly zero.
+
+**Trended.** `qualityTrend` and `qualityReport` (`src/pipeline/quality.ts`)
+order the records per subject and per metric — latest value, target, verdict,
+direction (`improving` / `stable` / `degrading`, where the zero-target metrics
+improve by falling) — and the portal quality screen displays them with the
+threshold in force.
+
+**Enforced.** The record that matters operationally is the latest
+`ACCEPTED_WITHOUT_CORRECTION`: `effectiveConfidenceThreshold`
+(`src/domain/quality.ts`) returns the configured threshold while it passes and
+**1.01 — unreachable — while it fails**, and `src/pipeline/attach.ts` applies
+that value instead of the setting. A failing measurement therefore stops every
+auto-application, routing all proposals to the human queue; a passing
+measurement restores the configured flow. The degradation and the recovery are
+both visible on the quality screen and both journalled. Rationale: ADR-19;
+runbook: `docs/OPERATIONS.md` §7.6; offline proof: `test/quality/**`
+(threshold, trend, versioning, runner).
+
+## 9. When each measure runs
+
+| Trigger | Reading | Attachment | Sufficiency | Questions | Mappings | Recorded quality |
+|---|---|---|---|---|---|---|
+| Every commit (CI, offline) | local scorer on the fixture run | local scorer | local scorer | local scorer | catalogue and propagation tests (`test/mapping/**`, `docs/CONTRACTS-EXT.md` §3) | runner covered offline by `test/quality/**` |
+| Prompt change | — | Bedrock judge task | — | Bedrock KB evaluation task | — | `runAndRecord.ts --check` |
+| Model change | local scorer + spot check | Bedrock judge task | local scorer | Bedrock KB evaluation task | — | `runAndRecord.ts --check` |
+| Before the submission | full run on the deployed stack | full run | full run | full run | full run | full run |
 
 The offline runs use `src/ai/mock/*` and the in-memory store, so they are
 deterministic and free. The Bedrock runs cost real tokens: they are the
 pre-submission gate, not the inner loop.
 
-## 8. What the numbers are not
+## 10. What the numbers are not
 
 They are not a claim that a control is satisfied. The evaluation measures
 whether the tool read a document correctly, attached it to the right control
 with a real quote, listed what was missing, and cited what it said. The judgment
 of whether the partner meets the requirement stays with the auditor — which is
 why no metric here is named after the c-word (ENF-IA-01), and why the pack hands
-over the known gaps along with the evidence.
+over the known gaps along with the evidence. Since the quality bonus, the
+numbers are also the tool's own governor: when they fall, the tool stops
+trusting itself and says so (§8).
