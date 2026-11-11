@@ -18,6 +18,8 @@ import json
 import os
 import re
 import sys
+import time
+import urllib.error
 import urllib.request
 
 API = os.environ.get("GITHUB_API_URL", "https://api.github.com")
@@ -58,14 +60,36 @@ FORBIDDEN_PATTERNS = [
 ]
 
 
+API_ATTEMPTS = 3
+API_BACKOFF_S = (5, 15)
+
+
 def api_get(path, token):
-    """GET sur l'API GitHub, retourne du JSON décodé."""
-    req = urllib.request.Request(API + path)
-    req.add_header("Authorization", "bearer " + token)
-    req.add_header("Accept", "application/vnd.github+json")
-    req.add_header("User-Agent", "couche0")
-    with urllib.request.urlopen(req, timeout=30) as resp:
-        return json.loads(resp.read().decode("utf-8"))
+    """GET sur l'API GitHub, retourne du JSON décodé.
+
+    Retente sur erreur réseau et sur 5xx : un dépassement de délai transitoire
+    de l'API ne doit pas mettre une PR en échec (constaté le 11/11 sur la PR
+    #15 : `urlopen error timed out`, code de sortie 2, PR bloquée pour rien).
+    Les bornes restent courtes pour tenir dans le budget CI de 5 minutes.
+    """
+    last = None
+    for attempt in range(API_ATTEMPTS):
+        req = urllib.request.Request(API + path)
+        req.add_header("Authorization", "bearer " + token)
+        req.add_header("Accept", "application/vnd.github+json")
+        req.add_header("User-Agent", "couche0")
+        try:
+            with urllib.request.urlopen(req, timeout=30) as resp:
+                return json.loads(resp.read().decode("utf-8"))
+        except urllib.error.HTTPError as exc:
+            last = exc
+            if exc.code < 500 and exc.code != 429:
+                raise
+        except (urllib.error.URLError, TimeoutError, OSError) as exc:
+            last = exc
+        if attempt + 1 < API_ATTEMPTS:
+            time.sleep(API_BACKOFF_S[attempt])
+    raise last
 
 
 def pr_context(repo, number, token):
