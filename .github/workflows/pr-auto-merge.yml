@@ -12,13 +12,13 @@
 # propre au lieu d'échouer. Poussée avec bail (lease) : jamais d'écrasement
 # d'un push d'auteur arrivé entre-temps. Forks exclus ; brouillons rebasés
 # et réconciliés mais jamais mergés.
-# Conflits (v5, 2026-10-28) : l'agent Fireworks tente de les résoudre
-# (.github/fireworks/conflict_agent.py, modèle MiniMax M3.1 Flash) : résolution
+# Conflits (v5, 2026-10-28) : l'agent de conflit tente de les résoudre
+# (.github/fireworks/conflict_agent.py, modèle InferHub combo/cheap) : résolution
 # conflit par conflit, fin du rebase, push avec bail, compte rendu sur la PR.
 # Sans le secret FIREWORKS_API_KEY, on saute comme avant et l'auteur rebase à
 # la main. Coupe-circuit : variable de dépôt FIREWORKS_AGENT_RESOLVE=0.
 # Conflits brouillons (v6, 2026-10-28) : le sweep traite aussi les brouillons
-# (rebase + agent Fireworks) sans jamais les merger, et les DIRTY comme les
+# (rebase + agent de conflit InferHub) sans jamais les merger, et les DIRTY comme les
 # BEHIND — la CI est la seule voie de résolution (plus de janitor local).
 # Auth push (v7, 2026-10-28) : PAT dans l'URL (x-access-token) au lieu du
 # helper gh, qui rend 403 « denied » sur les runners alors que l'API écrit.
@@ -75,7 +75,7 @@
 #      file, les met à jour contre `main` et rejoue les checks sur l'arbre
 #      fusionné du lot. Le balayeur ne merge plus et ne rebase plus ; il ne
 #      garde que ce qu'une file ne sait pas faire — conflit (`DIRTY`, rebase +
-#      agent Fireworks), panne d'infrastructure (`BLOCKED`, relance bornée), et
+#      agent de conflit), panne d'infrastructure (`BLOCKED`, relance bornée), et
 #      **branche non linéaire** (v16) : une PR qui a mergé `main` au lieu de
 #      le rebaser n'est pas `BEHIND`, la file la prend puis GitHub refuse son
 #      rebase-merge (`GITHUB_REBASE_MERGE_REFUSED`) ; on la linéarise avant.
@@ -202,6 +202,11 @@ on:
   # maintenant pris à la source, sans réveiller le balayeur pour rien.
   pull_request:
     types: [ready_for_review, edited]
+  # Réarmement manuel : une PR en conflit ne déclenche aucun événement
+  # `pull_request` (GitHub ne peut pas calculer le merge commit) et les cron
+  # GitHub arrivent en retard, voire pas du tout. Sans cette entrée, le seul
+  # réveil restant est un push sur `main`.
+  workflow_dispatch: {}
   push:
     branches: [main]
   schedule:
@@ -893,7 +898,7 @@ jobs:
             # un conflit. Posé dans `info/attributes` et pas seulement dans
             # `.gitattributes` : une branche ancienne ne porte pas encore le
             # fichier, et c'est justement elle qui conflicte. Sans ça, chaque
-            # mouvement de `main` relançait l'agent Fireworks sur CHANGELOG.md
+            # mouvement de `main` relançait l'agent de conflit sur CHANGELOG.md
             # → un push → une CI → un mouvement de `main` (livelock, 29/10).
             printf 'CHANGELOG.md merge=union\n' >> .git/info/attributes
             # Identité du propriétaire (règle du dépôt) : un commit poussé par
@@ -903,7 +908,7 @@ jobs:
             export GIT_EDITOR=true
             CLONE_FAIT=1
           }
-          rebaser() { # rebase la PR sur main ; l'agent Fireworks résout les conflits
+          rebaser() { # rebase la PR sur main ; l'agent InferHub résout les conflits
               if git fetch -q "$AUTH_URL" "pull/$PR/head:pr-$PR" 2>/dev/null \
                 && git checkout -q "pr-$PR" 2>/dev/null \
                 && git rebase -q origin/main >/dev/null 2>&1; then
@@ -931,7 +936,7 @@ jobs:
                 git rebase --abort >/dev/null 2>&1 || true
                 git checkout -q main 2>/dev/null || true
                 case "$rc" in
-                  0) echo "PR #$PR : conflit résolu par l'agent Fireworks" ;;
+                  0) echo "PR #$PR : conflit résolu par l'agent InferHub" ;;
                   *) echo "PR #$PR sautée (conflit, à l'auteur de rebaser)" ;;
                 esac
               fi
