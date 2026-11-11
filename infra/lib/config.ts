@@ -13,7 +13,7 @@
 export const EU_REGIONS = [
   'eu-west-1',
   'eu-west-2',
-  'eu-west-3',
+  'eu-central-1',
   'eu-central-1',
   'eu-central-2',
   'eu-north-1',
@@ -24,31 +24,38 @@ export const EU_REGIONS = [
 /**
  * EU regions where CloudFormation knows `AWS::Bedrock::DataAutomationProject`
  * (verified with `cdk synth` against the resource spec shipped in aws-cdk-lib
- * 2.276: eu-central-1 and eu-west-1 pass, eu-west-3 / eu-north-1 / eu-south-1
+ * 2.276: eu-central-1 and eu-west-1 pass, eu-central-1 / eu-north-1 / eu-south-1
  * raise F3006). Re-verify before a real deployment.
  */
 export const DATA_AUTOMATION_REGIONS = ['eu-central-1', 'eu-west-1'] as const;
 
 /** Fallback region (Paris). Overridden by `CDK_DEFAULT_REGION` / `REGISTRE_REGION`. */
-export const DEFAULT_REGION = 'eu-west-3';
+export const DEFAULT_REGION = 'eu-central-1';
 
 /** Placeholder account used when `cdk synth` runs without AWS credentials. */
 export const PLACEHOLDER_ACCOUNT = '111111111111';
 
-/** Logical step → handler file, relative to the repository root. */
+/**
+ * Logical step → handler file, relative to the repository root.
+ *
+ * Every entry but `api` points at an adapter of `src/lambda/`: one file, one
+ * exported `handler`, one step of the specification. `infra/lib/handlers.ts`
+ * checks that each file really exports a `handler` before bundling it, and
+ * falls back to a 501 stub only when it does not.
+ */
 export const HANDLERS = {
   api: 'src/api/lambda.ts',
-  ingest: 'src/pipeline/ingest.ts',
-  read: 'src/pipeline/read.ts',
-  candidates: 'src/pipeline/candidates.ts',
-  attach: 'src/pipeline/attach.ts',
-  sufficiency: 'src/pipeline/sufficiency.ts',
-  states: 'src/pipeline/states.ts',
-  index: 'src/pipeline/index.ts',
-  reminders: 'src/pipeline/reminders.ts',
-  collectS3: 'src/collectors/s3.ts',
-  collectItsm: 'src/collectors/itsm.ts',
-  collectAwsReport: 'src/collectors/awsReport.ts'
+  ingest: 'src/lambda/ingest.ts',
+  read: 'src/lambda/read.ts',
+  candidates: 'src/lambda/candidates.ts',
+  attach: 'src/lambda/attach.ts',
+  sufficiency: 'src/lambda/sufficiency.ts',
+  states: 'src/lambda/states.ts',
+  index: 'src/lambda/indexEvidence.ts',
+  reminders: 'src/lambda/reminders.ts',
+  collectS3: 'src/lambda/collectS3.ts',
+  collectItsm: 'src/lambda/collectItsm.ts',
+  collectAwsReport: 'src/lambda/collectAwsReport.ts'
 } as const;
 
 export type HandlerKey = keyof typeof HANDLERS;
@@ -94,7 +101,7 @@ export interface RegistreConfig {
  *
  * Precedence: `REGISTRE_REGION` (explicit, must be EU or synth fails) →
  * `CDK_DEFAULT_REGION` (the AWS profile's region, used only when it is inside
- * the EU) → `eu-west-3`. ENF-DATA-01 makes the EU constraint absolute, so a
+ * the EU) → `eu-central-1`. ENF-DATA-01 makes the EU constraint absolute, so a
  * profile pointing at `us-east-1` never silently produces an American stack:
  * it falls back to Paris with a loud warning.
  */

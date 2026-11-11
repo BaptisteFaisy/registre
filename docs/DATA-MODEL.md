@@ -194,7 +194,7 @@ an attachment, a sufficiency, a status, a trend point and an audit event.
 ## 4. Settings
 
 Stored as one item: `confidenceThreshold` (0.85), `reminderLeadDays` (30),
-`defaultPeriodicity` (`P1Y`), `region` (`eu-west-3` by default), `retentionMonths`
+`defaultPeriodicity` (`P1Y`), `region` (`eu-central-1` by default), `retentionMonths`
 (24), `readerModel`, `reasoningModel`, `answerModel`, `guardrailId`,
 `nightlyServiceTier` (`FLEX`). Every change is an audit event.
 

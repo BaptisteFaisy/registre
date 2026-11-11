@@ -160,6 +160,18 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           EVENT_PAYLOAD: ${{ toJSON(github.event) }}
         run: python3 .github/ci/changed_paths.py
+      # CDK bundles the Lambdas with esbuild, resolved from the repository root
+      # (the entry files live in ../src), so the root dependencies are needed
+      # here too - not only infra's own.
+      - name: Install root dependencies (esbuild for CDK bundling)
+        if: steps.paths.outputs.infra == 'yes'
+        shell: bash
+        run: |
+          if cmp -s package-lock.json node_modules/.package-lock.json; then
+            echo "node_modules is already in sync with package-lock.json"
+          else
+            npm ci --prefer-offline --no-audit --no-fund
+          fi
       - name: Infrastructure typecheck and synth
         if: steps.paths.outputs.infra == 'yes'
         shell: bash

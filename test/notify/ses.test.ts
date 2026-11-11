@@ -115,11 +115,11 @@ test('configuration: the sender and the configuration set come from the environm
   const options = sesOptionsFromEnv({
     [SES_FROM_ENV]: 'noreply@msp.demo',
     [SES_CONFIG_SET_ENV]: 'registre-reminders',
-    REGISTRE_REGION: 'eu-west-3'
+    REGISTRE_REGION: 'eu-central-1'
   });
   assert.deepEqual(options, {
     from: 'noreply@msp.demo',
-    region: 'eu-west-3',
+    region: 'eu-central-1',
     configurationSetName: 'registre-reminders'
   });
 });

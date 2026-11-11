@@ -21,7 +21,31 @@
     "noEmit": true,
     "types": [
       "node"
-    ]
+    ],
+    "baseUrl": ".",
+    "paths": {
+      "@aws-sdk/client-bedrock-runtime": [
+        "src/types/aws-sdk/bedrock-runtime.d.ts"
+      ],
+      "@aws-sdk/client-bedrock-agent-runtime": [
+        "src/types/aws-sdk/bedrock-agent-runtime.d.ts"
+      ],
+      "@aws-sdk/client-s3": [
+        "src/types/aws-sdk/s3.d.ts"
+      ],
+      "@aws-sdk/client-dynamodb": [
+        "src/types/aws-sdk/dynamodb.d.ts"
+      ],
+      "@aws-sdk/lib-dynamodb": [
+        "src/types/aws-sdk/dynamodb.d.ts"
+      ],
+      "@aws-sdk/client-sesv2": [
+        "src/types/aws-sdk/sesv2.d.ts"
+      ],
+      "@smithy/node-http-handler": [
+        "src/types/aws-sdk/smithy-node-http-handler.d.ts"
+      ]
+    }
   },
   "include": [
     "src/**/*.ts",
