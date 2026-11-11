@@ -1,5 +1,8 @@
 # Demonstration script and acceptance walkthrough
 
+> Recording the submission video? See `docs/VIDEO-KIT.md` (shot-by-shot script,
+> narration, seeded situations, compliance checklist). Form texts: `docs/SUBMISSION-TEXTS.md`.
+
 Two artefacts: a three-minute video script, and the acceptance run that proves
 the sixteen scenarios of chapter 22. Both use the same demonstration data, so
 what the video shows is what the tests check.
