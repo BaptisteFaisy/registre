@@ -23,11 +23,18 @@ export const FORBIDDEN_STEMS: readonly string[] = [
 ] as const;
 
 /** Regex matching forbidden stems with French/English word boundaries. */
-const FORBIDDEN_REGEX = /\b(non[- ]?conforme[s]?|conforme[s]?|conformit[eé][s]?|non[- ]?compliant|compliant|compliance)\b/i;
+/**
+ * Source of the forbidden pattern. Accented forms need `\p{L}` lookarounds
+ * instead of `\b` (JavaScript word boundaries are ASCII-only, so `conformité`
+ * would otherwise never match). Compiled fresh on every call: a shared global
+ * regex keeps `lastIndex` state and would skip every other match.
+ */
+const FORBIDDEN_SOURCE =
+  '(?<![\\p{L}])(non[- ]?conformit[eé]s?|non[- ]?conformes?|conformit[eé]s?|conformes?|non[- ]?compliant|compliants?|compliance)(?![\\p{L}])';
 
 /** True when text contains any form of "compliant" / "conforme". */
 export function containsForbiddenWord(text: string): boolean {
-  return FORBIDDEN_REGEX.test(text);
+  return new RegExp(FORBIDDEN_SOURCE, 'iu').test(text);
 }
 
 /** Finds every match with byte offset and surrounding context. */
@@ -39,7 +46,7 @@ export interface Violation {
 
 export function findViolations(text: string): Violation[] {
   const matches: Violation[] = [];
-  const regex = new RegExp(FORBIDDEN_REGEX, 'gi');
+  const regex = new RegExp(FORBIDDEN_SOURCE, 'giu');
   let match: RegExpExecArray | null;
   while ((match = regex.exec(text)) !== null) {
     const start = Math.max(0, match.index - 30);
