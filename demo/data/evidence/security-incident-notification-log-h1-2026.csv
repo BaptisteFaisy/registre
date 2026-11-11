@@ -1,0 +1,4 @@
+date,record_id,category,summary,owner,status
+2026-01-01,EV-018-01,EXPORT,Security Incident Notification Log  H1 2026,Security Officer,closed
+2026-04-01,EV-018-02,EXPORT,Log of security incidents that required customer notification  with the notification date and the channel used. Rows name the customer contacts who were called.,Security Officer,verified
+2026-06-30,EV-018-03,EXPORT,Northwind Logistics,operations,completed

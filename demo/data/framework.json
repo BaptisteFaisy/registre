@@ -1,0 +1,463 @@
+{
+  "framework": {
+    "id": "demo-msp",
+    "name": "Demonstration MSP framework",
+    "version": "1.0",
+    "confidentiality": "INTERNAL",
+    "source": "demonstration set written for the hackathon"
+  },
+  "controls": [
+    {
+      "id": "CONT-01",
+      "domain": "governance",
+      "title": "Information security policy reviewed annually",
+      "requirement": "The information security policy is reviewed, updated where needed and approved at least once a year.",
+      "expectedEvidence": [
+        "Policy title",
+        "Review date",
+        "Approver name",
+        "Version"
+      ],
+      "periodicity": "P1Y",
+      "owner": "quality.lead",
+      "mandatory": true
+    },
+    {
+      "id": "CONT-02",
+      "domain": "governance",
+      "title": "Roles and responsibilities defined and reviewed",
+      "requirement": "Roles and responsibilities for service delivery and security are documented, assigned and reviewed at least once a year.",
+      "expectedEvidence": [
+        "Document title",
+        "Role list",
+        "Review date",
+        "Approver name"
+      ],
+      "periodicity": "P1Y",
+      "owner": "quality.lead",
+      "mandatory": true
+    },
+    {
+      "id": "CONT-03",
+      "domain": "governance",
+      "title": "Management review of the service management system",
+      "requirement": "Management reviews service performance, risks and improvements at least every quarter and records its decisions.",
+      "expectedEvidence": [
+        "Meeting date",
+        "Attendees",
+        "Decisions recorded",
+        "Action owners"
+      ],
+      "periodicity": "P3M",
+      "owner": "managing.director",
+      "mandatory": true
+    },
+    {
+      "id": "CONT-04",
+      "domain": "governance",
+      "title": "Internal audit programme executed",
+      "requirement": "An internal audit programme covers the framework scope every year and records findings and their owners.",
+      "expectedEvidence": [
+        "Audit plan",
+        "Scope covered",
+        "Findings",
+        "Auditor name"
+      ],
+      "periodicity": "P1Y",
+      "owner": "quality.lead",
+      "mandatory": true
+    },
+    {
+      "id": "CONT-05",
+      "domain": "governance",
+      "title": "Supplier and subcontractor register maintained",
+      "requirement": "Suppliers and subcontractors are listed, assessed for risk and their contract is reviewed twice a year.",
+      "expectedEvidence": [
+        "Supplier name",
+        "Service provided",
+        "Contract review date",
+        "Risk rating"
+      ],
+      "periodicity": "P6M",
+      "owner": "procurement.lead",
+      "mandatory": false
+    },
+    {
+      "id": "CONT-06",
+      "domain": "incident_management",
+      "title": "Incident register maintained and reviewed",
+      "requirement": "Every incident is recorded in a register that is reviewed monthly, with its severity and its closure date.",
+      "expectedEvidence": [
+        "Reporting period",
+        "Incident count",
+        "Severity breakdown",
+        "Closure dates"
+      ],
+      "periodicity": "P1M",
+      "owner": "service.desk.manager",
+      "mandatory": true
+    },
+    {
+      "id": "CONT-07",
+      "domain": "incident_management",
+      "title": "Major incidents have a post-incident review",
+      "requirement": "Every major incident is reviewed after resolution: root cause, corrective actions and a named signatory.",
+      "expectedEvidence": [
+        "Incident reference",
+        "Root cause",
+        "Corrective actions",
+        "Review date",
+        "Signatory name"
+      ],
+      "periodicity": "P3M",
+      "owner": "service.desk.manager",
+      "mandatory": true
+    },
+    {
+      "id": "CONT-08",
+      "domain": "incident_management",
+      "title": "Incident response times measured against targets",
+      "requirement": "Response times are measured monthly against the committed targets and breaches are counted.",
+      "expectedEvidence": [
+        "Reporting period",
+        "Target response time",
+        "Measured response time",
+        "Breach count"
+      ],
+      "periodicity": "P1M",
+      "owner": "service.desk.manager",
+      "mandatory": false
+    },
+    {
+      "id": "CONT-09",
+      "domain": "incident_management",
+      "title": "Security incidents notified to the customer",
+      "requirement": "Security incidents affecting a customer are notified through the agreed channel within the agreed delay.",
+      "expectedEvidence": [
+        "Incident reference",
+        "Customer notified date",
+        "Notification channel",
+        "Notification owner"
+      ],
+      "periodicity": "P6M",
+      "owner": "security.officer",
+      "mandatory": true
+    },
+    {
+      "id": "CONT-10",
+      "domain": "incident_management",
+      "title": "Recurring incidents analysed as problems",
+      "requirement": "Recurring incidents are grouped into problem records with a root cause and a permanent fix.",
+      "expectedEvidence": [
+        "Problem record",
+        "Recurrence evidence",
+        "Root cause",
+        "Permanent fix"
+      ],
+      "periodicity": "P3M",
+      "owner": "service.desk.manager",
+      "mandatory": false
+    },
+    {
+      "id": "CONT-11",
+      "domain": "change_management",
+      "title": "Changes approved before implementation",
+      "requirement": "Every production change is approved by a named approver before it is implemented.",
+      "expectedEvidence": [
+        "Change reference",
+        "Approval date",
+        "Approver name",
+        "Implementation date"
+      ],
+      "periodicity": "P1M",
+      "owner": "change.manager",
+      "mandatory": true
+    },
+    {
+      "id": "CONT-12",
+      "domain": "change_management",
+      "title": "Emergency changes reviewed afterwards",
+      "requirement": "Emergency changes are justified when raised and reviewed by a second person after implementation.",
+      "expectedEvidence": [
+        "Emergency change reference",
+        "Justification",
+        "Post-implementation review date",
+        "Reviewer name"
+      ],
+      "periodicity": "P3M",
+      "owner": "change.manager",
+      "mandatory": true
+    },
+    {
+      "id": "CONT-13",
+      "domain": "change_management",
+      "title": "Change success measured",
+      "requirement": "The share of successful changes and the number of rollbacks are measured every quarter.",
+      "expectedEvidence": [
+        "Reporting period",
+        "Change count",
+        "Failed change count",
+        "Rollback count"
+      ],
+      "periodicity": "P3M",
+      "owner": "change.manager",
+      "mandatory": false
+    },
+    {
+      "id": "CONT-14",
+      "domain": "change_management",
+      "title": "Configuration baseline of managed environments",
+      "requirement": "A configuration baseline of the managed environments is approved and refreshed twice a year.",
+      "expectedEvidence": [
+        "Baseline date",
+        "Systems covered",
+        "Configuration items",
+        "Approver name"
+      ],
+      "periodicity": "P6M",
+      "owner": "platform.lead",
+      "mandatory": true
+    },
+    {
+      "id": "CONT-15",
+      "domain": "change_management",
+      "title": "Segregation of duties on production access",
+      "requirement": "Requesting, approving and granting production access are performed by different roles.",
+      "expectedEvidence": [
+        "Process description",
+        "Roles separated",
+        "Review date",
+        "Approver name"
+      ],
+      "periodicity": "P1Y",
+      "owner": "platform.lead",
+      "mandatory": true
+    },
+    {
+      "id": "CONT-16",
+      "domain": "continuity",
+      "title": "Backup restoration tested",
+      "requirement": "Backups of the managed environments are tested by a real restore at a defined interval.",
+      "expectedEvidence": [
+        "Test date",
+        "System or dataset restored",
+        "Measured recovery time",
+        "Test result",
+        "Signatory name"
+      ],
+      "periodicity": "P3M",
+      "owner": "operations.lead",
+      "mandatory": true
+    },
+    {
+      "id": "CONT-17",
+      "domain": "continuity",
+      "title": "Business continuity plan reviewed",
+      "requirement": "The business continuity plan is reviewed and approved once a year and covers every managed service.",
+      "expectedEvidence": [
+        "Plan title",
+        "Review date",
+        "Approver name",
+        "Services covered"
+      ],
+      "periodicity": "P1Y",
+      "owner": "operations.lead",
+      "mandatory": true
+    },
+    {
+      "id": "CONT-18",
+      "domain": "continuity",
+      "title": "Recovery objectives defined per service",
+      "requirement": "Every managed service has an approved recovery time objective and recovery point objective.",
+      "expectedEvidence": [
+        "Service name",
+        "Recovery time objective",
+        "Recovery point objective",
+        "Approval date"
+      ],
+      "periodicity": "P1Y",
+      "owner": "operations.lead",
+      "mandatory": true
+    },
+    {
+      "id": "CONT-19",
+      "domain": "continuity",
+      "title": "Backup jobs complete and are monitored",
+      "requirement": "Backup jobs are monitored monthly and failed jobs are counted and followed up.",
+      "expectedEvidence": [
+        "Reporting period",
+        "Backup job count",
+        "Failed job count",
+        "Monitoring evidence"
+      ],
+      "periodicity": "P1M",
+      "owner": "operations.lead",
+      "mandatory": true
+    },
+    {
+      "id": "CONT-20",
+      "domain": "continuity",
+      "title": "Continuity exercise run with a customer scenario",
+      "requirement": "A continuity exercise based on a customer scenario is run once a year and its lessons are recorded.",
+      "expectedEvidence": [
+        "Exercise date",
+        "Scenario described",
+        "Participants",
+        "Lessons recorded"
+      ],
+      "periodicity": "P1Y",
+      "owner": "operations.lead",
+      "mandatory": false
+    },
+    {
+      "id": "CONT-21",
+      "domain": "security",
+      "title": "Privileged access reviewed quarterly",
+      "requirement": "Privileged accounts are reviewed every quarter and unnecessary access is removed.",
+      "expectedEvidence": [
+        "Review date",
+        "Accounts reviewed",
+        "Removals made",
+        "Reviewer name"
+      ],
+      "periodicity": "P3M",
+      "owner": "security.officer",
+      "mandatory": true
+    },
+    {
+      "id": "CONT-22",
+      "domain": "security",
+      "title": "Security awareness training completed",
+      "requirement": "Every employee completes security awareness training once a year and completion is tracked.",
+      "expectedEvidence": [
+        "Training period",
+        "Participant count",
+        "Completion rate",
+        "Training owner"
+      ],
+      "periodicity": "P1Y",
+      "owner": "security.officer",
+      "mandatory": true
+    },
+    {
+      "id": "CONT-23",
+      "domain": "security",
+      "title": "Vulnerability scans run and findings tracked",
+      "requirement": "Managed systems are scanned monthly and findings carry severity and remediation deadlines.",
+      "expectedEvidence": [
+        "Scan date",
+        "Systems scanned",
+        "Findings by severity",
+        "Remediation deadlines"
+      ],
+      "periodicity": "P1M",
+      "owner": "security.officer",
+      "mandatory": true
+    },
+    {
+      "id": "CONT-24",
+      "domain": "security",
+      "title": "Data encrypted at rest and in transit",
+      "requirement": "Data at rest and in transit is encrypted with managed keys, and the control is described and approved.",
+      "expectedEvidence": [
+        "Control description",
+        "Services covered",
+        "Key management detail",
+        "Approver name"
+      ],
+      "periodicity": "P1Y",
+      "owner": "platform.lead",
+      "mandatory": true
+    },
+    {
+      "id": "CONT-25",
+      "domain": "security",
+      "title": "Personnel screened before privileged access",
+      "requirement": "Personnel granted privileged access are screened before the access is granted.",
+      "expectedEvidence": [
+        "Screening type",
+        "Role covered",
+        "Completion date",
+        "Record owner"
+      ],
+      "periodicity": "P1Y",
+      "owner": "hr.lead",
+      "mandatory": false
+    },
+    {
+      "id": "CONT-26",
+      "domain": "client_relationship",
+      "title": "Customer satisfaction measured",
+      "requirement": "Customer satisfaction is measured twice a year and the results lead to recorded actions.",
+      "expectedEvidence": [
+        "Survey period",
+        "Response count",
+        "Satisfaction score",
+        "Actions taken"
+      ],
+      "periodicity": "P6M",
+      "owner": "account.manager",
+      "mandatory": false
+    },
+    {
+      "id": "CONT-27",
+      "domain": "client_relationship",
+      "title": "Service reviews held with each customer",
+      "requirement": "Each customer has a service review every quarter with minutes and agreed actions.",
+      "expectedEvidence": [
+        "Customer name",
+        "Review date",
+        "Attendees",
+        "Agreed actions"
+      ],
+      "periodicity": "P3M",
+      "owner": "account.manager",
+      "mandatory": true
+    },
+    {
+      "id": "CONT-28",
+      "domain": "client_relationship",
+      "title": "Service level reports delivered",
+      "requirement": "A service level report is delivered to each customer every month with the measured levels.",
+      "expectedEvidence": [
+        "Reporting period",
+        "Customer name",
+        "Service levels reported",
+        "Delivery date"
+      ],
+      "periodicity": "P1M",
+      "owner": "account.manager",
+      "mandatory": true
+    },
+    {
+      "id": "CONT-29",
+      "domain": "client_relationship",
+      "title": "Customer complaints handled within the agreed delay",
+      "requirement": "Customer complaints are recorded and resolved within the agreed delay by a named owner.",
+      "expectedEvidence": [
+        "Complaint reference",
+        "Receipt date",
+        "Resolution date",
+        "Resolution owner"
+      ],
+      "periodicity": "P6M",
+      "owner": "account.manager",
+      "mandatory": true
+    },
+    {
+      "id": "CONT-30",
+      "domain": "client_relationship",
+      "title": "Customer data handling agreement on file",
+      "requirement": "Every customer has a signed data handling agreement that is reviewed once a year.",
+      "expectedEvidence": [
+        "Customer name",
+        "Agreement reference",
+        "Signature date",
+        "Review date"
+      ],
+      "periodicity": "P1Y",
+      "owner": "account.manager",
+      "mandatory": true
+    }
+  ]
+}

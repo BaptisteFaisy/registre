@@ -1,0 +1,26 @@
+---
+Title: Security Awareness Training Completion 2026
+Type: LIST
+Date: 2026-03-31
+Period: 2026-01-01..2026-03-31
+Version: 1.0
+Author: Security Officer
+Personal data: yes
+Summary: List of employees with their training completion date for the first quarter campaign. It carries names and employee numbers, so the access level is restricted. The file does not compute a completion rate.
+---
+
+# Security Awareness Training Completion 2026
+
+List of employees with their training completion date for the first quarter campaign. It carries names and employee numbers, so the access level is restricted. The file does not compute a completion rate.
+
+## Scope reference — CONT-22: Security awareness training completed
+Requirement addressed: Every employee completes security awareness training once a year and completion is tracked.
+
+- Training period: 2026-01-01 to 2026-03-31.
+- Participant count: Recorded in EV-045 (Security Awareness Training Completion 2026).
+- Training owner: Recorded in EV-045 (Security Awareness Training Completion 2026).
+
+## Restricted contact details
+Point of contact: Claire Martin (claire.martin@northwind-msp.example, +33 6 12 34 56 78)
+Payroll / HR ref: employee 2840107512345 42 — FR76 3000 6000 0112 3456 7890 189
+

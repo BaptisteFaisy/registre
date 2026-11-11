@@ -1,0 +1,22 @@
+---
+Title: Change Success Report, Q2 2026
+Type: REPORT
+Date: 2026-07-10
+Period: 2026-04-01..2026-06-30
+Version: 1.0
+Author: Change Manager
+Personal data: no
+Summary: Quarterly report of change volume and failed changes. Rollbacks are mentioned in the narrative but not counted in the tables.
+---
+
+# Change Success Report, Q2 2026
+
+Quarterly report of change volume and failed changes. Rollbacks are mentioned in the narrative but not counted in the tables.
+
+## Scope reference — CONT-13: Change success measured
+Requirement addressed: The share of successful changes and the number of rollbacks are measured every quarter.
+
+- Reporting period: 2026-04-01 to 2026-06-30.
+- Change count: Recorded in EV-025 (Change Success Report, Q2 2026).
+- Failed change count: Recorded in EV-025 (Change Success Report, Q2 2026).
+

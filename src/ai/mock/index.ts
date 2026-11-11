@@ -29,6 +29,12 @@ export interface MockAiOptions {
   evidences?: readonly Evidence[];
   /** Scripted model answers; the heuristic runs when a key is absent. */
   script?: ReasonerScript;
+  /**
+   * Relevance floor of the offline evidence search (EF-QR-02). Raising it makes
+   * a question no document answers return no passage, so the pipeline refuses
+   * instead of composing a weakly grounded answer.
+   */
+  evidenceMinScore?: number;
 }
 
 /**
@@ -41,7 +47,7 @@ export function createMockAi(options: MockAiOptions = {}): AiServices {
     provider: 'mock',
     reader: createScriptedReader({ meter: costs }),
     controlRetriever: createControlRetriever(options.controls ?? []),
-    evidenceRetriever: createEvidenceRetriever(options.evidences ?? []),
+    evidenceRetriever: createEvidenceRetriever(options.evidences ?? [], options.evidenceMinScore),
     reasoner: createScriptedReasoner(options.script ?? {}),
     composer: createMockComposer(),
     guardrail: createMockGuardrail(),

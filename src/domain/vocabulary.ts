@@ -13,14 +13,24 @@ import { badRequest } from '../support/errors.ts';
 /** Forbidden words when speaking about a control or a sufficiency verdict. */
 export const FORBIDDEN_STEMS: readonly string[] = [
   'conforme',
-  'conformité',
+  'conformes',
   'non-conforme',
   'non conforme',
   'compliant',
-  'compliance',
+  'compliants',
   'non-compliant',
-  'non compliant'
+  'non compliant',
+  'in compliance',
+  'en conformité',
+  'non-conformité'
 ] as const;
+
+/**
+ * The nouns "compliance" and "conformité" stay allowed: they name the discipline
+ * (a compliance officer, a compliance calendar), they never qualify a control.
+ * What ENF-IA-01 forbids is the judgement - the adjective applied to a control.
+ */
+export const ALLOWED_NOUNS: readonly string[] = ['compliance', 'conformité'] as const;
 
 /** Regex matching forbidden stems with French/English word boundaries. */
 /**
@@ -30,7 +40,7 @@ export const FORBIDDEN_STEMS: readonly string[] = [
  * regex keeps `lastIndex` state and would skip every other match.
  */
 const FORBIDDEN_SOURCE =
-  '(?<![\\p{L}])(non[- ]?conformit[eé]s?|non[- ]?conformes?|conformit[eé]s?|conformes?|non[- ]?compliant|compliants?|compliance)(?![\\p{L}])';
+  '(?<!\\p{L})(non[- ]?conformes?|conformes?|non[- ]?compliants?|compliants?|in compliance|en conformit[eé]|non[- ]?conformit[eé]s?)(?!\\p{L})';
 
 /** True when text contains any form of "compliant" / "conforme". */
 export function containsForbiddenWord(text: string): boolean {

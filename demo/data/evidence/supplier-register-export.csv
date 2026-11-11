@@ -1,0 +1,4 @@
+date,record_id,category,summary,owner,status
+2026-01-01,EV-006-01,EXPORT,Supplier and Subcontractor Register,Procurement Lead,closed
+2026-04-01,EV-006-02,EXPORT,Register of suppliers and subcontractors used for managed services  with the service provided and the last contract review date.,Procurement Lead,verified
+2026-06-30,EV-006-03,EXPORT,internal-estate,operations,completed

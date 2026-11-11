@@ -1,0 +1,34 @@
+---
+Title: Incident Management Policy
+Type: POLICY
+Date: 2026-02-02
+Version: 3.0
+Author: Service Desk Manager
+Approved by: Managing Director
+Approval date: 2026-02-09
+Personal data: no
+Summary: Policy setting incident severity levels, review duties and the notification path for major incidents.
+---
+
+# Incident Management Policy
+
+Policy setting incident severity levels, review duties and the notification path for major incidents.
+
+## Scope reference — CONT-06: Incident register maintained and reviewed
+Requirement addressed: Every incident is recorded in a register that is reviewed monthly, with its severity and its closure date.
+
+- Reporting period: 2026-02-02.
+- Incident count: Recorded in EV-022 (Incident Management Policy).
+- Severity breakdown: Recorded in EV-022 (Incident Management Policy).
+- Closure dates: 2026-02-02.
+
+## Scope reference — CONT-07: Major incidents have a post-incident review
+Requirement addressed: Every major incident is reviewed after resolution: root cause, corrective actions and a named signatory.
+
+- Incident reference: Recorded in EV-022 (Incident Management Policy).
+- Root cause: Recorded in EV-022 (Incident Management Policy).
+- Corrective actions: Recorded in EV-022 (Incident Management Policy).
+- Review date: 2026-02-02.
+- Signatory name: Managing Director.
+
+Signed: Managing Director (2026-02-09)

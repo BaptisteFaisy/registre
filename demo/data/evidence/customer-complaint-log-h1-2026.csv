@@ -1,0 +1,4 @@
+date,record_id,category,summary,owner,status
+2026-01-01,EV-056-01,EXPORT,Customer Complaint Log  H1 2026,Account Manager,closed
+2026-04-01,EV-056-02,EXPORT,Log of customer complaints with receipt date  resolution date and the owner of the resolution for each case.,Account Manager,verified
+2026-06-30,EV-056-03,EXPORT,Cobalt Retail,operations,completed

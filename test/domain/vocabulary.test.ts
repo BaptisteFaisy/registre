@@ -9,6 +9,7 @@ import {
   containsForbiddenWord,
   findViolations,
   FORBIDDEN_STEMS,
+  ALLOWED_NOUNS,
   RECOMMENDED_VOCABULARY
 } from '../../src/domain/vocabulary.ts';
 import { CONTROL_STATES } from '../../src/domain/types.ts';
@@ -20,9 +21,13 @@ const SUFFICIENCY: readonly SufficiencyClass[] = ['COMPLETE', 'PARTIAL', 'TO_VER
 
 test('English forbidden forms are detected', () => {
   assert.equal(containsForbiddenWord('This control is compliant.'), true);
-  assert.equal(containsForbiddenWord('Evidence of compliance'), true);
   assert.equal(containsForbiddenWord('a non-compliant environment'), true);
   assert.equal(containsForbiddenWord('a non compliant environment'), true);
+  // The judgement is forbidden, the discipline is not: "in compliance" qualifies
+  // the control, while the bare noun names a function or a calendar.
+  assert.equal(containsForbiddenWord('the control is in compliance'), true);
+  assert.equal(containsForbiddenWord('Evidence of compliance'), false);
+  assert.equal(containsForbiddenWord('Quality and Compliance Lead'), false);
 });
 
 test('French forbidden forms are detected, including non-conforme', () => {
@@ -33,9 +38,10 @@ test('French forbidden forms are detected, including non-conforme', () => {
 });
 
 test('the stem list declares the French and English forms of the ban', () => {
-  for (const stem of ['conforme', 'non-conforme', 'compliant', 'compliance', 'non-compliant']) {
+  for (const stem of ['conforme', 'conformes', 'non-conforme', 'compliant', 'compliants', 'non-compliant', 'in compliance', 'en conformité']) {
     assert.ok(FORBIDDEN_STEMS.includes(stem), `${stem} must be declared`);
   }
+  assert.deepEqual([...ALLOWED_NOUNS], ['compliance', 'conformité']);
 });
 
 test('neutral wording is not flagged', () => {

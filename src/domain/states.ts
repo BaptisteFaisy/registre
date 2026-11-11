@@ -150,12 +150,16 @@ function statusForBest(
   now: string
 ): ControlStatus {
   const sufficiencyClass = best.sufficiency?.class ?? 'TO_VERIFY';
+  const state = stateFromBest(best, candidates);
   const blocker = prudenceBlocker(best, control, sufficiencyClass, isTypeValidated);
-  if (blocker !== null) {
+  // Prudence (12.4) only ever prevents an upgrade to COVERED: an expired
+  // control stays EXPIRED (R5) and a control about to expire stays TO_RENEW,
+  // with the blocker recorded as a note so the reviewer still sees the doubt.
+  if (state === 'COVERED' && blocker !== null) {
     return makeStatus(control, 'TO_VERIFY', best.freshness, sufficiencyClass, best.evidence.id, best.expiresAt, pending, [blocker], now);
   }
-  const state = stateFromBest(best, candidates);
-  return makeStatus(control, state, best.freshness, sufficiencyClass, best.evidence.id, best.expiresAt, pending, notesFor(state), now);
+  const notes = blocker === null ? notesFor(state, sufficiencyClass) : [...notesFor(state, sufficiencyClass), blocker];
+  return makeStatus(control, state, best.freshness, sufficiencyClass, best.evidence.id, best.expiresAt, pending, notes, now);
 }
 
 /** Maps the best candidate to a state, doubt going to TO_VERIFY — EF-FRA-02. */
@@ -167,11 +171,16 @@ function stateFromBest(best: Candidate, all: readonly Candidate[]): ControlState
   return all.every((candidate) => candidate.freshness === 'EXPIRED') ? 'EXPIRED' : 'TO_VERIFY';
 }
 
-function notesFor(state: ControlState): string[] {
+/**
+ * Notes of a state. `sufficiency-not-complete` is only claimed when the
+ * sufficiency really is incomplete: an unreadable document with a complete
+ * assessment must not be reported as missing elements.
+ */
+function notesFor(state: ControlState, sufficiencyClass: SufficiencyClass): string[] {
   if (state === 'COVERED') return [];
   if (state === 'TO_RENEW') return [STATE_NOTES.expiresSoon];
   if (state === 'EXPIRED') return [STATE_NOTES.expired];
-  return [STATE_NOTES.sufficiencyIncomplete];
+  return sufficiencyClass === 'COMPLETE' ? [] : [STATE_NOTES.sufficiencyIncomplete];
 }
 
 function makeStatus(

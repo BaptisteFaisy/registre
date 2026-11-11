@@ -1,0 +1,22 @@
+---
+Title: Incident Response Time Report, September 2026
+Type: REPORT
+Date: 2026-10-03
+Period: 2026-09-01..2026-09-30
+Version: 1.0
+Author: Service Desk Manager
+Personal data: no
+Summary: Monthly report of measured first-response times per severity, with the number of breaches. The committed targets are not reproduced in the report.
+---
+
+# Incident Response Time Report, September 2026
+
+Monthly report of measured first-response times per severity, with the number of breaches. The committed targets are not reproduced in the report.
+
+## Scope reference — CONT-08: Incident response times measured against targets
+Requirement addressed: Response times are measured monthly against the committed targets and breaches are counted.
+
+- Reporting period: 2026-09-01 to 2026-09-30.
+- Measured response time: Recorded in EV-017 (Incident Response Time Report, September 2026).
+- Breach count: Recorded in EV-017 (Incident Response Time Report, September 2026).
+

@@ -1,0 +1,24 @@
+---
+Title: Continuity Test Report 2026
+Type: REPORT
+Date: 2026-09-12
+Version: 1.0
+Author: Operations Lead
+Approved by: Managing Director
+Approval date: 2026-09-16
+Personal data: no
+Summary: Report of the September continuity test on the customer portal. The scenario and the participants are described; the lessons learned section is empty. The test covers failover, not the restore of a backup.
+---
+
+# Continuity Test Report 2026
+
+Report of the September continuity test on the customer portal. The scenario and the participants are described; the lessons learned section is empty. The test covers failover, not the restore of a backup.
+
+## Scope reference — CONT-20: Continuity exercise run with a customer scenario
+Requirement addressed: A continuity exercise based on a customer scenario is run once a year and its lessons are recorded.
+
+- Exercise date: 2026-09-12.
+- Scenario described: Recorded in EV-041 (Continuity Test Report 2026).
+- Participants: Recorded in EV-041 (Continuity Test Report 2026).
+
+Signed: Managing Director (2026-09-16)

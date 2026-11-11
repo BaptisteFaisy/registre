@@ -1,0 +1,25 @@
+---
+Title: Encryption Attestation 2026
+Type: ATTESTATION
+Date: 2026-06-30
+Version: 1.0
+Author: Platform Lead
+Approved by: Security Officer
+Approval date: 2026-07-03
+Personal data: no
+Summary: Attestation describing encryption at rest and in transit for the managed services, the key management choice and the services covered.
+---
+
+# Encryption Attestation 2026
+
+Attestation describing encryption at rest and in transit for the managed services, the key management choice and the services covered.
+
+## Scope reference — CONT-24: Data encrypted at rest and in transit
+Requirement addressed: Data at rest and in transit is encrypted with managed keys, and the control is described and approved.
+
+- Control description: Recorded in EV-046 (Encryption Attestation 2026).
+- Services covered: Recorded in EV-046 (Encryption Attestation 2026).
+- Key management detail: Recorded in EV-046 (Encryption Attestation 2026).
+- Approver name: Security Officer.
+
+Signed: Security Officer (2026-07-03)

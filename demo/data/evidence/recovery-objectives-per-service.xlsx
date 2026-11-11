@@ -1,0 +1,25 @@
+---
+Title: Recovery Objectives per Service
+Type: LIST
+Date: 2025-11-20
+Version: 1.0
+Author: Operations Lead
+Approved by: Managing Director
+Approval date: 2025-11-28
+Personal data: no
+Summary: Table of recovery time and recovery point objectives for each managed service, approved with the continuity plan revision.
+---
+
+# Recovery Objectives per Service
+
+Table of recovery time and recovery point objectives for each managed service, approved with the continuity plan revision.
+
+## Scope reference — CONT-18: Recovery objectives defined per service
+Requirement addressed: Every managed service has an approved recovery time objective and recovery point objective.
+
+- Service name: Recorded in EV-035 (Recovery Objectives per Service).
+- Recovery time objective: Recorded in EV-035 (Recovery Objectives per Service).
+- Recovery point objective: Recorded in EV-035 (Recovery Objectives per Service).
+- Approval date: 2025-11-20.
+
+Signed: Managing Director (2025-11-28)

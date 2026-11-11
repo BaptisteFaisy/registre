@@ -60,12 +60,25 @@ export class MemoryControlRetriever implements ControlRetriever {
 }
 
 /** `EvidenceRetriever` over an in-memory evidence catalogue (EF-QR-01/03). */
+/**
+ * Relevance floor of the offline evidence search.
+ *
+ * A managed knowledge base returns nothing when no chunk is close enough to the
+ * question; the token-similarity stand-in needs the same behaviour, otherwise a
+ * question no document answers would still return a weak passage and the answer
+ * would look grounded (EF-QR-02). Callers may raise it; the default keeps the
+ * permissive behaviour the unit tests rely on.
+ */
+export const DEFAULT_EVIDENCE_MIN_SCORE = MIN_MATCH_SCORE;
+
 export class MemoryEvidenceRetriever implements EvidenceRetriever {
   readonly id = 'mock-kb-evidence';
   private readonly evidences: readonly Evidence[];
+  private readonly minScore: number;
 
-  constructor(evidences: readonly Evidence[] = []) {
+  constructor(evidences: readonly Evidence[] = [], minScore: number = DEFAULT_EVIDENCE_MIN_SCORE) {
     this.evidences = evidences;
+    this.minScore = minScore;
   }
 
   async search(input: {
@@ -81,7 +94,7 @@ export class MemoryEvidenceRetriever implements EvidenceRetriever {
       if (!allowed.has(evidence.accessLevel)) continue;
       for (const page of evidence.textPages) {
         const score = round3(similarity(input.query, page.text));
-        if (score < MIN_MATCH_SCORE) continue;
+        if (score < this.minScore) continue;
         passages.push({
           evidenceId: evidence.id,
           title: evidence.fields.title,
@@ -107,6 +120,9 @@ export function createControlRetriever(controls: readonly Control[] = []): Contr
 }
 
 /** Factory used by `createMockAi` (EF-QR-01, EF-QR-03). */
-export function createEvidenceRetriever(evidences: readonly Evidence[] = []): EvidenceRetriever {
-  return new MemoryEvidenceRetriever(evidences);
+export function createEvidenceRetriever(
+  evidences: readonly Evidence[] = [],
+  minScore: number = DEFAULT_EVIDENCE_MIN_SCORE
+): EvidenceRetriever {
+  return new MemoryEvidenceRetriever(evidences, minScore);
 }

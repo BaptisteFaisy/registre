@@ -1,0 +1,4 @@
+date,record_id,category,summary,owner,status
+2026-08-01,EV-028-01,EXPORT,Change Approvals Export  August 2026,Change Manager,closed
+2026-08-16,EV-028-02,EXPORT,Export of approved changes for August 2026 with the approval date and the approver. The implementation date is recorded in a separate tool.,Change Manager,verified
+2026-08-31,EV-028-03,EXPORT,internal-estate,operations,completed

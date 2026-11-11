@@ -1,0 +1,4 @@
+date,record_id,category,summary,owner,status
+2026-01-01,EV-031-01,EXPORT,Access Change Log  H1 2026,Platform Lead,closed
+2026-04-01,EV-031-02,EXPORT,Log of production access changes for the first half of 2026  with the requester and the approver of each change. The log does not state which duties are kept separate.,Platform Lead,verified
+2026-06-30,EV-031-03,EXPORT,internal-estate,operations,completed

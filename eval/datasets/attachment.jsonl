@@ -5,7 +5,7 @@
 {"evidenceId":"EV-005","fileName":"internal-audit-report-2026.pdf","expectedControlIds":["CONT-04"],"mustAttachNone":false,"notes":"Supports 1 control(s) of the framework."}
 {"evidenceId":"EV-006","fileName":"supplier-register-export.csv","expectedControlIds":["CONT-05"],"mustAttachNone":false,"notes":"Supports 1 control(s) of the framework."}
 {"evidenceId":"EV-007","fileName":"change-management-procedure-v2.pdf","expectedControlIds":["CONT-11","CONT-15"],"mustAttachNone":false,"notes":"Supports 2 control(s) of the framework."}
-{"evidenceId":"EV-008","fileName":"board-attestation-internal-control.pdf","expectedControlIds":["CONT-01","CONT-04"],"mustAttachNone":false,"notes":"Supports 2 control(s) of the framework."}
+{"evidenceId":"EV-008","fileName":"board-attestation-internal-control.pdf","expectedControlIds":["CONT-04"],"mustAttachNone":false,"notes":"Supports 1 control(s) of the framework."}
 {"evidenceId":"EV-009","fileName":"management-review-minutes-2026-q2.docx","expectedControlIds":["CONT-03"],"mustAttachNone":false,"notes":"Supports 1 control(s) of the framework."}
 {"evidenceId":"EV-010","fileName":"risk-register-export-h1-2026.csv","expectedControlIds":["CONT-05","CONT-04"],"mustAttachNone":false,"notes":"Supports 2 control(s) of the framework."}
 {"evidenceId":"EV-011","fileName":"audit-calendar-screenshot.png","expectedControlIds":["CONT-04"],"mustAttachNone":false,"notes":"Supports 1 control(s) of the framework."}
@@ -48,7 +48,7 @@
 {"evidenceId":"EV-048","fileName":"privileged-account-list-sep-2026.csv","expectedControlIds":["CONT-21"],"mustAttachNone":false,"notes":"Supports 1 control(s) of the framework."}
 {"evidenceId":"EV-049","fileName":"vulnerability-scan-report-oct-2026.pdf","expectedControlIds":["CONT-23"],"mustAttachNone":false,"notes":"Supports 1 control(s) of the framework."}
 {"evidenceId":"EV-050","fileName":"personnel-screening-records-2026.xlsx","expectedControlIds":["CONT-25"],"mustAttachNone":false,"notes":"Supports 1 control(s) of the framework."}
-{"evidenceId":"EV-051","fileName":"security-committee-minutes-oct-2026.docx","expectedControlIds":["CONT-01","CONT-23"],"mustAttachNone":false,"notes":"Supports 2 control(s) of the framework."}
+{"evidenceId":"EV-051","fileName":"security-committee-minutes-oct-2026.docx","expectedControlIds":["CONT-23"],"mustAttachNone":false,"notes":"Supports 1 control(s) of the framework."}
 {"evidenceId":"EV-052","fileName":"encryption-standard-scanned.pdf","expectedControlIds":["CONT-24"],"mustAttachNone":false,"notes":"Supports 1 control(s) of the framework."}
 {"evidenceId":"EV-053","fileName":"customer-satisfaction-survey-h1-2026.pdf","expectedControlIds":["CONT-26"],"mustAttachNone":false,"notes":"Supports 1 control(s) of the framework."}
 {"evidenceId":"EV-054","fileName":"service-review-minutes-northwind-aug-2026.docx","expectedControlIds":["CONT-27"],"mustAttachNone":false,"notes":"Supports 1 control(s) of the framework."}
