@@ -14,7 +14,6 @@ export const EU_REGIONS = [
   'eu-west-1',
   'eu-west-2',
   'eu-central-1',
-  'eu-central-1',
   'eu-central-2',
   'eu-north-1',
   'eu-south-1',
@@ -24,8 +23,8 @@ export const EU_REGIONS = [
 /**
  * EU regions where CloudFormation knows `AWS::Bedrock::DataAutomationProject`
  * (verified with `cdk synth` against the resource spec shipped in aws-cdk-lib
- * 2.276: eu-central-1 and eu-west-1 pass, eu-central-1 / eu-north-1 / eu-south-1
- * raise F3006). Re-verify before a real deployment.
+ * 2.276: eu-central-1 and eu-west-1 pass, while eu-west-3 (Paris), eu-north-1
+ * and eu-south-1 raise F3006). Re-verify before a real deployment.
  */
 export const DATA_AUTOMATION_REGIONS = ['eu-central-1', 'eu-west-1'] as const;
 

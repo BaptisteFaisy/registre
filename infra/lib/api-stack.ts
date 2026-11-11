@@ -63,6 +63,8 @@ export interface ApiStackProps extends cdk.StackProps {
   readonly stateMachine: sfn.IStateMachine;
   readonly evidenceKnowledgeBaseId: string;
   readonly guardrailId: string;
+  /** Asymmetric key that signs audit-pack manifests. */
+  readonly signingKey: kms.IKey;
 }
 
 export class ApiStack extends cdk.Stack {
@@ -141,12 +143,17 @@ export class ApiStack extends cdk.Stack {
         CONFIDENCE_THRESHOLD: String(config.confidenceThreshold),
         ANSWER_MODEL: config.models.answer,
         REASONING_MODEL: config.models.reasoning,
-        USER_POOL_ID: this.userPool.userPoolId
+        USER_POOL_ID: this.userPool.userPoolId,
+        // Pack signing goes through KMS in production; the local Ed25519 signer
+        // is what the offline demo and the tests use.
+        REGISTRE_SIGNER: 'kms',
+        REGISTRE_SIGNING_KEY_ARN: props.signingKey.keyArn
       },
       policies: bedrockPolicyStatements(config)
     });
     props.table.grantReadWriteData(fn);
     props.key.grantDecrypt(fn);
+    props.signingKey.grant(fn, 'kms:Sign', 'kms:GetPublicKey');
     grantBucket(fn, props.vaultBucket.bucketArn, true);
     props.stateMachine.grantStartExecution(fn);
     return fn;

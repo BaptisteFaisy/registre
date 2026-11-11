@@ -40,6 +40,12 @@ export class VaultStack extends cdk.Stack {
   public readonly bucket: s3.Bucket;
   /** Customer-managed key shared by S3, DynamoDB and the Bedrock roles. */
   public readonly key: kms.Key;
+  /**
+   * Asymmetric key that signs audit-pack manifests, so a third party can check
+   * a frozen pack without trusting us (ENF-INT-01, axis 1). Sign/Verify only:
+   * it cannot encrypt anything, which keeps the blast radius small.
+   */
+  public readonly signingKey: kms.Key;
 
   public constructor(scope: Construct, id: string, props: VaultStackProps) {
     super(scope, id, props);
@@ -52,6 +58,18 @@ export class VaultStack extends cdk.Stack {
       pendingWindow: Duration.days(30),
       removalPolicy: cdk.RemovalPolicy.RETAIN
     });
+
+    this.signingKey = new kms.Key(this, 'PackSigningKey', {
+      alias: `alias/${resourceName(config, 'pack-signing')}`,
+      description: 'Registre audit-pack manifest signing (ECDSA P-256, sign and verify only)',
+      keySpec: kms.KeySpec.ECC_NIST_P256,
+      keyUsage: kms.KeyUsage.SIGN_VERIFY,
+      enableKeyRotation: false,
+      pendingWindow: Duration.days(30),
+      removalPolicy: cdk.RemovalPolicy.RETAIN
+    });
+    // Key rotation stays off on purpose: rotating a signing key would make the
+    // signatures of already-frozen packs unverifiable with the current key id.
 
     this.bucket = new s3.Bucket(this, 'EvidenceVault', {
       bucketName: bucketName(config, 'vault'),
