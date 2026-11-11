@@ -37,6 +37,42 @@ class EnvOrTest(unittest.TestCase):
                 conflict_agent.env_or("FIREWORKS_MODEL", "DEFAUT"), "M")
 
 
+class ProviderTest(unittest.TestCase):
+    """Fournisseur du modèle : InferHub d'abord, Fireworks en repli."""
+
+    def test_defaut_inferhub(self):
+        with mock.patch.dict(os.environ, {}, clear=True):
+            self.assertEqual(conflict_agent.provider_model(), "combo/cheap")
+            self.assertEqual(conflict_agent.provider_api_url(),
+                             "https://api.inferhub.dev/v1/chat/completions")
+            self.assertEqual(conflict_agent.provider_key(), "")
+
+    def test_inferhub_gagne_sur_fireworks(self):
+        with mock.patch.dict(os.environ, {
+                "INFERHUB_API_KEY": "ih", "FIREWORKS_API_KEY": "fw",
+                "INFERHUB_MODEL": "combo/cheap", "FIREWORKS_MODEL": "mm",
+                "INFERHUB_BASE_URL": "https://api.inferhub.dev/v1/chat/completions",
+                "FIREWORKS_BASE_URL": "https://api.fireworks.ai/x"}):
+            self.assertEqual(conflict_agent.provider_key(), "ih")
+            self.assertEqual(conflict_agent.provider_model(), "combo/cheap")
+            self.assertIn("inferhub.dev", conflict_agent.provider_api_url())
+
+    def test_repli_fireworks_si_inferhub_vide(self):
+        # GitHub injecte une variable absente comme "" : le repli doit tenir.
+        with mock.patch.dict(os.environ, {
+                "INFERHUB_API_KEY": "", "FIREWORKS_API_KEY": "fw",
+                "INFERHUB_MODEL": "", "FIREWORKS_MODEL": "mm",
+                "INFERHUB_BASE_URL": "", "FIREWORKS_BASE_URL": "https://api.fireworks.ai/x"}):
+            self.assertEqual(conflict_agent.provider_key(), "fw")
+            self.assertEqual(conflict_agent.provider_model(), "mm")
+            self.assertIn("fireworks.ai", conflict_agent.provider_api_url())
+
+    def test_coupe_circuit_inferhub(self):
+        with mock.patch.dict(os.environ, {"INFERHUB_AGENT_RESOLVE": "0"}):
+            with self.assertRaises(conflict_agent.Skip):
+                conflict_agent.preflight("O/R", 1, "sha", True, time.time())
+
+
 class PushUrlTest(unittest.TestCase):
     """URL push : PAT du CI, repli "origin" en local."""
 

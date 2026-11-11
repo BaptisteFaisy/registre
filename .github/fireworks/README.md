@@ -1,15 +1,22 @@
-# Agents Fireworks
+# Agents Hermes (InferHub)
 
 Deux agents, deux problèmes distincts, jamais une porte de merge : seule la CI
 verte fait merger. Tous deux sont lus sur `origin/main` par le sweep (la
 branche d'une PR peut être antérieure), et n'écrivent que du texte ou des puces
 vérifiées.
 
+**Fournisseur du modèle : InferHub** (`https://api.inferhub.dev/v1`, API
+compatible OpenAI `chat/completions`), modèle méta-routeur `combo/cheap`. Le
+dossier s'appelle encore `fireworks/` pour ne pas casser les chemins câblés
+dans `pr-auto-merge.yml` et `triage-rouge.yml` ; les variables `FIREWORKS_*`
+restent lues **en repli** seulement, si les `INFERHUB_*` correspondantes sont
+absentes ou vides.
+
 ## Agent de conflit (`conflict_agent.py`)
 
 Quand le sweep de `pr-auto-merge` échoue à rebaser une PR, il appelle
 `conflict_agent.py` dans son clone, rebase en cours. L'agent demande au modèle
-Fireworks la résolution de chaque fichier en conflit, termine le rebase, pousse
+InferHub la résolution de chaque fichier en conflit, termine le rebase, pousse
 sur la branche de la PR avec bail et rend compte en commentaire. La file reprend
 au passage suivant ; seule la CI verte fait merger.
 
@@ -39,10 +46,12 @@ Le script est lu sur `origin/main` (pas sur la branche de la PR, qui peut
 
 | Variable / secret | Défaut | Effet |
 |---|---|---|
-| secret `FIREWORKS_API_KEY` | — | sans lui, l'agent ne fait rien |
-| var `FIREWORKS_MODEL` | `accounts/fireworks/models/minimax-m3p1-flash` | modèle interrogé |
-| var `FIREWORKS_BASE_URL` | `https://api.fireworks.ai/inference/v1/chat/completions` | point d'API |
-| var `FIREWORKS_AGENT_RESOLVE` | `1` | `0` coupe l'agent sans toucher au code |
+| secret `INFERHUB_API_KEY` | — | sans lui, l'agent ne fait rien |
+| var `INFERHUB_MODEL` | `combo/cheap` | modèle interrogé (méta-routeur InferHub) |
+| var `INFERHUB_BASE_URL` | `https://api.inferhub.dev/v1/chat/completions` | point d'API |
+| var `INFERHUB_AGENT_RESOLVE` | `1` | `0` coupe l'agent sans toucher au code |
+| var `INFERHUB_AGENT_SCOPE` | `1` | `0` coupe l'agent de périmètre |
+| secret/var `FIREWORKS_*` | — | **repli** seulement, si l'`INFERHUB_*` équivalent est vide |
 
 ## Garde-fous
 
