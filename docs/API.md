@@ -161,7 +161,7 @@ Errors: `NOT_FOUND`, `FORBIDDEN`, `UPSTREAM`.
 { "filename": "restore-test-2026-Q4.pdf", "contentType": "application/pdf",
   "contentBase64": "JVBERi0xLjQK...", "fileDate": "2026-10-14", "controlId": "CONT-16" }
 ```
-**Raw document** — the bytes are the body, the document's own `Content-Type` is the request content type, the name travels in `?filename=` or in the `X-File-Name` header. Answers `201` with the bare `Evidence` when the content is new, `200` with the existing `Evidence` when the fingerprint is already known (the new location is then appended to it, R8).
+**Raw document** — the bytes are the body, the document's own `Content-Type` is the request content type, the name travels in `?filename=` or in the `X-File-Name` header (`?fileDate=` and `?controlId=` are the raw form's optional fields). Answers `201` with the bare `Evidence` when the content is new, `200` with the existing `Evidence` when the fingerprint is already known (the new location is then appended to it, R8). One extension field rides along: `duplicate`, `false` on 201 and `true` on 200. The portal also sends `sizeBytes` and `accessLevel` in the envelope; the API ignores both and derives them from the document.
 ```json
 { "id": "ev-033", "sha256": "9f2c4e7b1a...", "revision": 1,
   "fields": { "type": "REPORT", "title": "Restore test 2026-Q4", "documentDate": "2026-10-14", "…": "…" },
@@ -173,7 +173,7 @@ Errors: `NOT_FOUND`, `FORBIDDEN`, `UPSTREAM`.
 Errors: `UNREADABLE` (empty or unsupported file), `BAD_REQUEST` (no name, no content), `FORBIDDEN` (a control owner depositing for a control it does not own), `UPSTREAM`.
 
 ### 3.10 `GET /v1/evidence/{id}` — evidence detail
-All roles, subject to the clearance. Path parameter `id`. Answers the bare `Evidence`, with `textPages`: the excerpts, personal data masked, fully replaced by the restriction marker when the access level is above the caller's clearance (ENF-CONF-01/02, EF-QR-03).
+All roles, subject to the clearance. Path parameter `id`; optional `?include=text` widens each excerpt from 400 to 2000 characters. Answers the bare `Evidence`, with `textPages`: the excerpts, personal data masked, fully replaced by the restriction marker when the access level is above the caller's clearance (ENF-CONF-01/02, EF-QR-03). One extension field rides along: `excerptsMasked`, `true` when the clearance forced the mask.
 ```json
 { "id": "ev-045", "sha256": "5b81d0c3a...", "revision": 1,
   "fields": { "type": "MINUTES", "title": "Incident review 2026-09", "documentDate": "2026-09-18", "…": "…" },
@@ -239,7 +239,7 @@ Errors: `NOT_FOUND` (unknown control), `FORBIDDEN` (not the owner), `CONFLICT` (
 Errors: `BAD_REQUEST` (unknown status), `FORBIDDEN`.
 
 ### 3.15 `POST /v1/validations/{id}/decision` — decide an item
-`QL`, `AD`. Body `{ "decision": "ACCEPT" | "REJECT" | "CORRECT", "note": string }`; the note is mandatory for `CORRECT`. Answers the bare decided `ValidationItem`, with its author, its date and its reason (EF-VAL-02).
+`QL`, `AD`. Body `{ "decision": "ACCEPT" | "REJECT" | "CORRECT", "note": string }`; for `CORRECT` the note is mandatory — it is the reason of the correction — and `controlId` names the control the evidence really belongs to. Answers the bare decided `ValidationItem`, with its author, its date and its reason (EF-VAL-02).
 ```json
 { "id": "va-0007", "kind": "ATTACHMENT", "attachmentId": "at-0032", "evidenceId": "ev-034", "controlId": "CONT-16",
   "reason": "confidence 0.62 below threshold 0.85", "createdAt": "2026-11-11T09:31:04+01:00", "status": "DECIDED",
@@ -277,7 +277,7 @@ Errors: `BAD_REQUEST` (empty question), `FORBIDDEN`, `UPSTREAM`.
 Errors: `NOT_FOUND`, `BAD_REQUEST` (invalid `freezeAt`), `FORBIDDEN`, `UPSTREAM`.
 
 ### 3.18 `GET /v1/packs` — list packs
-`QL`, `IA`, `AD`. Optional query parameter `frameworkId`. Answers a bare `Pack[]`.
+`QL`, `IA`, `AD`. Optional query parameter `frameworkId`. Answers a bare `Pack[]`, each pack carrying its `downloadUrl` (§3.19).
 ```json
 [ { "id": "pk-0003", "frameworkId": "demo-msp", "frozenAt": "2026-11-11T09:30:00+01:00", "index": [], "knownGaps": [],
     "archive": { "uri": "s3://registre-vault/packs/pk-0003/pack.zip", "sha256": "3a7f9c2e...", "sizeBytes": 8412003 },
@@ -315,7 +315,7 @@ Errors: `NOT_FOUND`, `FORBIDDEN`, `UPSTREAM`.
 Errors: `BAD_REQUEST` (unknown status), `FORBIDDEN`.
 
 ### 3.22 `GET /v1/audit-log` — audit trail
-`QL`, `IA`, `AD`. Query parameters `limit` (page size) and `action` (one `AuditAction`). Answers a bare `AuditEvent[]`, newest first.
+`QL`, `IA`, `AD`. Query parameters `limit` (page size, 100 by default, 1000 at most), `offset`, `action` (one `AuditAction`), `objectId`, and `verify=chain` to run the chain verification. Answers a bare `AuditEvent[]`, newest first; the page metadata travels in the response headers — `x-audit-total`, `x-audit-limit`, `x-audit-offset`, plus `x-audit-chain` (`ok`, or `broken:<seq>`) when the chain was verified.
 ```json
 [ { "seq": 418, "id": "ae-0418", "at": "2026-11-11T09:31:02+01:00", "actor": "u-quality", "action": "ATTACHMENT_APPLIED",
     "objectType": "attachment", "objectId": "at-0031", "detail": { "controlId": "CONT-16", "confidence": 0.91 },
