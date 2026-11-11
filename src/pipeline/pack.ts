@@ -13,12 +13,15 @@
 import type {
   Control,
   ControlStatus,
+  Evidence,
   FrameworkId,
   KnownGap,
   Pack,
   PackId,
   PackIndexEntry
 } from '../domain/types.ts';
+import type { PackManifest, PackSignature, SignatureAlgorithm } from '../domain/verification.ts';
+import { buildManifest as buildPackManifest } from '../domain/manifest.ts';
 import type { Services } from '../ports/index.ts';
 import { notFound } from '../support/errors.ts';
 import { canonicalJson, sha256Bytes } from '../support/hash.ts';
@@ -37,8 +40,8 @@ interface PackDocument {
   knownGaps: KnownGap[];
 }
 
-/** Fingerprints of everything the pack carries — EF-DOS-02, chapter 16.3. */
-interface PackManifest {
+/** Fingerprints of everything the archive carries — EF-DOS-02, chapter 16.3. */
+interface ArchiveChecksums {
   packId: PackId;
   frameworkId: FrameworkId;
   frozenAt: string;
@@ -64,7 +67,8 @@ export async function assemblePack(services: Services, frameworkId: FrameworkId,
     index: await buildIndex(services, controls, statuses),
     knownGaps: detectKnownGaps(statuses)
   };
-  const written = await writeArchive(services, document);
+  const attested = await attest(services, document, framework.version, statuses);
+  const written = await writeArchive(services, document, attested.attestation);
   const pack: Pack = {
     id,
     frameworkId,
@@ -72,7 +76,9 @@ export async function assemblePack(services: Services, frameworkId: FrameworkId,
     index: document.index,
     knownGaps: document.knownGaps,
     archive: written.archive,
-    checksumsVerified: written.verified
+    checksumsVerified: written.verified,
+    manifest: attested.manifest,
+    signature: attested.signature
   };
   await services.state.putPack(pack);
   await record(services, actor, 'PACK_ASSEMBLED', 'pack', id, {
@@ -81,9 +87,77 @@ export async function assemblePack(services: Services, frameworkId: FrameworkId,
     knownGaps: document.knownGaps.length,
     evidence: countEvidence(document.index),
     archive: written.archive.uri,
-    checksumsVerified: written.verified
+    checksumsVerified: written.verified,
+    rootHash: attested.manifest.rootHash,
+    signed: attested.signature !== null,
+    signerKeyId: attested.signature?.keyId ?? null
   });
   return pack;
+}
+
+/** Manifest plus signature of one pack, ready to be written next to the archive. */
+async function attest(
+  services: Services,
+  document: PackDocument,
+  frameworkVersion: string,
+  statuses: readonly ControlStatus[]
+): Promise<{
+  manifest: PackManifest;
+  signature: PackSignature | null;
+  attestation: PackAttestation | null;
+}> {
+  const manifest = buildPackManifest({
+    packId: document.packId,
+    frameworkId: document.frameworkId,
+    frameworkVersion,
+    frozenAt: document.frozenAt,
+    index: document.index,
+    knownGaps: document.knownGaps,
+    statuses,
+    evidenceById: await collectEvidence(services, document.index)
+  });
+  const signature = await signManifest(services, manifest);
+  return {
+    manifest,
+    signature,
+    attestation: signature === null ? null : { manifest, signature }
+  };
+}
+
+/** What gets written next to the archive so a third party can verify it. */
+export interface PackAttestation {
+  manifest: PackManifest;
+  signature: PackSignature;
+}
+
+/** Signs the canonical manifest; `null` when no signing key is configured. */
+export async function signManifest(services: Services, manifest: PackManifest): Promise<PackSignature | null> {
+  const payload = new TextEncoder().encode(canonicalJson(manifest));
+  const signed = await services.signer.sign({ payload, purpose: `pack:${manifest.packId}` });
+  if (signed.algorithm === 'NONE' || signed.signature === '') return null;
+  return {
+    algorithm: signed.algorithm as SignatureAlgorithm,
+    keyId: signed.keyId,
+    signedAt: signed.signedAt,
+    signature: signed.signature,
+    rootHash: manifest.rootHash
+  };
+}
+
+/** Evidence of an index, fetched once so the manifest can carry provenance. */
+async function collectEvidence(
+  services: Services,
+  index: readonly PackIndexEntry[]
+): Promise<Map<string, Evidence>> {
+  const out = new Map<string, Evidence>();
+  for (const entry of index) {
+    for (const line of entry.evidence) {
+      if (out.has(line.evidenceId)) continue;
+      const evidence = await services.state.getEvidence(line.evidenceId);
+      if (evidence !== null) out.set(evidence.id, evidence);
+    }
+  }
+  return out;
 }
 
 /** One index entry per control, state included — EF-DOS-01. */
@@ -129,7 +203,8 @@ async function evidenceEntries(services: Services, controlId: string): Promise<P
 /** Writes the index and its manifest, then verifies the fingerprint — EF-DOS-02. */
 async function writeArchive(
   services: Services,
-  document: PackDocument
+  document: PackDocument,
+  attestation: PackAttestation | null
 ): Promise<{ archive: Pack['archive']; verified: boolean }> {
   const bytes = new TextEncoder().encode(canonicalJson(document));
   const indexSha256 = sha256Bytes(bytes);
@@ -140,21 +215,31 @@ async function writeArchive(
     contentType: 'application/json',
     retainDays
   });
-  const manifest = buildManifest(document, indexSha256);
+  const checksums = buildChecksums(document, indexSha256);
   await services.evidenceStore.put({
     key: `packs/${document.packId}/manifest.json`,
-    bytes: new TextEncoder().encode(canonicalJson(manifest)),
+    bytes: new TextEncoder().encode(canonicalJson(checksums)),
     contentType: 'application/json',
     retainDays
   });
+  if (attestation !== null) {
+    // The signed attestation is the artefact a third party verifies offline
+    // (scripts/verify-pack.sh): canonical manifest, root hash and signature.
+    await services.evidenceStore.put({
+      key: `packs/${document.packId}/attestation.json`,
+      bytes: new TextEncoder().encode(canonicalJson(attestation)),
+      contentType: 'application/json',
+      retainDays
+    });
+  }
   const verified = await verifyArchive(services, stored.uri, stored.sha256);
   return { archive: { uri: stored.uri, sha256: stored.sha256, sizeBytes: stored.sizeBytes }, verified };
 }
 
 /** Fingerprints of the index and of every evidence it names — EF-DOS-02. */
-function buildManifest(document: PackDocument, indexSha256: string): PackManifest {
+function buildChecksums(document: PackDocument, indexSha256: string): ArchiveChecksums {
   const seen = new Set<string>();
-  const evidence: PackManifest['evidence'] = [];
+  const evidence: ArchiveChecksums['evidence'] = [];
   for (const entry of document.index) {
     for (const item of entry.evidence) {
       if (seen.has(item.evidenceId)) continue;

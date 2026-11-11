@@ -5,6 +5,7 @@
 
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { manifestIsSelfConsistent } from '../../src/domain/manifest.ts';
 import { assemblePack, verifyArchive } from '../../src/pipeline/pack.ts';
 import { makeControl, makeSufficiency } from '../fixtures/builders.ts';
 import { fakeServices, pendingAttachment, seed, storedEvidence } from './fakeServices.ts';
@@ -72,8 +73,15 @@ test('R14: the archive is written to the vault and its fingerprints are verified
   assert.ok(pack.archive.sizeBytes > 0);
   assert.deepEqual(services.vaultKeys(), [
     `vault://packs/${pack.id}/index.json#v1`,
-    `vault://packs/${pack.id}/manifest.json#v1`
+    `vault://packs/${pack.id}/manifest.json#v1`,
+    `vault://packs/${pack.id}/attestation.json#v1`
   ]);
+  // The pack carries a canonical manifest and its signature: that is what a
+  // third party verifies offline (scripts/verify-pack.sh), never the content.
+  assert.equal(pack.manifest.rootHash.length, 64);
+  assert.equal(manifestIsSelfConsistent(pack.manifest), true);
+  assert.ok(pack.signature !== null, 'a signed pack reports its signature');
+  assert.equal(pack.signature?.rootHash, pack.manifest.rootHash);
   const index = JSON.parse(new TextDecoder().decode(await services.evidenceStore.get(pack.archive.uri)));
   assert.equal(index.index.length, 2, 'the archive carries a readable index');
   assert.equal(index.knownGaps.length, 1);

@@ -13,6 +13,8 @@
 
 import { DEFAULT_SETTINGS } from '../domain/types.ts';
 import type { Services } from '../ports/index.ts';
+import { signerFromEnv } from '../crypto/localSigner.ts';
+import { createMemoryExtensions } from '../store/extensionsMemory.ts';
 import { createMockAi } from '../ai/mock/index.ts';
 import { InMemoryAuditSink, InMemoryStateStore, LocalEvidenceStore, MemoryCostMeter, MemoryNotifier } from '../store/index.ts';
 import { clockFromEnv } from '../support/clock.ts';
@@ -47,6 +49,8 @@ export function createDemoServices(options: DemoServicesOptions = {}): Services 
     state: new InMemoryStateStore({ clock, settings }),
     audit: new InMemoryAuditSink({ clock }),
     notifier: new MemoryNotifier({ clock }),
+    signer: signerFromEnv({}),
+    extensions: createMemoryExtensions({ clock }),
     settings
   };
 }

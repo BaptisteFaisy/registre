@@ -64,6 +64,8 @@ interface AuditFilter {
 import { DEFAULT_SETTINGS } from '../../src/domain/types.ts';
 import { sha256Bytes } from '../../src/support/hash.ts';
 import { FixedClock } from '../../src/support/clock.ts';
+import { signerFromEnv } from '../../src/crypto/localSigner.ts';
+import { createMemoryExtensions } from '../../src/store/extensionsMemory.ts';
 import { redactText } from '../../src/domain/redaction.ts';
 import { unsupportedSpans } from '../../src/ai/anchoring.ts';
 import { MemoryState } from './memoryState.ts';
@@ -282,6 +284,8 @@ export function fakeServices(options: FakeOptions = {}): FakeBundle {
 
   return {
     clock,
+    signer: signerFromEnv({}),
+    extensions: createMemoryExtensions({ clock }),
     reader: new FakeReader(readResult(options.read)),
     controlRetriever: new FakeControlRetriever(options.controls ?? [], async () => state.allControls()),
     evidenceRetriever: new FakeEvidenceRetriever(options.passages ?? []),

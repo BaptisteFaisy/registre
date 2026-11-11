@@ -9,6 +9,17 @@
  * Pure types only: no I/O, no dependencies. Keep under 500 lines.
  */
 
+import type { PackManifest, PackSignature, EvidenceProvenance } from './verification.ts';
+
+export type { PackManifest, PackSignature, EvidenceProvenance, VerificationResult, ShareGrant, ShareScope } from './verification.ts';
+export type { ControlMapping, MappingStatus, ReuseMetric } from './mapping.ts';
+export type { DriftEvent, DriftKind, QualityRecord, QualityMetric, QualitySubject } from './quality.ts';
+export type { Draft } from './draft.ts';
+export type { Settings } from './settings.ts';
+export { DEFAULT_SETTINGS } from './settings.ts';
+export type { Answer, AnswerCitation, CostReport, Passage } from './answer.ts';
+export { NO_EVIDENCE_ANSWER } from './answer.ts';
+
 /* ------------------------------------------------------------------ ids */
 
 export type FrameworkId = string;
@@ -170,6 +181,14 @@ export interface Evidence {
   ingestedAt: string;
   reader: string;
   cost?: CostRecord;
+  /**
+   * Where the document comes from. Absent means `HUMAN_DOCUMENT`; use
+   * `provenanceOf()` from `./verification.ts` rather than reading the field.
+   * A machine attestation is refreshed by a collector and can drift.
+   */
+  provenance?: EvidenceProvenance;
+  /** For a machine attestation: the statement it makes, compared run to run. */
+  attestedState?: string | null;
 }
 
 /** Convenience: full text of an evidence (all pages joined). */
@@ -208,6 +227,8 @@ export interface Attachment {
   rejectionReason?: RejectionReason;
   autoApplied: boolean;
   model: string;
+  /** Prompt version that produced this proposal; used by the quality trend. */
+  promptVersion?: string;
   createdAt: string;
   decidedBy?: string;
   decidedAt?: string;
@@ -336,11 +357,19 @@ export interface Pack {
     sizeBytes: number;
   };
   checksumsVerified: boolean;
+  /** Canonical, content-free description; its `rootHash` is what gets signed. */
+  manifest: PackManifest;
+  /** `null` only when the deployment has no signing key configured. */
+  signature: PackSignature | null;
 }
 
 /* ------------------------------------------------------------- validation */
 
-export type ValidationKind = 'ATTACHMENT' | 'SUFFICIENCY' | 'UNREADABLE_EVIDENCE';
+export type ValidationKind =
+  | 'ATTACHMENT'
+  | 'SUFFICIENCY'
+  | 'UNREADABLE_EVIDENCE'
+  | 'MAPPING';
 
 export type ValidationDecision = 'ACCEPT' | 'REJECT' | 'CORRECT';
 
@@ -374,6 +403,16 @@ export type AuditAction =
   | 'REMINDER_SENT'
   | 'QUESTION_ASKED'
   | 'PACK_ASSEMBLED'
+  | 'PACK_VERIFIED'
+  | 'SHARE_CREATED'
+  | 'SHARE_REVOKED'
+  | 'SHARE_USED'
+  | 'MAPPING_PROPOSED'
+  | 'MAPPING_DECIDED'
+  | 'DRIFT_DETECTED'
+  | 'DRIFT_ACKNOWLEDGED'
+  | 'DRAFT_GENERATED'
+  | 'QUALITY_RECORDED'
   | 'PACK_DOWNLOADED'
   | 'SETTINGS_UPDATED'
   | 'ACCESS_DENIED';
@@ -410,77 +449,17 @@ export interface Principal {
   clearance: AccessLevel;
   /** Controls owned by a CONTROL_OWNER (empty for other roles). */
   ownedControls: ControlId[];
-}
-
-/* --------------------------------------------------------------- settings */
-
-export interface Settings {
-  /** Attachments at or above this confidence are applied without review. */
-  confidenceThreshold: number;
-  /** Reminders are sent this many days before expiry. */
-  reminderLeadDays: number;
-  defaultPeriodicity: string;
-  region: string;
-  retentionMonths: number;
-  readerModel: string;
-  reasoningModel: string;
-  answerModel: string;
-  guardrailId: string | null;
-  /** Nightly batch runs on the Bedrock Flex service tier. */
-  nightlyServiceTier: 'FLEX' | 'STANDARD';
-}
-
-export const DEFAULT_SETTINGS: Settings = {
-  confidenceThreshold: 0.85,
-  reminderLeadDays: 30,
-  defaultPeriodicity: 'P1Y',
-  region: 'eu-central-1',
-  retentionMonths: 24,
-  readerModel: 'bedrock-data-automation',
-  reasoningModel: 'anthropic.claude-sonnet-4-20250514-v1:0',
-  answerModel: 'anthropic.claude-sonnet-4-20250514-v1:0',
-  guardrailId: null,
-  nightlyServiceTier: 'FLEX'
-};
-
-/* ------------------------------------------------------------------- QA */
-
-export interface Passage {
-  evidenceId: EvidenceId;
-  title: string | null;
-  documentDate: string | null;
-  page: number | null;
-  text: string;
-  score: number;
-  accessLevel: AccessLevel;
-}
-
-export interface AnswerCitation {
-  evidenceId: EvidenceId;
-  title: string | null;
-  page: number | null;
-  documentDate: string | null;
-  quote: string;
-}
-
-export interface Answer {
-  question: string;
-  text: string;
-  citations: AnswerCitation[];
-  /** True when the guardrail replaced an unanchored draft. */
-  noEvidence: boolean;
-  redacted: boolean;
-  passagesUsed: number;
-  cost?: CostRecord;
-}
-
-export const NO_EVIDENCE_ANSWER = 'No evidence answers this question.';
-
-/* --------------------------------------------------------------- cost UI */
-
-export interface CostReport {
-  totalUsd: number;
-  perEvidenceUsd: number;
-  evidenceCount: number;
-  bySource: Record<string, number>;
+  /**
+   * Set when the principal comes from a share grant rather than a session: the
+   * rights are then narrowed to one pack or one framework, and every excerpt is
+   * watermarked with this identity. Absent for every ordinary session.
+   */
+  share?: {
+    token: string;
+    frameworkId: FrameworkId;
+    packId: PackId | null;
+    scope: 'PACK' | 'FRAMEWORK';
+    watermark: string;
+    expiresAt: string;
+  };
 }

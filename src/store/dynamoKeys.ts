@@ -86,7 +86,12 @@ export type EntityKind =
   | 'PACK'
   | 'SETTINGS'
   | 'TYPE_VALIDATION'
-  | 'AUDIT';
+  | 'AUDIT'
+  | 'SHARE'
+  | 'MAPPING'
+  | 'DRIFT'
+  | 'QUALITY'
+  | 'VERIFICATION';
 
 export interface DynamoKeys {
   PK: string;
@@ -285,6 +290,42 @@ export const SCOPE = {
   evidence: (id: EvidenceId): string => `EVIDENCE#${id}`,
   hash: (sha256: string): string => `HASH#${sha256}`,
   validation: 'VALIDATION'
+} as const;
+
+/* Keys of the three extensions (share grants, mappings, drifts, quality). */
+
+/** A share grant: `PK=SHARE#<token>`, and a scope row for the pack listing. */
+export function shareKeys(token: string): DynamoKeys {
+  return itemKeys(`SHARE#${token}`);
+}
+
+/** A cross-framework mapping: `PK=MAPPING#<id>`. */
+export function mappingKeys(id: string): DynamoKeys {
+  return itemKeys(`MAPPING#${id}`);
+}
+
+/** A drift event: `PK=DRIFT#<id>`. */
+export function driftKeys(id: string): DynamoKeys {
+  return itemKeys(`DRIFT#${id}`);
+}
+
+/** A quality record: `PK=QUALITY#<subjectKey>`, sorted by measurement instant. */
+export function qualityKeys(subjectKey: string, measuredAt: string, id: string): DynamoKeys {
+  return itemKeys(`QUALITY#${subjectKey}`, `${measuredAt}#${id}`);
+}
+
+/** A verification result: `PK=VERIFICATION#<packId>`, sorted by instant. */
+export function verificationKeys(packId: string, verifiedAt: string): DynamoKeys {
+  return itemKeys(`VERIFICATION#${packId}`, verifiedAt);
+}
+
+/** Partition holding every row of one extension entity kind, for listings. */
+export const EXTENSION_PARTITION = {
+  shares: 'SHARES',
+  mappings: 'MAPPINGS',
+  drifts: 'DRIFTS',
+  verifications: 'VERIFICATIONS',
+  quality: 'QUALITY'
 } as const;
 
 /** Every value a status-partitioned queue can take (used to merge listings). */

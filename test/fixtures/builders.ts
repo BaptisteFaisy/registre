@@ -25,6 +25,8 @@ import type {
   ValidationItem
 } from '../../src/domain/types.ts';
 import { DEFAULT_SETTINGS } from '../../src/domain/types.ts';
+import type { PackManifest, PackSignature } from '../../src/domain/verification.ts';
+import { sha256Json } from '../../src/support/hash.ts';
 
 export const TEST_NOW = '2026-11-11T12:00:00.000Z';
 export const TEST_TODAY = '2026-11-11';
@@ -211,6 +213,34 @@ export function makePrincipal(overrides: Partial<Principal> = {}): Principal {
     role: 'QUALITY_LEAD',
     clearance: 'RESTRICTED',
     ownedControls: [],
+    ...overrides
+  };
+}
+
+/** A minimal canonical manifest, hash consistent with its content. */
+export function makeManifest(overrides: Partial<PackManifest> = {}): PackManifest {
+  const base: Omit<PackManifest, 'rootHash'> = {
+    packId: 'pk-fixture',
+    frameworkId: 'demo-msp',
+    frameworkVersion: '1.0',
+    frozenAt: TEST_NOW,
+    controlCount: 0,
+    evidenceCount: 0,
+    knownGapCount: 0,
+    controls: [],
+    ...overrides
+  };
+  return { ...base, rootHash: overrides.rootHash ?? sha256Json(base) };
+}
+
+/** A signature of `makeManifest()`, shaped like a local Ed25519 one. */
+export function makeSignature(overrides: Partial<PackSignature> = {}): PackSignature {
+  return {
+    algorithm: 'ED25519-LOCAL',
+    keyId: 'test-key',
+    signedAt: TEST_NOW,
+    signature: 'c2lnbmF0dXJl',
+    rootHash: makeManifest().rootHash,
     ...overrides
   };
 }

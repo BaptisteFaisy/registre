@@ -24,6 +24,7 @@ import type {
   IngestRequest,
   PipelineApi
 } from '../../src/api/pipeline.ts';
+import { makeManifest, makeSignature } from '../fixtures/builders.ts';
 import { makeEvidence, makeStatus, makeSufficiency, makeValidation } from '../fixtures/builders.ts';
 
 /** One recorded call, so a test can assert what reached the pipeline. */
@@ -190,7 +191,9 @@ function packOf(log: Recorder) {
       ],
       knownGaps: [{ controlId: 'CONT-03', state: 'NO_EVIDENCE', detail: 'No restore test recorded this quarter' }],
       archive: { uri: 'memory://packs/pk-1/pack.zip#v1', sha256: 'b'.repeat(64), sizeBytes: 4 },
-      checksumsVerified: true
+      checksumsVerified: true,
+      manifest: makeManifest({ packId: 'pk-1', frameworkId }),
+      signature: makeSignature()
     });
 }
 
