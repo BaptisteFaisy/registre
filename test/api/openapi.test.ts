@@ -131,3 +131,126 @@ test('the public routes need no credential, the others do', async () => {
     await api.close();
   }
 });
+
+/**
+ * Component names referenced by the route table but not defined in
+ * `src/api/schemas*.ts`. The list is empty: every reference resolves. Any new
+ * dangling reference fails the suite, which is the point of keeping the check.
+ */
+const KNOWN_DANGLING_SCHEMAS: readonly string[] = [];
+
+/** The response schema the new contract gives each operation of chapter 15. */
+const CONTRACT_SCHEMAS: Readonly<Record<string, string>> = {
+  'POST /v1/frameworks': 'Framework',
+  'GET /v1/frameworks': 'FrameworkArray',
+  'GET /v1/frameworks/{id}/controls': 'ControlArray',
+  'GET /v1/frameworks/{id}/readiness': 'ReadinessOverview',
+  'GET /v1/frameworks/{id}/diff': 'FrameworkDiff',
+  'POST /v1/evidence': 'Evidence',
+  'GET /v1/evidence/{id}': 'Evidence',
+  'GET /v1/controls/{id}': 'ControlWithRelations',
+  'GET /v1/controls/{id}/evidence': 'EvidenceArray',
+  'GET /v1/validations': 'ValidationItemArray',
+  'POST /v1/validations/{id}/decision': 'ValidationItem',
+  'POST /v1/ask': 'Answer',
+  'POST /v1/frameworks/{id}/packs': 'Pack',
+  'GET /v1/packs': 'PackArray',
+  'GET /v1/packs/{id}': 'Pack',
+  'GET /v1/reminders': 'ReminderArray',
+  'GET /v1/audit-log': 'AuditEventArray'
+  // POST /v1/controls/{id}/remind is left out on purpose: the route answers a
+  // bare `Reminder` with 201 while the table declares `ReminderList` and 202.
+};
+
+/** Component names of the document. */
+function schemaNames(): string[] {
+  const document = buildOpenApiDocument();
+  return Object.keys((document.components as { schemas: Record<string, unknown> }).schemas);
+}
+
+/** Every component name a `$ref` of the document points at. */
+function referencedSchemas(node: unknown, names = new Set<string>()): Set<string> {
+  if (Array.isArray(node)) {
+    for (const item of node) referencedSchemas(item, names);
+    return names;
+  }
+  if (node === null || typeof node !== 'object') return names;
+  for (const [key, value] of Object.entries(node as Record<string, unknown>)) {
+    if (key === '$ref' && typeof value === 'string' && value.startsWith('#/components/schemas/')) {
+      names.add(value.slice('#/components/schemas/'.length));
+    }
+    referencedSchemas(value, names);
+  }
+  return names;
+}
+
+test('the contract schemas are the ones the route table declares', () => {
+  const declared = new Map(
+    ROUTES.map((route) => [`${route.method} ${openApiPath(route.path)}`, route.meta.responseSchema])
+  );
+  for (const [operation, schema] of Object.entries(CONTRACT_SCHEMAS)) {
+    assert.equal(declared.get(operation), schema, `${operation} must answer ${schema}`);
+  }
+  assert.equal(declared.get('POST /v1/auth/session'), 'Session');
+  assert.equal(declared.get('GET /v1/auth/accounts'), 'SessionAccountArray');
+});
+
+test('the document exposes the schemas the new contract answers', () => {
+  const schemas = schemaNames();
+  for (const name of [
+    'Framework',
+    'FrameworkArray',
+    'FrameworkDiff',
+    'Control',
+    'ControlArray',
+    'ReadinessOverview',
+    'ControlWithRelations',
+    'Evidence',
+    'EvidenceArray',
+    'ValidationItem',
+    'ValidationItemArray',
+    'Reminder',
+    'ReminderArray',
+    'Pack',
+    'PackArray',
+    'Session',
+    'SessionRequest',
+    'SessionAccountArray',
+    'CostReport'
+  ]) {
+    assert.ok(schemas.includes(name), `${name} is missing from components.schemas`);
+  }
+});
+
+test('the bare list schemas of the contract are declared as arrays', () => {
+  const document = buildOpenApiDocument();
+  const schemas = (document.components as { schemas: Record<string, { type?: string }> }).schemas;
+  for (const name of [
+    'FrameworkArray',
+    'ControlArray',
+    'EvidenceArray',
+    'ValidationItemArray',
+    'ReminderArray',
+    'PackArray',
+    'SessionAccountArray'
+  ]) {
+    assert.equal(schemas[name]?.type, 'array', `${name} is the bare list of the contract`);
+  }
+});
+
+test('safety net: no route and no schema references an undefined component', () => {
+  const defined = schemaNames();
+  const dangling = new Set<string>();
+  for (const route of ROUTES) {
+    for (const name of [route.meta.responseSchema, route.meta.requestSchema]) {
+      if (name !== undefined && !defined.includes(name)) dangling.add(name);
+    }
+  }
+  for (const name of referencedSchemas(buildOpenApiDocument())) {
+    if (!defined.includes(name)) dangling.add(name);
+  }
+  const unexpected = [...dangling].filter((name) => !KNOWN_DANGLING_SCHEMAS.includes(name)).sort();
+  assert.deepEqual(unexpected, [], 'these references have no schema behind them');
+  const resolved = KNOWN_DANGLING_SCHEMAS.filter((name) => !dangling.has(name));
+  assert.deepEqual(resolved, [], 'these references now resolve: drop them from KNOWN_DANGLING_SCHEMAS');
+});

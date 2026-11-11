@@ -73,6 +73,31 @@ export const EVIDENCE_SCHEMAS = {
       decidedNote: nullableString
     }
   },
+  Sufficiency: {
+    type: 'object',
+    required: ['id', 'attachmentId', 'evidenceId', 'controlId', 'elements', 'class', 'missing', 'computedAt'],
+    properties: {
+      id: stringSchema,
+      attachmentId: stringSchema,
+      evidenceId: stringSchema,
+      controlId: stringSchema,
+      elements: {
+        type: 'array',
+        items: {
+          type: 'object',
+          required: ['expected', 'present', 'quote'],
+          properties: {
+            expected: stringSchema,
+            present: { type: 'boolean' },
+            quote: nullableString
+          }
+        }
+      },
+      class: { type: 'string', enum: [...SUFFICIENCY_ENUM] },
+      missing: { type: 'array', items: stringSchema },
+      computedAt: { type: 'string', format: 'date-time' }
+    }
+  },
   EvidenceArray: {
     type: 'array',
     items: { $ref: '#/components/schemas/Evidence' }

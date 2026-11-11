@@ -45,20 +45,27 @@ VITE_API_URL=http://127.0.0.1:8787 VITE_USE_MOCKS=0 npm run dev
 
 ## 3. Session: how the portal gets a token
 
-1. The sign-in screen posts the credentials to `POST /v1/auth/session`
-   (`portal/src/state/app.tsx`, `signIn`).
-2. The API answers `{ "token": "...", "principal": { ... } }`.
+1. The sign-in screen hands the credentials to `SessionFlow.signIn`
+   (`portal/src/state/auth.ts`), which calls the identity client `AuthApi`:
+   `HttpAuthApi` in HTTP mode (`portal/src/api/auth.ts`), `MockAuthApi` in the
+   offline mode. `HttpAuthApi` posts to `POST /v1/auth/session` through the
+   same `HttpClient` as the business routes.
+2. The API answers `{ "token": "...", "principal": { ... } }` and sets the
+   `registre_session` cookie.
 3. Both are kept in `sessionStorage` (`portal/src/state/session.ts`, keys
    `registre.token` and `registre.principal`), so a page reload does not sign
    the judges out.
 4. Every later call carries `Authorization: Bearer <token>`; `HttpClient`
    adds the header from the injected `TokenProvider`. The API also accepts the
    same token in the `registre_session` cookie.
-5. `POST /v1/auth/logout` closes the session server-side and clears the
-   cookie; the portal drops its stored principal and token.
+5. Sign-out calls `POST /v1/auth/logout`, which clears the cookie server-side;
+   the flow then drops the stored principal and token. A failed logout is
+   tolerated — the local session ends anyway, so the portal always reaches the
+   sign-in screen.
 
-A `401` from any route means the session is gone: `ApiError.isUnauthorized` is
-what the screens test to send the user back to the sign-in screen.
+A `401` from any route means the session is gone: `HttpClient` calls the
+`onUnauthorized` hook, wired to `SessionFlow.endSession()`, which drops back to
+the sign-in screen; `ApiError.isUnauthorized` is what the screens test.
 
 The token of the demonstration directory is `base64url(login:password)`, which
 makes it easy to build one by hand for a `curl` call:
@@ -187,17 +194,18 @@ contract").
 
 Documented so that nobody rediscovers them at the worst moment:
 
-- **Session and accounts are outside `RegistreApi`.** The interface has no
-  `signIn()` or `listAccounts()`: `state/app.tsx` calls `POST /v1/auth/session`
-  directly, and the sign-in screen still reads the mock account list in both
-  modes. In HTTP mode it should read `GET /v1/auth/accounts`, which is public
-  and never returns a password.
-- **The deposit body.** `HttpRegistreApi.uploadEvidence` posts a metadata-only
-  JSON body (`fileName`, `contentType`, `sizeBytes`, `suggestedControlId`,
-  `accessLevel`), while `POST /v1/evidence` expects either the base64 envelope
-  (`filename`, `contentType`, `contentBase64`, `fileDate?`, `controlId?`) or
-  the raw bytes. Until the client carries the bytes, the deposit screen runs
-  on the mock; the contract test deposits with the base64 envelope.
+- **`GET /v1/auth/accounts` has no client.** The session and the logout are
+  served by `AuthApi`, but the accounts route is not: the sign-in screen still
+  renders the mock account list (`portal/src/mocks/principals.ts`) in both
+  modes, so in HTTP mode it offers logins the API does not know. The route is
+  public and never returns a password — reading it is what makes the judges'
+  reminder sheet real (EF-ADM-03).
+- **Two envelope fields the API ignores.** `buildEvidencePayload`
+  (`portal/src/api/evidencePayload.ts`) sends `sizeBytes` and `accessLevel`
+  beside the documented `filename`, `contentType`, `contentBase64`, `fileDate?`
+  and `controlId?`. The API derives the size from the bytes and the access
+  level from what the reader finds in the document, so the level chosen in the
+  deposit form has no effect today.
 - **Browser uploads and `X-File-Name`.** The CORS policy allows
   `authorization`, `content-type` and `x-request-id` only, so a browser must
   name the file with `?filename=` rather than with the `X-File-Name` header

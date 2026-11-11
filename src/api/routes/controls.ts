@@ -148,8 +148,8 @@ export const controlRoutes: readonly RouteDefinition[] = [
       requirement: 'EF-REL-01',
       roles: REMIND_ROLES,
       requestSchema: 'RemindRequest',
-      responseSchema: 'ReminderList',
-      successStatus: 202,
+      responseSchema: 'Reminder',
+      successStatus: 201,
       errors: [400, 401, 403, 404, 409],
       notes: 'The message lists what to provide, taken from the sufficiency gaps when relevant.'
     }
