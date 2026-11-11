@@ -43,15 +43,25 @@ function walk(dir: string, out: string[] = []): string[] {
   return out;
 }
 
+/** True when the whole line is a comment (//, /*, *, or a closing *\/). */
+function isCommentLine(line: string): boolean {
+  const trimmed = line.trimStart();
+  return (
+    trimmed.startsWith('//') ||
+    trimmed.startsWith('/*') ||
+    trimmed.startsWith('*') ||
+    trimmed.endsWith('*/')
+  );
+}
+
 function scanFile(file: string, hits: Hit[]): void {
   const normalised = relative(process.cwd(), file).split(sep).join('/');
   if (EXCLUDED_FILES.has(normalised)) return;
   const content = readFileSync(file, 'utf8');
   content.split('\n').forEach((line, index) => {
-    if (line.trimStart().startsWith('*') || line.trimStart().startsWith('//')) {
-      // Doc comments describing the ban are allowed (they quote the rule).
-      if (/never|forbidden|interdit|banned|ENF-IA-01/i.test(line)) return;
-    }
+    // Comments may quote the rule they enforce; only code and strings are
+    // scanned, so a doc comment saying "never compliant" stays legitimate.
+    if (isCommentLine(line)) return;
     for (const violation of findViolations(line)) {
       hits.push({ file: normalised, line: index + 1, word: violation.word, text: line.trim().slice(0, 120) });
     }
