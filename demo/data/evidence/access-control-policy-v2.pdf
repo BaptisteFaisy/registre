@@ -1,0 +1,33 @@
+---
+Title: Access Control Policy
+Type: POLICY
+Date: 2026-03-18
+Version: 2.1
+Author: Security Officer
+Approved by: Managing Director
+Approval date: 2026-03-25
+Personal data: no
+Summary: Policy for account creation, privileged access, quarterly review and screening before access is granted.
+---
+
+# Access Control Policy
+
+Policy for account creation, privileged access, quarterly review and screening before access is granted.
+
+## Scope reference — CONT-21: Privileged access reviewed quarterly
+Requirement addressed: Privileged accounts are reviewed every quarter and unnecessary access is removed.
+
+- Review date: 2026-03-18.
+- Accounts reviewed: Recorded in EV-047 (Access Control Policy).
+- Removals made: Recorded in EV-047 (Access Control Policy).
+- Reviewer name: Recorded in EV-047 (Access Control Policy).
+
+## Scope reference — CONT-25: Personnel screened before privileged access
+Requirement addressed: Personnel granted privileged access are screened before the access is granted.
+
+- Screening type: Recorded in EV-047 (Access Control Policy).
+- Role covered: Recorded in EV-047 (Access Control Policy).
+- Completion date: 2026-03-18.
+- Record owner: Recorded in EV-047 (Access Control Policy).
+
+Signed: Managing Director (2026-03-25)

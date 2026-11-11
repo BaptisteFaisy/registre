@@ -1,0 +1,4 @@
+date,record_id,category,summary,owner,status
+2026-07-01,EV-043-01,EXPORT,Access Review  Q3 2026,Security Officer,closed
+2026-08-15,EV-043-02,EXPORT,Quarterly review of privileged accounts with the review date and the accounts examined. Access removals are tracked in the ticket tool  not in this file.,Security Officer,verified
+2026-09-30,EV-043-03,EXPORT,internal-estate,Managing Director,completed

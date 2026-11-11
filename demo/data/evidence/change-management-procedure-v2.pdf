@@ -1,0 +1,29 @@
+---
+Title: Change Management Procedure
+Type: PROCEDURE
+Date: 2026-04-14
+Version: 2.0
+Author: Change Manager
+Personal data: no
+Summary: Procedure describing how changes are raised, approved, implemented and reviewed. It also states which roles may request and approve production access. The document carries no signature block.
+---
+
+# Change Management Procedure
+
+Procedure describing how changes are raised, approved, implemented and reviewed. It also states which roles may request and approve production access. The document carries no signature block.
+
+## Scope reference — CONT-11: Changes approved before implementation
+Requirement addressed: Every production change is approved by a named approver before it is implemented.
+
+- Change reference: Recorded in EV-007 (Change Management Procedure).
+- Approval date: 2026-04-14.
+- Implementation date: 2026-04-14.
+
+## Scope reference — CONT-15: Segregation of duties on production access
+Requirement addressed: Requesting, approving and granting production access are performed by different roles.
+
+- Process description: Recorded in EV-007 (Change Management Procedure).
+- Roles separated: Recorded in EV-007 (Change Management Procedure).
+- Review date: 2026-04-14.
+- Approver name: verified in meeting record.
+

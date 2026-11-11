@@ -1585,13 +1585,6 @@
       "evidenceId": "EV-008",
       "attachments": [
         {
-          "controlId": "CONT-01",
-          "supports": true,
-          "confidence": 0.93,
-          "quote": "quote verified against the evidence text",
-          "citationVerified": true
-        },
-        {
           "controlId": "CONT-04",
           "supports": true,
           "confidence": 0.93,
@@ -2162,13 +2155,6 @@
     {
       "evidenceId": "EV-051",
       "attachments": [
-        {
-          "controlId": "CONT-01",
-          "supports": true,
-          "confidence": 0.93,
-          "quote": "quote verified against the evidence text",
-          "citationVerified": true
-        },
         {
           "controlId": "CONT-23",
           "supports": true,

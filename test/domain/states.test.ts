@@ -138,10 +138,13 @@ test('R5 — an expired policy leaves the control expired once the type is valid
   assert.deepEqual(status.notes, [STATE_NOTES.expired]);
 });
 
-test('12.4 — doubt wins over expired when the mandatory evidence type is not validated', () => {
+test('R5 — prudence never hides an expiry: an unvalidated mandatory control stays expired', () => {
+  // 12.4 only prevents an upgrade to COVERED. Downgrading EXPIRED to TO_VERIFY
+  // would hide the very situation R5 asks the tool to surface.
   const status = evaluate({ evidence: { fields: makeFields({ documentDate: '2025-05-11' }) }, isTypeValidated: false });
-  assert.equal(status.state, 'TO_VERIFY');
-  assert.deepEqual(status.notes, [STATE_NOTES.mandatoryFirstValidation]);
+  assert.equal(status.state, 'EXPIRED');
+  assert.equal(status.freshness, 'EXPIRED');
+  assert.deepEqual(status.notes, [STATE_NOTES.expired, STATE_NOTES.mandatoryFirstValidation]);
 });
 
 test('12.4 — an expired and partial evidence is to verify, not expired', () => {

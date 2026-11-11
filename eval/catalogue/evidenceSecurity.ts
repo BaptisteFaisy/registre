@@ -131,7 +131,8 @@ export const SECURITY_EVIDENCE: readonly CatalogueEvidence[] = [
     approvalDate: '2026-10-09',
     summary:
       'Security committee minutes covering the policy review calendar, the open vulnerabilities and the next access review.',
-    expectedControls: ['CONT-01', 'CONT-23']
+    // CONT-01 deliberately not listed: see EV-008 (acceptance scenario R5).
+    expectedControls: ['CONT-23']
   }),
   ev({
     id: 'EV-052',

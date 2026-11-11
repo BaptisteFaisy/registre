@@ -1,0 +1,25 @@
+---
+Title: Production Access Procedure
+Type: PROCEDURE
+Date: 2026-04-20
+Version: 1.2
+Author: Platform Lead
+Approved by: Security Officer
+Approval date: 2026-04-24
+Personal data: no
+Summary: Procedure describing how production access is requested, approved and granted, and which roles are kept separate.
+---
+
+# Production Access Procedure
+
+Procedure describing how production access is requested, approved and granted, and which roles are kept separate.
+
+## Scope reference — CONT-15: Segregation of duties on production access
+Requirement addressed: Requesting, approving and granting production access are performed by different roles.
+
+- Process description: Recorded in EV-027 (Production Access Procedure).
+- Roles separated: Recorded in EV-027 (Production Access Procedure).
+- Review date: 2026-04-20.
+- Approver name: Security Officer.
+
+Signed: Security Officer (2026-04-24)

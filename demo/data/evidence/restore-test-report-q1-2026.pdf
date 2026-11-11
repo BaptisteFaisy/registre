@@ -1,0 +1,26 @@
+---
+Title: Restore Test Report, Q1 2026
+Type: REPORT
+Date: 2026-03-27
+Version: 1.0
+Author: Operations Lead
+Approved by: Managing Director
+Approval date: 2026-03-31
+Personal data: no
+Summary: Report of the restore test run on the billing platform in March 2026, with the measured recovery time and the result. Signed by the operations lead.
+---
+
+# Restore Test Report, Q1 2026
+
+Report of the restore test run on the billing platform in March 2026, with the measured recovery time and the result. Signed by the operations lead.
+
+## Scope reference — CONT-16: Backup restoration tested
+Requirement addressed: Backups of the managed environments are tested by a real restore at a defined interval.
+
+- Test date: 2026-03-27.
+- System or dataset restored: Recorded in EV-038 (Restore Test Report, Q1 2026).
+- Measured recovery time: Recorded in EV-038 (Restore Test Report, Q1 2026).
+- Test result: Recorded in EV-038 (Restore Test Report, Q1 2026).
+- Signatory name: Managing Director.
+
+Signed: Managing Director (2026-03-31)

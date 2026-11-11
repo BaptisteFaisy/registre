@@ -1,0 +1,33 @@
+---
+Title: Change Advisory Board Minutes, September 2026
+Type: MINUTES
+Date: 2026-09-08
+Version: 1.0
+Author: Change Manager
+Approved by: Platform Lead
+Approval date: 2026-09-09
+Personal data: no
+Summary: Weekly change advisory board minutes listing the changes approved and the ones deferred. Attendees and decisions are recorded.
+---
+
+# Change Advisory Board Minutes, September 2026
+
+Weekly change advisory board minutes listing the changes approved and the ones deferred. Attendees and decisions are recorded.
+
+## Scope reference — CONT-11: Changes approved before implementation
+Requirement addressed: Every production change is approved by a named approver before it is implemented.
+
+- Change reference: Recorded in EV-029 (Change Advisory Board Minutes, September 2026).
+- Approval date: 2026-09-08.
+- Approver name: Platform Lead.
+- Implementation date: 2026-09-08.
+
+## Scope reference — CONT-13: Change success measured
+Requirement addressed: The share of successful changes and the number of rollbacks are measured every quarter.
+
+- Reporting period: 2026-09-08.
+- Change count: Recorded in EV-029 (Change Advisory Board Minutes, September 2026).
+- Failed change count: Recorded in EV-029 (Change Advisory Board Minutes, September 2026).
+- Rollback count: Recorded in EV-029 (Change Advisory Board Minutes, September 2026).
+
+Signed: Platform Lead (2026-09-09)

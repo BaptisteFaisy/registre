@@ -1,0 +1,25 @@
+---
+Title: Security Committee Minutes, October 2026
+Type: MINUTES
+Date: 2026-10-08
+Version: 1.0
+Author: Security Officer
+Approved by: Managing Director
+Approval date: 2026-10-09
+Personal data: no
+Summary: Security committee minutes covering the policy review calendar, the open vulnerabilities and the next access review.
+---
+
+# Security Committee Minutes, October 2026
+
+Security committee minutes covering the policy review calendar, the open vulnerabilities and the next access review.
+
+## Scope reference — CONT-23: Vulnerability scans run and findings tracked
+Requirement addressed: Managed systems are scanned monthly and findings carry severity and remediation deadlines.
+
+- Scan date: 2026-10-08.
+- Systems scanned: Recorded in EV-051 (Security Committee Minutes, October 2026).
+- Findings by severity: Recorded in EV-051 (Security Committee Minutes, October 2026).
+- Remediation deadlines: Recorded in EV-051 (Security Committee Minutes, October 2026).
+
+Signed: Managing Director (2026-10-09)

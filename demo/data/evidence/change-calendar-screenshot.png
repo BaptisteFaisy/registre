@@ -1,0 +1,22 @@
+---
+Title: Change Calendar Screenshot
+Type: SCREENSHOT
+Date: 2026-09-25
+Version: 1.0
+Author: Change Manager
+Personal data: no
+Summary: Screenshot of the change calendar for the last week of September, showing approved maintenance windows.
+---
+
+# Change Calendar Screenshot
+
+Screenshot of the change calendar for the last week of September, showing approved maintenance windows.
+
+## Scope reference — CONT-11: Changes approved before implementation
+Requirement addressed: Every production change is approved by a named approver before it is implemented.
+
+- Change reference: Recorded in EV-032 (Change Calendar Screenshot).
+- Approval date: 2026-09-25.
+- Approver name: verified in meeting record.
+- Implementation date: 2026-09-25.
+

@@ -1,0 +1,26 @@
+---
+Title: Personnel Screening Records 2026
+Type: LIST
+Date: 2026-02-28
+Version: 1.0
+Author: HR Lead
+Personal data: yes
+Summary: Record of the screening checks performed before privileged access was granted, with the role covered and the completion date. It holds personal data, so the access level is restricted.
+---
+
+# Personnel Screening Records 2026
+
+Record of the screening checks performed before privileged access was granted, with the role covered and the completion date. It holds personal data, so the access level is restricted.
+
+## Scope reference — CONT-25: Personnel screened before privileged access
+Requirement addressed: Personnel granted privileged access are screened before the access is granted.
+
+- Screening type: Recorded in EV-050 (Personnel Screening Records 2026).
+- Role covered: Recorded in EV-050 (Personnel Screening Records 2026).
+- Completion date: 2026-02-28.
+- Record owner: Recorded in EV-050 (Personnel Screening Records 2026).
+
+## Restricted contact details
+Point of contact: Claire Martin (claire.martin@northwind-msp.example, +33 6 12 34 56 78)
+Payroll / HR ref: employee 2840107512345 42 — FR76 3000 6000 0112 3456 7890 189
+

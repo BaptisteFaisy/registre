@@ -1,0 +1,22 @@
+---
+Title: Backup Console Screenshot
+Type: SCREENSHOT
+Date: 2026-10-05
+Version: 1.0
+Author: Operations Lead
+Personal data: no
+Summary: Screenshot of the backup console showing the last successful runs of the managed databases. The date shown on screen differs from the file timestamp.
+---
+
+# Backup Console Screenshot
+
+Screenshot of the backup console showing the last successful runs of the managed databases. The date shown on screen differs from the file timestamp.
+
+## Scope reference — CONT-19: Backup jobs complete and are monitored
+Requirement addressed: Backup jobs are monitored monthly and failed jobs are counted and followed up.
+
+- Reporting period: 2026-10-06.
+- Backup job count: Recorded in EV-042 (Backup Console Screenshot).
+- Failed job count: Recorded in EV-042 (Backup Console Screenshot).
+- Monitoring evidence: Recorded in EV-042 (Backup Console Screenshot).
+

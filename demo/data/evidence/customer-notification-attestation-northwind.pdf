@@ -1,0 +1,26 @@
+---
+Title: Customer Notification Attestation, Northwind
+Type: ATTESTATION
+Date: 2026-05-14
+Version: 1.0
+Author: Security Officer
+Approved by: Managing Director
+Approval date: 2026-05-15
+Client: Northwind Logistics
+Personal data: no
+Summary: Attestation that Northwind Logistics was notified of a security incident within the agreed delay, naming the channel and the notification owner.
+---
+
+# Customer Notification Attestation, Northwind
+
+Attestation that Northwind Logistics was notified of a security incident within the agreed delay, naming the channel and the notification owner.
+
+## Scope reference — CONT-09: Security incidents notified to the customer
+Requirement addressed: Security incidents affecting a customer are notified through the agreed channel within the agreed delay.
+
+- Incident reference: Recorded in EV-020 (Customer Notification Attestation, Northwind).
+- Customer notified date: 2026-05-14.
+- Notification channel: Recorded in EV-020 (Customer Notification Attestation, Northwind).
+- Notification owner: Recorded in EV-020 (Customer Notification Attestation, Northwind).
+
+Signed: Managing Director (2026-05-15)

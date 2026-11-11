@@ -118,7 +118,9 @@ export const GOVERNANCE_EVIDENCE: readonly CatalogueEvidence[] = [
     approvalDate: '2026-03-05',
     summary:
       'Signed statement by the board that the internal control system is operated as described in the policy set. It references the audit plan for the year.',
-    expectedControls: ['CONT-01', 'CONT-04']
+    // CONT-01 deliberately not listed: the stale policy (EV-001) must remain the
+    // only evidence of that control, so acceptance scenario R5 shows EXPIRED.
+    expectedControls: ['CONT-04']
   }),
   ev({
     id: 'EV-009',

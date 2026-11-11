@@ -1,0 +1,4 @@
+date,record_id,category,summary,owner,status
+2026-01-01,EV-021-01,EXPORT,Major Incident Log  H1 2026,Service Desk Manager,closed
+2026-04-01,EV-021-02,EXPORT,Log of major incidents for the first half of 2026 with root cause and review date. The log is produced from the ticket tool and carries no signature.,Service Desk Manager,verified
+2026-06-30,EV-021-03,EXPORT,internal-estate,operations,completed
