@@ -9,7 +9,7 @@
   },
   "scripts": {
     "typecheck": "tsc -p tsconfig.json",
-    "test": "node --test \"test/**/*.test.ts\"",
+    "test": "node --test --test-concurrency=4 \"test/**/*.test.ts\"",
     "test:watch": "node --test --watch \"test/**/*.test.ts\"",
     "demo": "node tools/demo/main.ts",
     "demo:generate": "node tools/demo/generate.ts",
