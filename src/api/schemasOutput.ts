@@ -119,20 +119,9 @@ export const OUTPUT_SCHEMAS = {
       hash: stringSchema
     }
   },
-  AuditPage: {
-    type: 'object',
-    required: ['total', 'limit', 'offset', 'events'],
-    properties: {
-      total: { type: 'integer' },
-      limit: { type: 'integer' },
-      offset: { type: 'integer' },
-      nextOffset: nullableInteger,
-      events: { type: 'array', items: { $ref: '#/components/schemas/AuditEvent' } },
-      chain: {
-        type: 'object',
-        description: 'Present with ?verify=chain: the hash chain verdict (ENF-INT-02).',
-        properties: { ok: { type: 'boolean' }, brokenAt: nullableInteger }
-      }
-    }
-  }
+  AuditEventArray: {
+    type: 'array',
+    description: 'Bare list of audit events, newest first. Pagination and the hash-chain verdict travel in the x-audit-* response headers.',
+    items: { $ref: '#/components/schemas/AuditEvent' }
+  },
 } as const;
