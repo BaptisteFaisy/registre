@@ -1,0 +1,10 @@
+# CDK artefacts
+cdk.out/
+dist/
+
+# Dependencies (the repository lock file is committed, not the tree)
+node_modules/
+
+# Local environment
+.env
+*.local

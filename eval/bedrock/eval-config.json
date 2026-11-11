@@ -1,0 +1,46 @@
+{
+  "framework": {
+    "id": "demo-msp",
+    "version": "1.0"
+  },
+  "counts": {
+    "evidence": 60,
+    "controls": 30,
+    "questions": 25,
+    "trapQuestions": 5
+  },
+  "tasks": [
+    {
+      "name": "registre-attachment-judge",
+      "kind": "model-as-judge",
+      "dataset": "attachment-dataset.jsonl",
+      "datasetFormat": "one JSON object per line: { \"prompt\": string, \"referenceResponse\": string }",
+      "metrics": [
+        "attachment_set_matches",
+        "attachment_quote_grounded"
+      ],
+      "modelIdentifier": "anthropic.:0",
+      "notes": "metrics are defined in attachment-metrics.json; the dataset is regenerated from the catalogue"
+    },
+    {
+      "name": "registre-qa-knowledge-base",
+      "kind": "knowledge-base",
+      "dataset": "qa-dataset.jsonl",
+      "datasetFormat": "one JSON object per line: { \"conversationTurns\": [{ \"prompt\": { \"content\": [{ \"text\": string }] }, \"referenceResponses\": [{ \"text\": string }] }] }",
+      "metrics": [
+        "Correctness",
+        "Completeness",
+        "Helpfulness",
+        "Faithfulness"
+      ],
+      "modelIdentifier": "anthropic.:0",
+      "knowledgeBaseId": "<BEDROCK_KNOWLEDGE_BASE_ID>",
+      "notes": "the five trap questions expect the refusal sentence; any answer naming a document is a failure"
+    }
+  ],
+  "cli": [
+    "aws bedrock create-evaluation-job --cli-input-json file://eval/bedrock/attachment-job.json",
+    "aws bedrock create-evaluation-job --cli-input-json file://eval/bedrock/qa-job.json",
+    "aws bedrock get-evaluation-job --job-identifier <job-arn>"
+  ]
+}

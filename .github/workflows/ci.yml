@@ -115,8 +115,8 @@ jobs:
           python3 .github/fireworks/test_union_journal.py
           python3 .github/fireworks/test_quota.py
 
-  apps:
-    name: apps
+  portal:
+    name: portal
     runs-on: [self-hosted, linux, x64, registre-worker]
     timeout-minutes: 5
     env:
@@ -141,6 +141,25 @@ jobs:
           npm ci --prefer-offline --no-audit --no-fund
           npm run typecheck
           npm run build
+
+  infra:
+    name: infra
+    runs-on: [self-hosted, linux, x64, registre-worker]
+    timeout-minutes: 5
+    env:
+      PATH: /home/baptiste/.local/node22/bin:/home/baptiste/.local/bin:/usr/local/bin:/usr/bin:/bin
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+          clean: false
+      - name: Changed areas (path-gated steps)
+        id: paths
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          EVENT_PAYLOAD: ${{ toJSON(github.event) }}
+        run: python3 .github/ci/changed_paths.py
       - name: Infrastructure typecheck and synth
         if: steps.paths.outputs.infra == 'yes'
         shell: bash
@@ -154,7 +173,7 @@ jobs:
     name: ci
     runs-on: [self-hosted, linux, x64, registre-worker]
     timeout-minutes: 5
-    needs: [typecheck, tests, guards, apps]
+    needs: [typecheck, tests, guards, portal, infra]
     if: always()
     steps:
       - name: Aggregate the conclusions of the parallel jobs
@@ -169,8 +188,12 @@ jobs:
           check typecheck "${{ needs.typecheck.result }}"
           check tests "${{ needs.tests.result }}"
           check guards "${{ needs.guards.result }}"
-          if [ "${{ needs.apps.result }}" != "success" ] && [ "${{ needs.apps.result }}" != "skipped" ]; then
-            echo "::error::job apps finished with '${{ needs.apps.result }}'"
+          if [ "${{ needs.portal.result }}" != "success" ] && [ "${{ needs.portal.result }}" != "skipped" ]; then
+            echo "::error::job portal finished with '${{ needs.portal.result }}'"
+            status=1
+          fi
+          if [ "${{ needs.infra.result }}" != "success" ] && [ "${{ needs.infra.result }}" != "skipped" ]; then
+            echo "::error::job infra finished with '${{ needs.infra.result }}'"
             status=1
           fi
           exit $status

@@ -1,0 +1,2710 @@
+{
+  "runId": "fixture-perfect",
+  "producedBy": "fixture",
+  "reading": [
+    {
+      "evidenceId": "EV-001",
+      "fields": {
+        "type": "POLICY",
+        "title": "Information Security Policy",
+        "documentDate": "2025-05-12",
+        "period": {
+          "start": null,
+          "end": null
+        },
+        "version": "4.0",
+        "author": "Quality Lead",
+        "approver": "Chief Executive Officer",
+        "approvalDate": "2025-05-20",
+        "client": null,
+        "personalData": false
+      },
+      "flags": {
+        "unreadable": false,
+        "missingDate": false,
+        "missingAuthor": false,
+        "dateToConfirm": false
+      },
+      "accessLevel": "INTERNAL"
+    },
+    {
+      "evidenceId": "EV-002",
+      "fields": {
+        "type": "POLICY",
+        "title": "Information Security Policy (service desk copy)",
+        "documentDate": "2025-05-12",
+        "period": {
+          "start": null,
+          "end": null
+        },
+        "version": "4.0",
+        "author": "Quality Lead",
+        "approver": "Chief Executive Officer",
+        "approvalDate": "2025-05-20",
+        "client": null,
+        "personalData": false
+      },
+      "flags": {
+        "unreadable": false,
+        "missingDate": false,
+        "missingAuthor": false,
+        "dateToConfirm": false
+      },
+      "accessLevel": "INTERNAL"
+    },
+    {
+      "evidenceId": "EV-003",
+      "fields": {
+        "type": "LIST",
+        "title": "Roles and Responsibilities Matrix",
+        "documentDate": "2026-02-10",
+        "period": {
+          "start": null,
+          "end": null
+        },
+        "version": "1.0",
+        "author": "Quality Lead",
+        "approver": "Managing Director",
+        "approvalDate": "2026-02-12",
+        "client": null,
+        "personalData": false
+      },
+      "flags": {
+        "unreadable": false,
+        "missingDate": false,
+        "missingAuthor": false,
+        "dateToConfirm": false
+      },
+      "accessLevel": "INTERNAL"
+    },
+    {
+      "evidenceId": "EV-004",
+      "fields": {
+        "type": "MINUTES",
+        "title": "Management Review Minutes, Q3 2026",
+        "documentDate": "2026-09-18",
+        "period": {
+          "start": null,
+          "end": null
+        },
+        "version": "1.0",
+        "author": "Quality Lead",
+        "approver": "Managing Director",
+        "approvalDate": "2026-10-02",
+        "client": null,
+        "personalData": false
+      },
+      "flags": {
+        "unreadable": false,
+        "missingDate": false,
+        "missingAuthor": false,
+        "dateToConfirm": false
+      },
+      "accessLevel": "INTERNAL"
+    },
+    {
+      "evidenceId": "EV-005",
+      "fields": {
+        "type": "REPORT",
+        "title": "Internal Audit Report 2026",
+        "documentDate": "2026-01-30",
+        "period": {
+          "start": null,
+          "end": null
+        },
+        "version": "1.0",
+        "author": "Internal Auditor",
+        "approver": "Quality Lead",
+        "approvalDate": "2026-02-06",
+        "client": null,
+        "personalData": false
+      },
+      "flags": {
+        "unreadable": false,
+        "missingDate": false,
+        "missingAuthor": false,
+        "dateToConfirm": false
+      },
+      "accessLevel": "INTERNAL"
+    },
+    {
+      "evidenceId": "EV-006",
+      "fields": {
+        "type": "EXPORT",
+        "title": "Supplier and Subcontractor Register",
+        "documentDate": "2026-08-31",
+        "period": {
+          "start": "2026-01-01",
+          "end": "2026-06-30"
+        },
+        "version": "1.0",
+        "author": "Procurement Lead",
+        "approver": null,
+        "approvalDate": null,
+        "client": null,
+        "personalData": false
+      },
+      "flags": {
+        "unreadable": false,
+        "missingDate": false,
+        "missingAuthor": false,
+        "dateToConfirm": false
+      },
+      "accessLevel": "INTERNAL"
+    },
+    {
+      "evidenceId": "EV-007",
+      "fields": {
+        "type": "PROCEDURE",
+        "title": "Change Management Procedure",
+        "documentDate": "2026-04-14",
+        "period": {
+          "start": null,
+          "end": null
+        },
+        "version": "2.0",
+        "author": "Change Manager",
+        "approver": null,
+        "approvalDate": null,
+        "client": null,
+        "personalData": false
+      },
+      "flags": {
+        "unreadable": false,
+        "missingDate": false,
+        "missingAuthor": false,
+        "dateToConfirm": false
+      },
+      "accessLevel": "INTERNAL"
+    },
+    {
+      "evidenceId": "EV-008",
+      "fields": {
+        "type": "ATTESTATION",
+        "title": "Board Attestation on Internal Control",
+        "documentDate": "2026-03-05",
+        "period": {
+          "start": null,
+          "end": null
+        },
+        "version": "1.0",
+        "author": "Managing Director",
+        "approver": "Board Chair",
+        "approvalDate": "2026-03-05",
+        "client": null,
+        "personalData": false
+      },
+      "flags": {
+        "unreadable": false,
+        "missingDate": false,
+        "missingAuthor": false,
+        "dateToConfirm": false
+      },
+      "accessLevel": "INTERNAL"
+    },
+    {
+      "evidenceId": "EV-009",
+      "fields": {
+        "type": "MINUTES",
+        "title": "Management Review Minutes, Q2 2026",
+        "documentDate": "2026-06-19",
+        "period": {
+          "start": null,
+          "end": null
+        },
+        "version": "1.0",
+        "author": "Quality Lead",
+        "approver": "Managing Director",
+        "approvalDate": "2026-06-24",
+        "client": null,
+        "personalData": false
+      },
+      "flags": {
+        "unreadable": false,
+        "missingDate": false,
+        "missingAuthor": false,
+        "dateToConfirm": false
+      },
+      "accessLevel": "INTERNAL"
+    },
+    {
+      "evidenceId": "EV-010",
+      "fields": {
+        "type": "EXPORT",
+        "title": "Risk Register Export, H1 2026",
+        "documentDate": "2026-07-02",
+        "period": {
+          "start": "2026-01-01",
+          "end": "2026-06-30"
+        },
+        "version": "1.0",
+        "author": "Quality Lead",
+        "approver": null,
+        "approvalDate": null,
+        "client": null,
+        "personalData": false
+      },
+      "flags": {
+        "unreadable": false,
+        "missingDate": false,
+        "missingAuthor": false,
+        "dateToConfirm": false
+      },
+      "accessLevel": "INTERNAL"
+    },
+    {
+      "evidenceId": "EV-011",
+      "fields": {
+        "type": "SCREENSHOT",
+        "title": "Audit Calendar Screenshot",
+        "documentDate": "2026-09-02",
+        "period": {
+          "start": null,
+          "end": null
+        },
+        "version": "1.0",
+        "author": "Quality Lead",
+        "approver": null,
+        "approvalDate": null,
+        "client": null,
+        "personalData": false
+      },
+      "flags": {
+        "unreadable": false,
+        "missingDate": false,
+        "missingAuthor": false,
+        "dateToConfirm": true
+      },
+      "accessLevel": "INTERNAL"
+    },
+    {
+      "evidenceId": "EV-012",
+      "fields": {
+        "type": "REPORT",
+        "title": "Internal Audit Plan 2026",
+        "documentDate": "2026-01-08",
+        "period": {
+          "start": null,
+          "end": null
+        },
+        "version": "1.0",
+        "author": "Quality Lead",
+        "approver": "Managing Director",
+        "approvalDate": "2026-01-12",
+        "client": null,
+        "personalData": false
+      },
+      "flags": {
+        "unreadable": false,
+        "missingDate": false,
+        "missingAuthor": false,
+        "dateToConfirm": false
+      },
+      "accessLevel": "INTERNAL"
+    },
+    {
+      "evidenceId": "EV-013",
+      "fields": {
+        "type": "EXPORT",
+        "title": "Incident Register Export, Q3 2026",
+        "documentDate": "2026-10-01",
+        "period": {
+          "start": "2026-07-01",
+          "end": "2026-09-30"
+        },
+        "version": "1.0",
+        "author": "Service Desk Manager",
+        "approver": null,
+        "approvalDate": null,
+        "client": null,
+        "personalData": false
+      },
+      "flags": {
+        "unreadable": false,
+        "missingDate": false,
+        "missingAuthor": false,
+        "dateToConfirm": false
+      },
+      "accessLevel": "INTERNAL"
+    },
+    {
+      "evidenceId": "EV-014",
+      "fields": {
+        "type": "EXPORT",
+        "title": "Incident Register Export, August 2026",
+        "documentDate": "2026-09-01",
+        "period": {
+          "start": "2026-08-01",
+          "end": "2026-08-31"
+        },
+        "version": "1.0",
+        "author": "Service Desk Manager",
+        "approver": null,
+        "approvalDate": null,
+        "client": null,
+        "personalData": false
+      },
+      "flags": {
+        "unreadable": false,
+        "missingDate": false,
+        "missingAuthor": false,
+        "dateToConfirm": false
+      },
+      "accessLevel": "INTERNAL"
+    },
+    {
+      "evidenceId": "EV-015",
+      "fields": {
+        "type": "MINUTES",
+        "title": "Major Incident Review INC-2026-014",
+        "documentDate": "2026-07-22",
+        "period": {
+          "start": null,
+          "end": null
+        },
+        "version": "1.0",
+        "author": "Service Desk Manager",
+        "approver": "Operations Lead",
+        "approvalDate": "2026-07-28",
+        "client": null,
+        "personalData": false
+      },
+      "flags": {
+        "unreadable": false,
+        "missingDate": false,
+        "missingAuthor": false,
+        "dateToConfirm": false
+      },
+      "accessLevel": "INTERNAL"
+    },
+    {
+      "evidenceId": "EV-016",
+      "fields": {
+        "type": "MINUTES",
+        "title": "Post-Incident Review INC-2026-021",
+        "documentDate": "2026-09-30",
+        "period": {
+          "start": null,
+          "end": null
+        },
+        "version": "1.0",
+        "author": "Service Desk Manager",
+        "approver": "Operations Lead",
+        "approvalDate": "2026-10-06",
+        "client": null,
+        "personalData": false
+      },
+      "flags": {
+        "unreadable": false,
+        "missingDate": false,
+        "missingAuthor": false,
+        "dateToConfirm": false
+      },
+      "accessLevel": "INTERNAL"
+    },
+    {
+      "evidenceId": "EV-017",
+      "fields": {
+        "type": "REPORT",
+        "title": "Incident Response Time Report, September 2026",
+        "documentDate": "2026-10-03",
+        "period": {
+          "start": "2026-09-01",
+          "end": "2026-09-30"
+        },
+        "version": "1.0",
+        "author": "Service Desk Manager",
+        "approver": null,
+        "approvalDate": null,
+        "client": null,
+        "personalData": false
+      },
+      "flags": {
+        "unreadable": false,
+        "missingDate": false,
+        "missingAuthor": false,
+        "dateToConfirm": false
+      },
+      "accessLevel": "INTERNAL"
+    },
+    {
+      "evidenceId": "EV-018",
+      "fields": {
+        "type": "EXPORT",
+        "title": "Security Incident Notification Log, H1 2026",
+        "documentDate": "2026-07-05",
+        "period": {
+          "start": "2026-01-01",
+          "end": "2026-06-30"
+        },
+        "version": "1.0",
+        "author": "Security Officer",
+        "approver": null,
+        "approvalDate": null,
+        "client": "Northwind Logistics",
+        "personalData": true
+      },
+      "flags": {
+        "unreadable": false,
+        "missingDate": false,
+        "missingAuthor": false,
+        "dateToConfirm": false
+      },
+      "accessLevel": "RESTRICTED"
+    },
+    {
+      "evidenceId": "EV-019",
+      "fields": {
+        "type": "EXPORT",
+        "title": "Problem Records Export, Q3 2026",
+        "documentDate": "2026-10-05",
+        "period": {
+          "start": "2026-07-01",
+          "end": "2026-09-30"
+        },
+        "version": "1.0",
+        "author": "Service Desk Manager",
+        "approver": null,
+        "approvalDate": null,
+        "client": null,
+        "personalData": false
+      },
+      "flags": {
+        "unreadable": false,
+        "missingDate": false,
+        "missingAuthor": false,
+        "dateToConfirm": false
+      },
+      "accessLevel": "INTERNAL"
+    },
+    {
+      "evidenceId": "EV-020",
+      "fields": {
+        "type": "ATTESTATION",
+        "title": "Customer Notification Attestation, Northwind",
+        "documentDate": "2026-05-14",
+        "period": {
+          "start": null,
+          "end": null
+        },
+        "version": "1.0",
+        "author": "Security Officer",
+        "approver": "Managing Director",
+        "approvalDate": "2026-05-15",
+        "client": "Northwind Logistics",
+        "personalData": false
+      },
+      "flags": {
+        "unreadable": false,
+        "missingDate": false,
+        "missingAuthor": false,
+        "dateToConfirm": false
+      },
+      "accessLevel": "INTERNAL"
+    },
+    {
+      "evidenceId": "EV-021",
+      "fields": {
+        "type": "EXPORT",
+        "title": "Major Incident Log, H1 2026",
+        "documentDate": "2026-07-04",
+        "period": {
+          "start": "2026-01-01",
+          "end": "2026-06-30"
+        },
+        "version": "1.0",
+        "author": "Service Desk Manager",
+        "approver": null,
+        "approvalDate": null,
+        "client": null,
+        "personalData": false
+      },
+      "flags": {
+        "unreadable": false,
+        "missingDate": false,
+        "missingAuthor": false,
+        "dateToConfirm": false
+      },
+      "accessLevel": "INTERNAL"
+    },
+    {
+      "evidenceId": "EV-022",
+      "fields": {
+        "type": "POLICY",
+        "title": "Incident Management Policy",
+        "documentDate": "2026-02-02",
+        "period": {
+          "start": null,
+          "end": null
+        },
+        "version": "3.0",
+        "author": "Service Desk Manager",
+        "approver": "Managing Director",
+        "approvalDate": "2026-02-09",
+        "client": null,
+        "personalData": false
+      },
+      "flags": {
+        "unreadable": false,
+        "missingDate": false,
+        "missingAuthor": false,
+        "dateToConfirm": false
+      },
+      "accessLevel": "INTERNAL"
+    },
+    {
+      "evidenceId": "EV-023",
+      "fields": {
+        "type": "EXPORT",
+        "title": "Change Register Export, September 2026",
+        "documentDate": "2026-10-02",
+        "period": {
+          "start": "2026-09-01",
+          "end": "2026-09-30"
+        },
+        "version": "1.0",
+        "author": "Change Manager",
+        "approver": null,
+        "approvalDate": null,
+        "client": null,
+        "personalData": false
+      },
+      "flags": {
+        "unreadable": false,
+        "missingDate": false,
+        "missingAuthor": false,
+        "dateToConfirm": false
+      },
+      "accessLevel": "INTERNAL"
+    },
+    {
+      "evidenceId": "EV-024",
+      "fields": {
+        "type": "MINUTES",
+        "title": "Emergency Change Review CHG-2026-118",
+        "documentDate": "2026-08-11",
+        "period": {
+          "start": null,
+          "end": null
+        },
+        "version": "1.0",
+        "author": "Change Manager",
+        "approver": "Platform Lead",
+        "approvalDate": "2026-08-14",
+        "client": null,
+        "personalData": false
+      },
+      "flags": {
+        "unreadable": false,
+        "missingDate": false,
+        "missingAuthor": false,
+        "dateToConfirm": false
+      },
+      "accessLevel": "INTERNAL"
+    },
+    {
+      "evidenceId": "EV-025",
+      "fields": {
+        "type": "REPORT",
+        "title": "Change Success Report, Q2 2026",
+        "documentDate": "2026-07-10",
+        "period": {
+          "start": "2026-04-01",
+          "end": "2026-06-30"
+        },
+        "version": "1.0",
+        "author": "Change Manager",
+        "approver": null,
+        "approvalDate": null,
+        "client": null,
+        "personalData": false
+      },
+      "flags": {
+        "unreadable": false,
+        "missingDate": false,
+        "missingAuthor": false,
+        "dateToConfirm": false
+      },
+      "accessLevel": "INTERNAL"
+    },
+    {
+      "evidenceId": "EV-026",
+      "fields": {
+        "type": "LIST",
+        "title": "Configuration Baseline Inventory",
+        "documentDate": "2026-07-15",
+        "period": {
+          "start": null,
+          "end": null
+        },
+        "version": "1.0",
+        "author": "Platform Lead",
+        "approver": "Operations Lead",
+        "approvalDate": "2026-07-20",
+        "client": null,
+        "personalData": false
+      },
+      "flags": {
+        "unreadable": false,
+        "missingDate": false,
+        "missingAuthor": false,
+        "dateToConfirm": false
+      },
+      "accessLevel": "INTERNAL"
+    },
+    {
+      "evidenceId": "EV-027",
+      "fields": {
+        "type": "PROCEDURE",
+        "title": "Production Access Procedure",
+        "documentDate": "2026-04-20",
+        "period": {
+          "start": null,
+          "end": null
+        },
+        "version": "1.2",
+        "author": "Platform Lead",
+        "approver": "Security Officer",
+        "approvalDate": "2026-04-24",
+        "client": null,
+        "personalData": false
+      },
+      "flags": {
+        "unreadable": false,
+        "missingDate": false,
+        "missingAuthor": false,
+        "dateToConfirm": false
+      },
+      "accessLevel": "INTERNAL"
+    },
+    {
+      "evidenceId": "EV-028",
+      "fields": {
+        "type": "EXPORT",
+        "title": "Change Approvals Export, August 2026",
+        "documentDate": "2026-09-02",
+        "period": {
+          "start": "2026-08-01",
+          "end": "2026-08-31"
+        },
+        "version": "1.0",
+        "author": "Change Manager",
+        "approver": null,
+        "approvalDate": null,
+        "client": null,
+        "personalData": false
+      },
+      "flags": {
+        "unreadable": false,
+        "missingDate": false,
+        "missingAuthor": false,
+        "dateToConfirm": false
+      },
+      "accessLevel": "INTERNAL"
+    },
+    {
+      "evidenceId": "EV-029",
+      "fields": {
+        "type": "MINUTES",
+        "title": "Change Advisory Board Minutes, September 2026",
+        "documentDate": "2026-09-08",
+        "period": {
+          "start": null,
+          "end": null
+        },
+        "version": "1.0",
+        "author": "Change Manager",
+        "approver": "Platform Lead",
+        "approvalDate": "2026-09-09",
+        "client": null,
+        "personalData": false
+      },
+      "flags": {
+        "unreadable": false,
+        "missingDate": false,
+        "missingAuthor": false,
+        "dateToConfirm": false
+      },
+      "accessLevel": "INTERNAL"
+    },
+    {
+      "evidenceId": "EV-030",
+      "fields": {
+        "type": "REPORT",
+        "title": "Emergency Change Report, Q1 2026",
+        "documentDate": "2026-04-08",
+        "period": {
+          "start": "2026-01-01",
+          "end": "2026-03-31"
+        },
+        "version": "1.0",
+        "author": "Change Manager",
+        "approver": null,
+        "approvalDate": null,
+        "client": null,
+        "personalData": false
+      },
+      "flags": {
+        "unreadable": false,
+        "missingDate": false,
+        "missingAuthor": false,
+        "dateToConfirm": false
+      },
+      "accessLevel": "INTERNAL"
+    },
+    {
+      "evidenceId": "EV-031",
+      "fields": {
+        "type": "EXPORT",
+        "title": "Access Change Log, H1 2026",
+        "documentDate": "2026-07-06",
+        "period": {
+          "start": "2026-01-01",
+          "end": "2026-06-30"
+        },
+        "version": "1.0",
+        "author": "Platform Lead",
+        "approver": null,
+        "approvalDate": null,
+        "client": null,
+        "personalData": false
+      },
+      "flags": {
+        "unreadable": false,
+        "missingDate": false,
+        "missingAuthor": false,
+        "dateToConfirm": false
+      },
+      "accessLevel": "INTERNAL"
+    },
+    {
+      "evidenceId": "EV-032",
+      "fields": {
+        "type": "SCREENSHOT",
+        "title": "Change Calendar Screenshot",
+        "documentDate": "2026-09-25",
+        "period": {
+          "start": null,
+          "end": null
+        },
+        "version": "1.0",
+        "author": "Change Manager",
+        "approver": null,
+        "approvalDate": null,
+        "client": null,
+        "personalData": false
+      },
+      "flags": {
+        "unreadable": false,
+        "missingDate": false,
+        "missingAuthor": false,
+        "dateToConfirm": false
+      },
+      "accessLevel": "INTERNAL"
+    },
+    {
+      "evidenceId": "EV-033",
+      "fields": {
+        "type": "REPORT",
+        "title": "Restore Test Report, Q2 2026",
+        "documentDate": "2026-06-28",
+        "period": {
+          "start": null,
+          "end": null
+        },
+        "version": "1.0",
+        "author": "Operations Lead",
+        "approver": "Managing Director",
+        "approvalDate": "2026-07-01",
+        "client": null,
+        "personalData": false
+      },
+      "flags": {
+        "unreadable": false,
+        "missingDate": false,
+        "missingAuthor": false,
+        "dateToConfirm": false
+      },
+      "accessLevel": "INTERNAL"
+    },
+    {
+      "evidenceId": "EV-034",
+      "fields": {
+        "type": "POLICY",
+        "title": "Business Continuity Plan",
+        "documentDate": "2026-01-15",
+        "period": {
+          "start": null,
+          "end": null
+        },
+        "version": "5.0",
+        "author": "Operations Lead",
+        "approver": "Managing Director",
+        "approvalDate": "2026-01-22",
+        "client": null,
+        "personalData": false
+      },
+      "flags": {
+        "unreadable": false,
+        "missingDate": false,
+        "missingAuthor": false,
+        "dateToConfirm": false
+      },
+      "accessLevel": "INTERNAL"
+    },
+    {
+      "evidenceId": "EV-035",
+      "fields": {
+        "type": "LIST",
+        "title": "Recovery Objectives per Service",
+        "documentDate": "2025-11-20",
+        "period": {
+          "start": null,
+          "end": null
+        },
+        "version": "1.0",
+        "author": "Operations Lead",
+        "approver": "Managing Director",
+        "approvalDate": "2025-11-28",
+        "client": null,
+        "personalData": false
+      },
+      "flags": {
+        "unreadable": false,
+        "missingDate": false,
+        "missingAuthor": false,
+        "dateToConfirm": false
+      },
+      "accessLevel": "INTERNAL"
+    },
+    {
+      "evidenceId": "EV-036",
+      "fields": {
+        "type": "EXPORT",
+        "title": "Backup Job Report, September 2026",
+        "documentDate": "2026-10-01",
+        "period": {
+          "start": "2026-09-01",
+          "end": "2026-09-30"
+        },
+        "version": "1.0",
+        "author": "Operations Lead",
+        "approver": null,
+        "approvalDate": null,
+        "client": null,
+        "personalData": false
+      },
+      "flags": {
+        "unreadable": false,
+        "missingDate": false,
+        "missingAuthor": false,
+        "dateToConfirm": false
+      },
+      "accessLevel": "INTERNAL"
+    },
+    {
+      "evidenceId": "EV-037",
+      "fields": {
+        "type": "MINUTES",
+        "title": "Continuity Exercise Minutes 2026",
+        "documentDate": "2026-05-06",
+        "period": {
+          "start": null,
+          "end": null
+        },
+        "version": "1.0",
+        "author": "Operations Lead",
+        "approver": "Managing Director",
+        "approvalDate": "2026-05-12",
+        "client": null,
+        "personalData": false
+      },
+      "flags": {
+        "unreadable": false,
+        "missingDate": false,
+        "missingAuthor": false,
+        "dateToConfirm": false
+      },
+      "accessLevel": "INTERNAL"
+    },
+    {
+      "evidenceId": "EV-038",
+      "fields": {
+        "type": "REPORT",
+        "title": "Restore Test Report, Q1 2026",
+        "documentDate": "2026-03-27",
+        "period": {
+          "start": null,
+          "end": null
+        },
+        "version": "1.0",
+        "author": "Operations Lead",
+        "approver": "Managing Director",
+        "approvalDate": "2026-03-31",
+        "client": null,
+        "personalData": false
+      },
+      "flags": {
+        "unreadable": false,
+        "missingDate": false,
+        "missingAuthor": false,
+        "dateToConfirm": false
+      },
+      "accessLevel": "INTERNAL"
+    },
+    {
+      "evidenceId": "EV-039",
+      "fields": {
+        "type": "EXPORT",
+        "title": "Backup Job Report, August 2026",
+        "documentDate": "2026-09-01",
+        "period": {
+          "start": "2026-08-01",
+          "end": "2026-08-31"
+        },
+        "version": "1.0",
+        "author": "Operations Lead",
+        "approver": null,
+        "approvalDate": null,
+        "client": null,
+        "personalData": false
+      },
+      "flags": {
+        "unreadable": false,
+        "missingDate": false,
+        "missingAuthor": false,
+        "dateToConfirm": false
+      },
+      "accessLevel": "INTERNAL"
+    },
+    {
+      "evidenceId": "EV-040",
+      "fields": {
+        "type": "LIST",
+        "title": "Recovery Runbook Inventory",
+        "documentDate": "2026-04-02",
+        "period": {
+          "start": null,
+          "end": null
+        },
+        "version": "1.0",
+        "author": "Operations Lead",
+        "approver": "Managing Director",
+        "approvalDate": "2026-04-09",
+        "client": null,
+        "personalData": false
+      },
+      "flags": {
+        "unreadable": false,
+        "missingDate": false,
+        "missingAuthor": false,
+        "dateToConfirm": false
+      },
+      "accessLevel": "INTERNAL"
+    },
+    {
+      "evidenceId": "EV-041",
+      "fields": {
+        "type": "REPORT",
+        "title": "Continuity Test Report 2026",
+        "documentDate": "2026-09-12",
+        "period": {
+          "start": null,
+          "end": null
+        },
+        "version": "1.0",
+        "author": "Operations Lead",
+        "approver": "Managing Director",
+        "approvalDate": "2026-09-16",
+        "client": null,
+        "personalData": false
+      },
+      "flags": {
+        "unreadable": false,
+        "missingDate": false,
+        "missingAuthor": false,
+        "dateToConfirm": false
+      },
+      "accessLevel": "INTERNAL"
+    },
+    {
+      "evidenceId": "EV-042",
+      "fields": {
+        "type": "SCREENSHOT",
+        "title": "Backup Console Screenshot",
+        "documentDate": "2026-10-06",
+        "period": {
+          "start": null,
+          "end": null
+        },
+        "version": "1.0",
+        "author": "Operations Lead",
+        "approver": null,
+        "approvalDate": null,
+        "client": null,
+        "personalData": false
+      },
+      "flags": {
+        "unreadable": false,
+        "missingDate": false,
+        "missingAuthor": false,
+        "dateToConfirm": true
+      },
+      "accessLevel": "INTERNAL"
+    },
+    {
+      "evidenceId": "EV-043",
+      "fields": {
+        "type": "EXPORT",
+        "title": "Access Review, Q3 2026",
+        "documentDate": "2026-10-04",
+        "period": {
+          "start": "2026-07-01",
+          "end": "2026-09-30"
+        },
+        "version": "1.0",
+        "author": "Security Officer",
+        "approver": "Managing Director",
+        "approvalDate": "2026-10-07",
+        "client": null,
+        "personalData": false
+      },
+      "flags": {
+        "unreadable": false,
+        "missingDate": false,
+        "missingAuthor": false,
+        "dateToConfirm": false
+      },
+      "accessLevel": "INTERNAL"
+    },
+    {
+      "evidenceId": "EV-044",
+      "fields": {
+        "type": "REPORT",
+        "title": "Vulnerability Scan Report, September 2026",
+        "documentDate": "2026-09-30",
+        "period": {
+          "start": "2026-09-01",
+          "end": "2026-09-30"
+        },
+        "version": "1.0",
+        "author": "Security Officer",
+        "approver": null,
+        "approvalDate": null,
+        "client": null,
+        "personalData": false
+      },
+      "flags": {
+        "unreadable": false,
+        "missingDate": false,
+        "missingAuthor": false,
+        "dateToConfirm": false
+      },
+      "accessLevel": "INTERNAL"
+    },
+    {
+      "evidenceId": "EV-045",
+      "fields": {
+        "type": "LIST",
+        "title": "Security Awareness Training Completion 2026",
+        "documentDate": "2026-03-31",
+        "period": {
+          "start": "2026-01-01",
+          "end": "2026-03-31"
+        },
+        "version": "1.0",
+        "author": "Security Officer",
+        "approver": null,
+        "approvalDate": null,
+        "client": null,
+        "personalData": true
+      },
+      "flags": {
+        "unreadable": false,
+        "missingDate": false,
+        "missingAuthor": false,
+        "dateToConfirm": false
+      },
+      "accessLevel": "RESTRICTED"
+    },
+    {
+      "evidenceId": "EV-046",
+      "fields": {
+        "type": "ATTESTATION",
+        "title": "Encryption Attestation 2026",
+        "documentDate": "2026-06-30",
+        "period": {
+          "start": null,
+          "end": null
+        },
+        "version": "1.0",
+        "author": "Platform Lead",
+        "approver": "Security Officer",
+        "approvalDate": "2026-07-03",
+        "client": null,
+        "personalData": false
+      },
+      "flags": {
+        "unreadable": false,
+        "missingDate": false,
+        "missingAuthor": false,
+        "dateToConfirm": false
+      },
+      "accessLevel": "INTERNAL"
+    },
+    {
+      "evidenceId": "EV-047",
+      "fields": {
+        "type": "POLICY",
+        "title": "Access Control Policy",
+        "documentDate": "2026-03-18",
+        "period": {
+          "start": null,
+          "end": null
+        },
+        "version": "2.1",
+        "author": "Security Officer",
+        "approver": "Managing Director",
+        "approvalDate": "2026-03-25",
+        "client": null,
+        "personalData": false
+      },
+      "flags": {
+        "unreadable": false,
+        "missingDate": false,
+        "missingAuthor": false,
+        "dateToConfirm": false
+      },
+      "accessLevel": "INTERNAL"
+    },
+    {
+      "evidenceId": "EV-048",
+      "fields": {
+        "type": "EXPORT",
+        "title": "Privileged Account List, September 2026",
+        "documentDate": "2026-09-30",
+        "period": {
+          "start": null,
+          "end": null
+        },
+        "version": "1.0",
+        "author": "Security Officer",
+        "approver": null,
+        "approvalDate": null,
+        "client": null,
+        "personalData": true
+      },
+      "flags": {
+        "unreadable": false,
+        "missingDate": false,
+        "missingAuthor": false,
+        "dateToConfirm": false
+      },
+      "accessLevel": "RESTRICTED"
+    },
+    {
+      "evidenceId": "EV-049",
+      "fields": {
+        "type": "REPORT",
+        "title": "Vulnerability Scan Report, October 2026",
+        "documentDate": "2026-10-31",
+        "period": {
+          "start": "2026-10-01",
+          "end": "2026-10-31"
+        },
+        "version": "1.0",
+        "author": "Security Officer",
+        "approver": null,
+        "approvalDate": null,
+        "client": null,
+        "personalData": false
+      },
+      "flags": {
+        "unreadable": false,
+        "missingDate": false,
+        "missingAuthor": false,
+        "dateToConfirm": false
+      },
+      "accessLevel": "INTERNAL"
+    },
+    {
+      "evidenceId": "EV-050",
+      "fields": {
+        "type": "LIST",
+        "title": "Personnel Screening Records 2026",
+        "documentDate": "2026-02-28",
+        "period": {
+          "start": null,
+          "end": null
+        },
+        "version": "1.0",
+        "author": "HR Lead",
+        "approver": null,
+        "approvalDate": null,
+        "client": null,
+        "personalData": true
+      },
+      "flags": {
+        "unreadable": false,
+        "missingDate": false,
+        "missingAuthor": false,
+        "dateToConfirm": false
+      },
+      "accessLevel": "RESTRICTED"
+    },
+    {
+      "evidenceId": "EV-051",
+      "fields": {
+        "type": "MINUTES",
+        "title": "Security Committee Minutes, October 2026",
+        "documentDate": "2026-10-08",
+        "period": {
+          "start": null,
+          "end": null
+        },
+        "version": "1.0",
+        "author": "Security Officer",
+        "approver": "Managing Director",
+        "approvalDate": "2026-10-09",
+        "client": null,
+        "personalData": false
+      },
+      "flags": {
+        "unreadable": false,
+        "missingDate": false,
+        "missingAuthor": false,
+        "dateToConfirm": false
+      },
+      "accessLevel": "INTERNAL"
+    },
+    {
+      "evidenceId": "EV-052",
+      "fields": {
+        "type": null,
+        "title": null,
+        "documentDate": null,
+        "period": {
+          "start": null,
+          "end": null
+        },
+        "version": null,
+        "author": null,
+        "approver": null,
+        "approvalDate": null,
+        "client": null,
+        "personalData": false
+      },
+      "flags": {
+        "unreadable": true,
+        "missingDate": false,
+        "missingAuthor": false,
+        "dateToConfirm": false
+      },
+      "accessLevel": "INTERNAL"
+    },
+    {
+      "evidenceId": "EV-053",
+      "fields": {
+        "type": "REPORT",
+        "title": "Customer Satisfaction Survey, H1 2026",
+        "documentDate": "2026-07-08",
+        "period": {
+          "start": "2026-01-01",
+          "end": "2026-06-30"
+        },
+        "version": "1.0",
+        "author": "Account Manager",
+        "approver": null,
+        "approvalDate": null,
+        "client": null,
+        "personalData": false
+      },
+      "flags": {
+        "unreadable": false,
+        "missingDate": false,
+        "missingAuthor": false,
+        "dateToConfirm": false
+      },
+      "accessLevel": "INTERNAL"
+    },
+    {
+      "evidenceId": "EV-054",
+      "fields": {
+        "type": "MINUTES",
+        "title": "Service Review Minutes, Northwind, August 2026",
+        "documentDate": "2026-08-20",
+        "period": {
+          "start": null,
+          "end": null
+        },
+        "version": "1.0",
+        "author": "Account Manager",
+        "approver": "Managing Director",
+        "approvalDate": "2026-08-21",
+        "client": "Northwind Logistics",
+        "personalData": false
+      },
+      "flags": {
+        "unreadable": false,
+        "missingDate": false,
+        "missingAuthor": false,
+        "dateToConfirm": false
+      },
+      "accessLevel": "INTERNAL"
+    },
+    {
+      "evidenceId": "EV-055",
+      "fields": {
+        "type": "REPORT",
+        "title": "Service Level Report, Northwind, September 2026",
+        "documentDate": "2026-10-02",
+        "period": {
+          "start": "2026-09-01",
+          "end": "2026-09-30"
+        },
+        "version": "1.0",
+        "author": "Account Manager",
+        "approver": null,
+        "approvalDate": null,
+        "client": "Northwind Logistics",
+        "personalData": false
+      },
+      "flags": {
+        "unreadable": false,
+        "missingDate": false,
+        "missingAuthor": false,
+        "dateToConfirm": false
+      },
+      "accessLevel": "INTERNAL"
+    },
+    {
+      "evidenceId": "EV-056",
+      "fields": {
+        "type": "EXPORT",
+        "title": "Customer Complaint Log, H1 2026",
+        "documentDate": "2026-07-03",
+        "period": {
+          "start": "2026-01-01",
+          "end": "2026-06-30"
+        },
+        "version": "1.0",
+        "author": "Account Manager",
+        "approver": null,
+        "approvalDate": null,
+        "client": "Cobalt Retail",
+        "personalData": false
+      },
+      "flags": {
+        "unreadable": false,
+        "missingDate": false,
+        "missingAuthor": false,
+        "dateToConfirm": false
+      },
+      "accessLevel": "INTERNAL"
+    },
+    {
+      "evidenceId": "EV-057",
+      "fields": {
+        "type": "LIST",
+        "title": "Data Processing Agreement Register",
+        "documentDate": "2026-02-11",
+        "period": {
+          "start": null,
+          "end": null
+        },
+        "version": "1.0",
+        "author": "Account Manager",
+        "approver": "Managing Director",
+        "approvalDate": "2026-02-16",
+        "client": null,
+        "personalData": false
+      },
+      "flags": {
+        "unreadable": false,
+        "missingDate": false,
+        "missingAuthor": false,
+        "dateToConfirm": false
+      },
+      "accessLevel": "INTERNAL"
+    },
+    {
+      "evidenceId": "EV-058",
+      "fields": {
+        "type": "MINUTES",
+        "title": "Service Review Minutes, Cobalt, September 2026",
+        "documentDate": "2026-09-04",
+        "period": {
+          "start": null,
+          "end": null
+        },
+        "version": "1.0",
+        "author": "Account Manager",
+        "approver": "Managing Director",
+        "approvalDate": "2026-09-07",
+        "client": "Cobalt Retail",
+        "personalData": false
+      },
+      "flags": {
+        "unreadable": false,
+        "missingDate": false,
+        "missingAuthor": false,
+        "dateToConfirm": false
+      },
+      "accessLevel": "INTERNAL"
+    },
+    {
+      "evidenceId": "EV-059",
+      "fields": {
+        "type": "REPORT",
+        "title": "Service Level Report, Cobalt, August 2026",
+        "documentDate": "2026-09-01",
+        "period": {
+          "start": "2026-08-01",
+          "end": "2026-08-31"
+        },
+        "version": "1.0",
+        "author": "Account Manager",
+        "approver": null,
+        "approvalDate": null,
+        "client": "Cobalt Retail",
+        "personalData": false
+      },
+      "flags": {
+        "unreadable": false,
+        "missingDate": false,
+        "missingAuthor": false,
+        "dateToConfirm": false
+      },
+      "accessLevel": "INTERNAL"
+    },
+    {
+      "evidenceId": "EV-060",
+      "fields": {
+        "type": "REPORT",
+        "title": "Office Relocation Plan 2027",
+        "documentDate": "2026-10-12",
+        "period": {
+          "start": null,
+          "end": null
+        },
+        "version": "1.0",
+        "author": "Office Manager",
+        "approver": "Managing Director",
+        "approvalDate": "2026-10-15",
+        "client": null,
+        "personalData": false
+      },
+      "flags": {
+        "unreadable": false,
+        "missingDate": false,
+        "missingAuthor": false,
+        "dateToConfirm": false
+      },
+      "accessLevel": "INTERNAL"
+    }
+  ],
+  "attachment": [
+    {
+      "evidenceId": "EV-001",
+      "attachments": [
+        {
+          "controlId": "CONT-01",
+          "supports": true,
+          "confidence": 0.93,
+          "quote": "quote verified against the evidence text",
+          "citationVerified": true
+        }
+      ]
+    },
+    {
+      "evidenceId": "EV-002",
+      "attachments": [
+        {
+          "controlId": "CONT-01",
+          "supports": true,
+          "confidence": 0.93,
+          "quote": "quote verified against the evidence text",
+          "citationVerified": true
+        }
+      ]
+    },
+    {
+      "evidenceId": "EV-003",
+      "attachments": [
+        {
+          "controlId": "CONT-02",
+          "supports": true,
+          "confidence": 0.93,
+          "quote": "quote verified against the evidence text",
+          "citationVerified": true
+        }
+      ]
+    },
+    {
+      "evidenceId": "EV-004",
+      "attachments": [
+        {
+          "controlId": "CONT-03",
+          "supports": true,
+          "confidence": 0.93,
+          "quote": "quote verified against the evidence text",
+          "citationVerified": true
+        }
+      ]
+    },
+    {
+      "evidenceId": "EV-005",
+      "attachments": [
+        {
+          "controlId": "CONT-04",
+          "supports": true,
+          "confidence": 0.93,
+          "quote": "quote verified against the evidence text",
+          "citationVerified": true
+        }
+      ]
+    },
+    {
+      "evidenceId": "EV-006",
+      "attachments": [
+        {
+          "controlId": "CONT-05",
+          "supports": true,
+          "confidence": 0.93,
+          "quote": "quote verified against the evidence text",
+          "citationVerified": true
+        }
+      ]
+    },
+    {
+      "evidenceId": "EV-007",
+      "attachments": [
+        {
+          "controlId": "CONT-11",
+          "supports": true,
+          "confidence": 0.93,
+          "quote": "quote verified against the evidence text",
+          "citationVerified": true
+        },
+        {
+          "controlId": "CONT-15",
+          "supports": true,
+          "confidence": 0.93,
+          "quote": "quote verified against the evidence text",
+          "citationVerified": true
+        }
+      ]
+    },
+    {
+      "evidenceId": "EV-008",
+      "attachments": [
+        {
+          "controlId": "CONT-01",
+          "supports": true,
+          "confidence": 0.93,
+          "quote": "quote verified against the evidence text",
+          "citationVerified": true
+        },
+        {
+          "controlId": "CONT-04",
+          "supports": true,
+          "confidence": 0.93,
+          "quote": "quote verified against the evidence text",
+          "citationVerified": true
+        }
+      ]
+    },
+    {
+      "evidenceId": "EV-009",
+      "attachments": [
+        {
+          "controlId": "CONT-03",
+          "supports": true,
+          "confidence": 0.93,
+          "quote": "quote verified against the evidence text",
+          "citationVerified": true
+        }
+      ]
+    },
+    {
+      "evidenceId": "EV-010",
+      "attachments": [
+        {
+          "controlId": "CONT-05",
+          "supports": true,
+          "confidence": 0.93,
+          "quote": "quote verified against the evidence text",
+          "citationVerified": true
+        },
+        {
+          "controlId": "CONT-04",
+          "supports": true,
+          "confidence": 0.93,
+          "quote": "quote verified against the evidence text",
+          "citationVerified": true
+        }
+      ]
+    },
+    {
+      "evidenceId": "EV-011",
+      "attachments": [
+        {
+          "controlId": "CONT-04",
+          "supports": true,
+          "confidence": 0.93,
+          "quote": "quote verified against the evidence text",
+          "citationVerified": true
+        }
+      ]
+    },
+    {
+      "evidenceId": "EV-012",
+      "attachments": [
+        {
+          "controlId": "CONT-04",
+          "supports": true,
+          "confidence": 0.93,
+          "quote": "quote verified against the evidence text",
+          "citationVerified": true
+        }
+      ]
+    },
+    {
+      "evidenceId": "EV-013",
+      "attachments": [
+        {
+          "controlId": "CONT-06",
+          "supports": true,
+          "confidence": 0.93,
+          "quote": "quote verified against the evidence text",
+          "citationVerified": true
+        }
+      ]
+    },
+    {
+      "evidenceId": "EV-014",
+      "attachments": [
+        {
+          "controlId": "CONT-06",
+          "supports": true,
+          "confidence": 0.93,
+          "quote": "quote verified against the evidence text",
+          "citationVerified": true
+        },
+        {
+          "controlId": "CONT-08",
+          "supports": true,
+          "confidence": 0.93,
+          "quote": "quote verified against the evidence text",
+          "citationVerified": true
+        }
+      ]
+    },
+    {
+      "evidenceId": "EV-015",
+      "attachments": [
+        {
+          "controlId": "CONT-07",
+          "supports": true,
+          "confidence": 0.93,
+          "quote": "quote verified against the evidence text",
+          "citationVerified": true
+        }
+      ]
+    },
+    {
+      "evidenceId": "EV-016",
+      "attachments": [
+        {
+          "controlId": "CONT-07",
+          "supports": true,
+          "confidence": 0.93,
+          "quote": "quote verified against the evidence text",
+          "citationVerified": true
+        }
+      ]
+    },
+    {
+      "evidenceId": "EV-017",
+      "attachments": [
+        {
+          "controlId": "CONT-08",
+          "supports": true,
+          "confidence": 0.93,
+          "quote": "quote verified against the evidence text",
+          "citationVerified": true
+        }
+      ]
+    },
+    {
+      "evidenceId": "EV-018",
+      "attachments": [
+        {
+          "controlId": "CONT-09",
+          "supports": true,
+          "confidence": 0.93,
+          "quote": "quote verified against the evidence text",
+          "citationVerified": true
+        }
+      ]
+    },
+    {
+      "evidenceId": "EV-019",
+      "attachments": [
+        {
+          "controlId": "CONT-10",
+          "supports": true,
+          "confidence": 0.93,
+          "quote": "quote verified against the evidence text",
+          "citationVerified": true
+        }
+      ]
+    },
+    {
+      "evidenceId": "EV-020",
+      "attachments": [
+        {
+          "controlId": "CONT-09",
+          "supports": true,
+          "confidence": 0.93,
+          "quote": "quote verified against the evidence text",
+          "citationVerified": true
+        }
+      ]
+    },
+    {
+      "evidenceId": "EV-021",
+      "attachments": [
+        {
+          "controlId": "CONT-07",
+          "supports": true,
+          "confidence": 0.93,
+          "quote": "quote verified against the evidence text",
+          "citationVerified": true
+        },
+        {
+          "controlId": "CONT-06",
+          "supports": true,
+          "confidence": 0.93,
+          "quote": "quote verified against the evidence text",
+          "citationVerified": true
+        }
+      ]
+    },
+    {
+      "evidenceId": "EV-022",
+      "attachments": [
+        {
+          "controlId": "CONT-06",
+          "supports": true,
+          "confidence": 0.93,
+          "quote": "quote verified against the evidence text",
+          "citationVerified": true
+        },
+        {
+          "controlId": "CONT-07",
+          "supports": true,
+          "confidence": 0.93,
+          "quote": "quote verified against the evidence text",
+          "citationVerified": true
+        }
+      ]
+    },
+    {
+      "evidenceId": "EV-023",
+      "attachments": [
+        {
+          "controlId": "CONT-11",
+          "supports": true,
+          "confidence": 0.93,
+          "quote": "quote verified against the evidence text",
+          "citationVerified": true
+        }
+      ]
+    },
+    {
+      "evidenceId": "EV-024",
+      "attachments": [
+        {
+          "controlId": "CONT-12",
+          "supports": true,
+          "confidence": 0.93,
+          "quote": "quote verified against the evidence text",
+          "citationVerified": true
+        }
+      ]
+    },
+    {
+      "evidenceId": "EV-025",
+      "attachments": [
+        {
+          "controlId": "CONT-13",
+          "supports": true,
+          "confidence": 0.93,
+          "quote": "quote verified against the evidence text",
+          "citationVerified": true
+        }
+      ]
+    },
+    {
+      "evidenceId": "EV-026",
+      "attachments": [
+        {
+          "controlId": "CONT-14",
+          "supports": true,
+          "confidence": 0.93,
+          "quote": "quote verified against the evidence text",
+          "citationVerified": true
+        }
+      ]
+    },
+    {
+      "evidenceId": "EV-027",
+      "attachments": [
+        {
+          "controlId": "CONT-15",
+          "supports": true,
+          "confidence": 0.93,
+          "quote": "quote verified against the evidence text",
+          "citationVerified": true
+        }
+      ]
+    },
+    {
+      "evidenceId": "EV-028",
+      "attachments": [
+        {
+          "controlId": "CONT-11",
+          "supports": true,
+          "confidence": 0.93,
+          "quote": "quote verified against the evidence text",
+          "citationVerified": true
+        },
+        {
+          "controlId": "CONT-12",
+          "supports": true,
+          "confidence": 0.93,
+          "quote": "quote verified against the evidence text",
+          "citationVerified": true
+        }
+      ]
+    },
+    {
+      "evidenceId": "EV-029",
+      "attachments": [
+        {
+          "controlId": "CONT-11",
+          "supports": true,
+          "confidence": 0.93,
+          "quote": "quote verified against the evidence text",
+          "citationVerified": true
+        },
+        {
+          "controlId": "CONT-13",
+          "supports": true,
+          "confidence": 0.93,
+          "quote": "quote verified against the evidence text",
+          "citationVerified": true
+        }
+      ]
+    },
+    {
+      "evidenceId": "EV-030",
+      "attachments": [
+        {
+          "controlId": "CONT-12",
+          "supports": true,
+          "confidence": 0.93,
+          "quote": "quote verified against the evidence text",
+          "citationVerified": true
+        }
+      ]
+    },
+    {
+      "evidenceId": "EV-031",
+      "attachments": [
+        {
+          "controlId": "CONT-15",
+          "supports": true,
+          "confidence": 0.93,
+          "quote": "quote verified against the evidence text",
+          "citationVerified": true
+        },
+        {
+          "controlId": "CONT-21",
+          "supports": true,
+          "confidence": 0.93,
+          "quote": "quote verified against the evidence text",
+          "citationVerified": true
+        }
+      ]
+    },
+    {
+      "evidenceId": "EV-032",
+      "attachments": [
+        {
+          "controlId": "CONT-11",
+          "supports": true,
+          "confidence": 0.93,
+          "quote": "quote verified against the evidence text",
+          "citationVerified": true
+        }
+      ]
+    },
+    {
+      "evidenceId": "EV-033",
+      "attachments": [
+        {
+          "controlId": "CONT-16",
+          "supports": true,
+          "confidence": 0.93,
+          "quote": "quote verified against the evidence text",
+          "citationVerified": true
+        }
+      ]
+    },
+    {
+      "evidenceId": "EV-034",
+      "attachments": [
+        {
+          "controlId": "CONT-17",
+          "supports": true,
+          "confidence": 0.93,
+          "quote": "quote verified against the evidence text",
+          "citationVerified": true
+        }
+      ]
+    },
+    {
+      "evidenceId": "EV-035",
+      "attachments": [
+        {
+          "controlId": "CONT-18",
+          "supports": true,
+          "confidence": 0.93,
+          "quote": "quote verified against the evidence text",
+          "citationVerified": true
+        }
+      ]
+    },
+    {
+      "evidenceId": "EV-036",
+      "attachments": [
+        {
+          "controlId": "CONT-19",
+          "supports": true,
+          "confidence": 0.93,
+          "quote": "quote verified against the evidence text",
+          "citationVerified": true
+        }
+      ]
+    },
+    {
+      "evidenceId": "EV-037",
+      "attachments": [
+        {
+          "controlId": "CONT-20",
+          "supports": true,
+          "confidence": 0.93,
+          "quote": "quote verified against the evidence text",
+          "citationVerified": true
+        }
+      ]
+    },
+    {
+      "evidenceId": "EV-038",
+      "attachments": [
+        {
+          "controlId": "CONT-16",
+          "supports": true,
+          "confidence": 0.93,
+          "quote": "quote verified against the evidence text",
+          "citationVerified": true
+        }
+      ]
+    },
+    {
+      "evidenceId": "EV-039",
+      "attachments": [
+        {
+          "controlId": "CONT-19",
+          "supports": true,
+          "confidence": 0.93,
+          "quote": "quote verified against the evidence text",
+          "citationVerified": true
+        }
+      ]
+    },
+    {
+      "evidenceId": "EV-040",
+      "attachments": [
+        {
+          "controlId": "CONT-17",
+          "supports": true,
+          "confidence": 0.93,
+          "quote": "quote verified against the evidence text",
+          "citationVerified": true
+        },
+        {
+          "controlId": "CONT-18",
+          "supports": true,
+          "confidence": 0.93,
+          "quote": "quote verified against the evidence text",
+          "citationVerified": true
+        }
+      ]
+    },
+    {
+      "evidenceId": "EV-041",
+      "attachments": [
+        {
+          "controlId": "CONT-20",
+          "supports": true,
+          "confidence": 0.93,
+          "quote": "quote verified against the evidence text",
+          "citationVerified": true
+        }
+      ]
+    },
+    {
+      "evidenceId": "EV-042",
+      "attachments": [
+        {
+          "controlId": "CONT-19",
+          "supports": true,
+          "confidence": 0.93,
+          "quote": "quote verified against the evidence text",
+          "citationVerified": true
+        }
+      ]
+    },
+    {
+      "evidenceId": "EV-043",
+      "attachments": [
+        {
+          "controlId": "CONT-21",
+          "supports": true,
+          "confidence": 0.93,
+          "quote": "quote verified against the evidence text",
+          "citationVerified": true
+        }
+      ]
+    },
+    {
+      "evidenceId": "EV-044",
+      "attachments": [
+        {
+          "controlId": "CONT-23",
+          "supports": true,
+          "confidence": 0.93,
+          "quote": "quote verified against the evidence text",
+          "citationVerified": true
+        }
+      ]
+    },
+    {
+      "evidenceId": "EV-045",
+      "attachments": [
+        {
+          "controlId": "CONT-22",
+          "supports": true,
+          "confidence": 0.93,
+          "quote": "quote verified against the evidence text",
+          "citationVerified": true
+        }
+      ]
+    },
+    {
+      "evidenceId": "EV-046",
+      "attachments": [
+        {
+          "controlId": "CONT-24",
+          "supports": true,
+          "confidence": 0.93,
+          "quote": "quote verified against the evidence text",
+          "citationVerified": true
+        }
+      ]
+    },
+    {
+      "evidenceId": "EV-047",
+      "attachments": [
+        {
+          "controlId": "CONT-21",
+          "supports": true,
+          "confidence": 0.93,
+          "quote": "quote verified against the evidence text",
+          "citationVerified": true
+        },
+        {
+          "controlId": "CONT-25",
+          "supports": true,
+          "confidence": 0.93,
+          "quote": "quote verified against the evidence text",
+          "citationVerified": true
+        }
+      ]
+    },
+    {
+      "evidenceId": "EV-048",
+      "attachments": [
+        {
+          "controlId": "CONT-21",
+          "supports": true,
+          "confidence": 0.93,
+          "quote": "quote verified against the evidence text",
+          "citationVerified": true
+        }
+      ]
+    },
+    {
+      "evidenceId": "EV-049",
+      "attachments": [
+        {
+          "controlId": "CONT-23",
+          "supports": true,
+          "confidence": 0.93,
+          "quote": "quote verified against the evidence text",
+          "citationVerified": true
+        }
+      ]
+    },
+    {
+      "evidenceId": "EV-050",
+      "attachments": [
+        {
+          "controlId": "CONT-25",
+          "supports": true,
+          "confidence": 0.93,
+          "quote": "quote verified against the evidence text",
+          "citationVerified": true
+        }
+      ]
+    },
+    {
+      "evidenceId": "EV-051",
+      "attachments": [
+        {
+          "controlId": "CONT-01",
+          "supports": true,
+          "confidence": 0.93,
+          "quote": "quote verified against the evidence text",
+          "citationVerified": true
+        },
+        {
+          "controlId": "CONT-23",
+          "supports": true,
+          "confidence": 0.93,
+          "quote": "quote verified against the evidence text",
+          "citationVerified": true
+        }
+      ]
+    },
+    {
+      "evidenceId": "EV-052",
+      "attachments": [
+        {
+          "controlId": "CONT-24",
+          "supports": true,
+          "confidence": 0.93,
+          "quote": "quote verified against the evidence text",
+          "citationVerified": true
+        }
+      ]
+    },
+    {
+      "evidenceId": "EV-053",
+      "attachments": [
+        {
+          "controlId": "CONT-26",
+          "supports": true,
+          "confidence": 0.93,
+          "quote": "quote verified against the evidence text",
+          "citationVerified": true
+        }
+      ]
+    },
+    {
+      "evidenceId": "EV-054",
+      "attachments": [
+        {
+          "controlId": "CONT-27",
+          "supports": true,
+          "confidence": 0.93,
+          "quote": "quote verified against the evidence text",
+          "citationVerified": true
+        }
+      ]
+    },
+    {
+      "evidenceId": "EV-055",
+      "attachments": [
+        {
+          "controlId": "CONT-28",
+          "supports": true,
+          "confidence": 0.93,
+          "quote": "quote verified against the evidence text",
+          "citationVerified": true
+        }
+      ]
+    },
+    {
+      "evidenceId": "EV-056",
+      "attachments": [
+        {
+          "controlId": "CONT-29",
+          "supports": true,
+          "confidence": 0.93,
+          "quote": "quote verified against the evidence text",
+          "citationVerified": true
+        }
+      ]
+    },
+    {
+      "evidenceId": "EV-057",
+      "attachments": [
+        {
+          "controlId": "CONT-30",
+          "supports": true,
+          "confidence": 0.93,
+          "quote": "quote verified against the evidence text",
+          "citationVerified": true
+        }
+      ]
+    },
+    {
+      "evidenceId": "EV-058",
+      "attachments": [
+        {
+          "controlId": "CONT-27",
+          "supports": true,
+          "confidence": 0.93,
+          "quote": "quote verified against the evidence text",
+          "citationVerified": true
+        }
+      ]
+    },
+    {
+      "evidenceId": "EV-059",
+      "attachments": [
+        {
+          "controlId": "CONT-28",
+          "supports": true,
+          "confidence": 0.93,
+          "quote": "quote verified against the evidence text",
+          "citationVerified": true
+        },
+        {
+          "controlId": "CONT-29",
+          "supports": true,
+          "confidence": 0.93,
+          "quote": "quote verified against the evidence text",
+          "citationVerified": true
+        }
+      ]
+    },
+    {
+      "evidenceId": "EV-060",
+      "attachments": []
+    }
+  ],
+  "sufficiency": [
+    {
+      "evidenceId": "EV-005",
+      "controlId": "CONT-04",
+      "missing": [
+        "Scope covered"
+      ]
+    },
+    {
+      "evidenceId": "EV-007",
+      "controlId": "CONT-11",
+      "missing": [
+        "Approver name"
+      ]
+    },
+    {
+      "evidenceId": "EV-010",
+      "controlId": "CONT-05",
+      "missing": [
+        "Risk rating"
+      ]
+    },
+    {
+      "evidenceId": "EV-012",
+      "controlId": "CONT-04",
+      "missing": [
+        "Findings"
+      ]
+    },
+    {
+      "evidenceId": "EV-013",
+      "controlId": "CONT-06",
+      "missing": [
+        "Severity breakdown"
+      ]
+    },
+    {
+      "evidenceId": "EV-016",
+      "controlId": "CONT-07",
+      "missing": [
+        "Corrective actions"
+      ]
+    },
+    {
+      "evidenceId": "EV-017",
+      "controlId": "CONT-08",
+      "missing": [
+        "Target response time"
+      ]
+    },
+    {
+      "evidenceId": "EV-019",
+      "controlId": "CONT-10",
+      "missing": [
+        "Permanent fix"
+      ]
+    },
+    {
+      "evidenceId": "EV-021",
+      "controlId": "CONT-07",
+      "missing": [
+        "Signatory name"
+      ]
+    },
+    {
+      "evidenceId": "EV-024",
+      "controlId": "CONT-12",
+      "missing": [
+        "Reviewer name"
+      ]
+    },
+    {
+      "evidenceId": "EV-025",
+      "controlId": "CONT-13",
+      "missing": [
+        "Rollback count"
+      ]
+    },
+    {
+      "evidenceId": "EV-028",
+      "controlId": "CONT-11",
+      "missing": [
+        "Implementation date"
+      ]
+    },
+    {
+      "evidenceId": "EV-031",
+      "controlId": "CONT-15",
+      "missing": [
+        "Roles separated"
+      ]
+    },
+    {
+      "evidenceId": "EV-033",
+      "controlId": "CONT-16",
+      "missing": [
+        "Measured recovery time"
+      ]
+    },
+    {
+      "evidenceId": "EV-036",
+      "controlId": "CONT-19",
+      "missing": [
+        "Monitoring evidence"
+      ]
+    },
+    {
+      "evidenceId": "EV-041",
+      "controlId": "CONT-20",
+      "missing": [
+        "Lessons recorded"
+      ]
+    },
+    {
+      "evidenceId": "EV-043",
+      "controlId": "CONT-21",
+      "missing": [
+        "Removals made"
+      ]
+    },
+    {
+      "evidenceId": "EV-045",
+      "controlId": "CONT-22",
+      "missing": [
+        "Completion rate"
+      ]
+    },
+    {
+      "evidenceId": "EV-049",
+      "controlId": "CONT-23",
+      "missing": [
+        "Remediation deadlines"
+      ]
+    },
+    {
+      "evidenceId": "EV-055",
+      "controlId": "CONT-28",
+      "missing": [
+        "Delivery date"
+      ]
+    }
+  ],
+  "answers": [
+    {
+      "questionId": "Q-01",
+      "answerKind": "EVIDENCE",
+      "citations": [
+        {
+          "evidenceId": "EV-001",
+          "quote": "cited passage",
+          "page": 1
+        }
+      ]
+    },
+    {
+      "questionId": "Q-02",
+      "answerKind": "EVIDENCE",
+      "citations": [
+        {
+          "evidenceId": "EV-038",
+          "quote": "cited passage",
+          "page": 1
+        }
+      ]
+    },
+    {
+      "questionId": "Q-03",
+      "answerKind": "EVIDENCE",
+      "citations": [
+        {
+          "evidenceId": "EV-038",
+          "quote": "cited passage",
+          "page": 1
+        }
+      ]
+    },
+    {
+      "questionId": "Q-04",
+      "answerKind": "EVIDENCE",
+      "citations": [
+        {
+          "evidenceId": "EV-013",
+          "quote": "cited passage",
+          "page": 1
+        }
+      ]
+    },
+    {
+      "questionId": "Q-05",
+      "answerKind": "EVIDENCE",
+      "citations": [
+        {
+          "evidenceId": "EV-014",
+          "quote": "cited passage",
+          "page": 1
+        }
+      ]
+    },
+    {
+      "questionId": "Q-06",
+      "answerKind": "EVIDENCE",
+      "citations": [
+        {
+          "evidenceId": "EV-015",
+          "quote": "cited passage",
+          "page": 1
+        }
+      ]
+    },
+    {
+      "questionId": "Q-07",
+      "answerKind": "EVIDENCE",
+      "citations": [
+        {
+          "evidenceId": "EV-024",
+          "quote": "cited passage",
+          "page": 1
+        },
+        {
+          "evidenceId": "EV-028",
+          "quote": "cited passage",
+          "page": 1
+        }
+      ]
+    },
+    {
+      "questionId": "Q-08",
+      "answerKind": "EVIDENCE",
+      "citations": [
+        {
+          "evidenceId": "EV-025",
+          "quote": "cited passage",
+          "page": 1
+        }
+      ]
+    },
+    {
+      "questionId": "Q-09",
+      "answerKind": "EVIDENCE",
+      "citations": [
+        {
+          "evidenceId": "EV-026",
+          "quote": "cited passage",
+          "page": 1
+        }
+      ]
+    },
+    {
+      "questionId": "Q-10",
+      "answerKind": "EVIDENCE",
+      "citations": [
+        {
+          "evidenceId": "EV-034",
+          "quote": "cited passage",
+          "page": 1
+        }
+      ]
+    },
+    {
+      "questionId": "Q-11",
+      "answerKind": "EVIDENCE",
+      "citations": [
+        {
+          "evidenceId": "EV-035",
+          "quote": "cited passage",
+          "page": 1
+        }
+      ]
+    },
+    {
+      "questionId": "Q-12",
+      "answerKind": "EVIDENCE",
+      "citations": [
+        {
+          "evidenceId": "EV-036",
+          "quote": "cited passage",
+          "page": 1
+        }
+      ]
+    },
+    {
+      "questionId": "Q-13",
+      "answerKind": "EVIDENCE",
+      "citations": [
+        {
+          "evidenceId": "EV-037",
+          "quote": "cited passage",
+          "page": 1
+        }
+      ]
+    },
+    {
+      "questionId": "Q-14",
+      "answerKind": "EVIDENCE",
+      "citations": [
+        {
+          "evidenceId": "EV-043",
+          "quote": "cited passage",
+          "page": 1
+        },
+        {
+          "evidenceId": "EV-048",
+          "quote": "cited passage",
+          "page": 1
+        }
+      ]
+    },
+    {
+      "questionId": "Q-15",
+      "answerKind": "EVIDENCE",
+      "citations": [
+        {
+          "evidenceId": "EV-045",
+          "quote": "cited passage",
+          "page": 1
+        }
+      ]
+    },
+    {
+      "questionId": "Q-16",
+      "answerKind": "EVIDENCE",
+      "citations": [
+        {
+          "evidenceId": "EV-049",
+          "quote": "cited passage",
+          "page": 1
+        }
+      ]
+    },
+    {
+      "questionId": "Q-17",
+      "answerKind": "EVIDENCE",
+      "citations": [
+        {
+          "evidenceId": "EV-046",
+          "quote": "cited passage",
+          "page": 1
+        }
+      ]
+    },
+    {
+      "questionId": "Q-18",
+      "answerKind": "EVIDENCE",
+      "citations": [
+        {
+          "evidenceId": "EV-053",
+          "quote": "cited passage",
+          "page": 1
+        }
+      ]
+    },
+    {
+      "questionId": "Q-19",
+      "answerKind": "EVIDENCE",
+      "citations": [
+        {
+          "evidenceId": "EV-054",
+          "quote": "cited passage",
+          "page": 1
+        }
+      ]
+    },
+    {
+      "questionId": "Q-20",
+      "answerKind": "EVIDENCE",
+      "citations": [
+        {
+          "evidenceId": "EV-057",
+          "quote": "cited passage",
+          "page": 1
+        }
+      ]
+    },
+    {
+      "questionId": "Q-21",
+      "answerKind": "NO_EVIDENCE",
+      "citations": []
+    },
+    {
+      "questionId": "Q-22",
+      "answerKind": "NO_EVIDENCE",
+      "citations": []
+    },
+    {
+      "questionId": "Q-23",
+      "answerKind": "NO_EVIDENCE",
+      "citations": []
+    },
+    {
+      "questionId": "Q-24",
+      "answerKind": "NO_EVIDENCE",
+      "citations": []
+    },
+    {
+      "questionId": "Q-25",
+      "answerKind": "NO_EVIDENCE",
+      "citations": []
+    }
+  ]
+}

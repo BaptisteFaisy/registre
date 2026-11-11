@@ -1,0 +1,64 @@
+{
+  "jobName": "registre-attachment-model-judge",
+  "roleArn": "<BEDROCK_EVALUATION_ROLE_ARN>",
+  "evaluationConfig": {
+    "automated": {
+      "datasetMetricConfigs": [
+        {
+          "taskType": "General",
+          "dataset": {
+            "name": "registre-attachment",
+            "datasetLocation": {
+              "s3Uri": "s3://<evidence-bucket>/eval/attachment-dataset.jsonl"
+            }
+          },
+          "metricNames": [
+            "attachment_set_matches",
+            "attachment_quote_grounded"
+          ]
+        }
+      ],
+      "customMetricDefinitions": [
+        {
+          "metricName": "attachment_set_matches",
+          "instructions": "The prompt asks which framework controls one piece of evidence supports. The reference response is the accepted answer: a JSON array of control ids. The generated response is the answer to grade. Rate 1 when both arrays hold exactly the same ids, in any order. Rate 0 when an id is missing, an id is added, or the answer is not a JSON array. An added id claims support that does not exist: it is an error, not a detail.",
+          "ratingMethod": "BINARY",
+          "scaleDefinitions": [
+            {
+              "definition": "The generated set of control ids is exactly the reference set.",
+              "rating": "1"
+            },
+            {
+              "definition": "The generated set differs from the reference set, or cannot be parsed.",
+              "rating": "0"
+            }
+          ]
+        },
+        {
+          "metricName": "attachment_quote_grounded",
+          "instructions": "A generated answer may carry a passage quoted from the evidence. Rate 1 when every quoted passage appears in the evidence text given in the prompt. Rate 0 when a quoted passage cannot be found there, or when the answer claims support without quoting anything. Ignore letter case and punctuation when comparing.",
+          "ratingMethod": "BINARY",
+          "scaleDefinitions": [
+            {
+              "definition": "Every quoted passage appears in the evidence text.",
+              "rating": "1"
+            },
+            {
+              "definition": "A quoted passage is absent from the evidence text, or no quote backs the claim.",
+              "rating": "0"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "inferenceConfig": {
+    "models": [
+      {
+        "bedrockModel": {
+          "modelIdentifier": "anthropic.:0"
+        }
+      }
+    ]
+  }
+}
