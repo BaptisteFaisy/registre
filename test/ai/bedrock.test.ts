@@ -22,10 +22,10 @@ import { ATTACHMENT_JSON_SCHEMA, SUFFICIENCY_JSON_SCHEMA } from '../../src/ai/sc
 import { RegistreError } from '../../src/support/errors.ts';
 import { makeSettings } from '../fixtures/builders.ts';
 
-const SETTINGS = makeSettings({ region: 'eu-west-3' });
+const SETTINGS = makeSettings({ region: 'eu-central-1' });
 
 test('the client region comes from Settings and never defaults silently', () => {
-  assert.equal(resolveRegion(SETTINGS), 'eu-west-3');
+  assert.equal(resolveRegion(SETTINGS), 'eu-central-1');
   assert.equal(resolveRegion(SETTINGS, { region: 'eu-west-1' }), 'eu-west-1');
   assert.throws(
     () => resolveRegion(makeSettings({ region: '' })),
@@ -34,9 +34,9 @@ test('the client region comes from Settings and never defaults silently', () => 
 });
 
 test('the client configuration retries three times and stays on the settings region', () => {
-  assert.deepEqual(clientConfig(SETTINGS), { region: 'eu-west-3', maxAttempts: 3 });
+  assert.deepEqual(clientConfig(SETTINGS), { region: 'eu-central-1', maxAttempts: 3 });
   assert.deepEqual(clientConfig(SETTINGS, { maxAttempts: 1, endpoint: 'http://localhost:4566' }), {
-    region: 'eu-west-3',
+    region: 'eu-central-1',
     maxAttempts: 1,
     endpoint: 'http://localhost:4566'
   });
@@ -51,7 +51,7 @@ test('the default credential chain is detected, not invented', () => {
 test('the Data Automation invocation carries the blueprint and the output location', () => {
   const target = {
     modelId: DATA_AUTOMATION_MODEL_ID,
-    blueprintArn: 'arn:aws:bedrock:eu-west-3:1:blueprint/x',
+    blueprintArn: 'arn:aws:bedrock:eu-central-1:1:blueprint/x',
     outputS3Uri: 's3://vault-bda/out/'
   };
   const modelInput = invocationInput('s3://vault/ev-1/policy.pdf', target);

@@ -434,7 +434,7 @@ export const DEFAULT_SETTINGS: Settings = {
   confidenceThreshold: 0.85,
   reminderLeadDays: 30,
   defaultPeriodicity: 'P1Y',
-  region: 'eu-west-3',
+  region: 'eu-central-1',
   retentionMonths: 24,
   readerModel: 'bedrock-data-automation',
   reasoningModel: 'anthropic.claude-sonnet-4-20250514-v1:0',

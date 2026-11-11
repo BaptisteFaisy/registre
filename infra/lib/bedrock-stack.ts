@@ -7,7 +7,7 @@
  *
  * POINTS TO CONFIRM BEFORE A REAL DEPLOYMENT (chapter 24, items 4, 6, 7, 8):
  *  - Managed knowledge bases and Data Automation are not available in every EU
- *    region. `eu-west-3` is the default; if the pair is unavailable there,
+ *    region. `eu-central-1` is the default; if the pair is unavailable there,
  *    switch `REGISTRE_REGION` to `eu-central-1` or `eu-west-1` (both stay in
  *    the EU, so ENF-DATA-01 holds) and re-synth.
  *  - `embeddingModelType: MANAGED` lets Bedrock choose the embedding model. If

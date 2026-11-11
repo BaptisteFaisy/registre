@@ -1,0 +1,31 @@
+{
+  "name": "registre-portal",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Registre portal — audit evidence register UI (Vite + React 18).",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "node --test src/lib/ src/mocks/",
+    "check:wording": "node scripts/check-wording.mjs",
+    "check:sizes": "node scripts/check-sizes.mjs",
+    "check": "npm run typecheck && npm run check:sizes && npm run check:wording && npm test && npm run build",
+    "build:demo": "vite build --mode demo",
+    "dev:demo": "vite --mode demo"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "typescript": "^5.7.3",
+    "vite": "^6.0.11"
+  }
+}

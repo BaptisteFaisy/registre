@@ -103,7 +103,7 @@ export class S3Collector implements Collector {
   /** Resolves the injected lister, or the lazily built SDK one. */
   private async lister(): Promise<S3Lister> {
     if (this.options.lister !== undefined) return this.options.lister;
-    this.cached ??= s3ListerFromSdk(this.options.region ?? 'eu-west-3');
+    this.cached ??= s3ListerFromSdk(this.options.region ?? 'eu-central-1');
     return this.cached;
   }
 
