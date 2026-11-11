@@ -21,6 +21,8 @@ import { attachmentEvidenceBlock, attachmentPreamble } from '../prompts/attachme
 import { sufficiencyControlBlock, sufficiencyEvidenceBlock } from '../prompts/sufficiency.ts';
 import { ATTACHMENT_JSON_SCHEMA, SUFFICIENCY_JSON_SCHEMA, parseAttachmentProposals, parseJsonPayload, parseSufficiencyElements } from '../schemas.ts';
 import { joinPages } from '../reading.ts';
+import type { VersionedAttachmentProposal } from '../versioning.ts';
+import { stampAttachmentVersion } from '../versioning.ts';
 import { createRuntimeClient } from './client.ts';
 import { recordCost, tokenCost } from './costs.ts';
 
@@ -68,7 +70,7 @@ export class BedrockStructuredReasoner implements Reasoner {
    * The candidate catalogue travels as the cached system prefix, the evidence as
    * the user turn: across a batch of evidences the prefix is paid once.
    */
-  async proposeAttachments(request: AttachmentRequest): Promise<ProposedAttachment[]> {
+  async proposeAttachments(request: AttachmentRequest): Promise<VersionedAttachmentProposal[]> {
     const candidates = request.candidates;
     const answer = await this.converse({
       prompt: attachmentEvidenceBlock({
@@ -80,7 +82,11 @@ export class BedrockStructuredReasoner implements Reasoner {
       schemaName: 'attachment_proposals',
       cacheablePrefix: attachmentPreamble(candidates)
     });
-    return parseAttachmentProposals(parseJsonPayload(answer, 'attachment proposals'), candidates.map((c) => c.control.id));
+    const proposals = parseAttachmentProposals(
+      parseJsonPayload(answer, 'attachment proposals'),
+      candidates.map((c) => c.control.id)
+    );
+    return proposals.map(stampAttachmentVersion);
   }
 
   /** Annex D elements for one evidence and one control (EF-SUF-01). */

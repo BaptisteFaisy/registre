@@ -13,6 +13,9 @@ export type Capability =
   | 'validation'
   | 'ask'
   | 'packs'
+  | 'verify'
+  | 'mappings'
+  | 'quality'
   | 'reminders'
   | 'audit'
   | 'settings'
@@ -25,6 +28,9 @@ const MATRIX: Record<Role, readonly Capability[]> = {
     'validation',
     'ask',
     'packs',
+    'verify',
+    'mappings',
+    'quality',
     'reminders',
     'audit',
     'settings',
@@ -32,8 +38,19 @@ const MATRIX: Record<Role, readonly Capability[]> = {
   ],
   CONTROL_OWNER: ['readiness', 'controls', 'reminders', 'upload'],
   EXECUTIVE: ['readiness', 'controls'],
-  INTERNAL_AUDITOR: ['readiness', 'controls', 'ask', 'packs', 'audit'],
-  ADMIN: ['readiness', 'controls', 'validation', 'ask', 'packs', 'reminders', 'audit', 'settings']
+  INTERNAL_AUDITOR: ['readiness', 'controls', 'ask', 'packs', 'verify', 'audit'],
+  ADMIN: [
+    'readiness',
+    'controls',
+    'validation',
+    'ask',
+    'packs',
+    'mappings',
+    'quality',
+    'reminders',
+    'audit',
+    'settings'
+  ]
 };
 
 /** True when the role may use the capability. */

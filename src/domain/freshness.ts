@@ -8,6 +8,7 @@
  */
 
 import type { Evidence, EvidenceFreshness } from './types.ts';
+import { cadencePeriodicity } from './quality.ts';
 import { addDuration, daysBetween } from '../support/iso8601.ts';
 
 /** Renewal window in days: an evidence expiring inside it is TO_RENEW (EF-FRA-01). */
@@ -65,4 +66,16 @@ export function computeFreshness(
   if (daysLeft < 0) return { freshness: 'EXPIRED', expiresAt };
   if (daysLeft <= leadDays) return { freshness: 'TO_RENEW', expiresAt };
   return { freshness: 'FRESH', expiresAt };
+}
+
+
+/**
+ * Periodicity of a machine attestation (axis 3a).
+ *
+ * A collector's report is refreshed on its own cadence — a daily backup report
+ * goes stale after a day, not after the control's declared periodicity. One
+ * helper so the state engine keeps a single freshness implementation.
+ */
+export function machinePeriodicityFor(cadenceHours = 24): string {
+  return cadencePeriodicity({ cadenceHours, graceHours: 0 });
 }

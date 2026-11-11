@@ -200,7 +200,7 @@ on screen.
 | Criterion | Where to look |
 |---|---|
 | **Technical implementation** — Bedrock used deeply | `docs/ARCHITECTURE.md` §4: two managed knowledge bases, Data Automation, structured outputs, Guardrails, evaluation tasks, Flex tier, prompt caching — each with the reason it was chosen; `infra/lib/bedrock-stack.ts` for the resources |
-| **Design** — quote verified by code, human validation, integrous evidence, imported framework, prudence written into the state rules | `src/domain/**` (states, freshness, sufficiency, citation, access), `docs/DECISIONS.md` (13 ADRs), `docs/SECURITY.md` |
+| **Design** — quote verified by code, human validation, integrous evidence, imported framework, prudence written into the state rules | `src/domain/**` (states, freshness, sufficiency, citation, access), `docs/DECISIONS.md` (19 ADRs), `docs/SECURITY.md` |
 | **Impact** — a problem every MSP candidate meets, with three measures | `docs/HLD.md` §2, `docs/SUBMISSION.md` §3.3, `docs/EVALUATION.md` |
 | **Innovation** — audit preparation becomes continuous monitoring, taking over where a closed AWS service stopped | `docs/SUBMISSION.md` §3.4, `docs/HLD.md` §1 |
 
@@ -260,6 +260,39 @@ EU-only hosting validated at deployment time, an immutable versioned vault with
 Object Lock, an append-only hash-chained audit log, and a prompt-injection defence
 that treats every document as data. Details in
 [`docs/SECURITY.md`](docs/SECURITY.md).
+
+## Beyond the hackathon scope
+
+Three extensions and a bonus, built on the same spine — contracts in
+[`docs/CONTRACTS-EXT.md`](docs/CONTRACTS-EXT.md), rationale in
+[`docs/HLD.md`](docs/HLD.md) §8, decisions ADR-16 to ADR-19 in
+[`docs/DECISIONS.md`](docs/DECISIONS.md):
+
+- **Verification without trust.** Every frozen pack carries a canonical manifest
+  and a signature (KMS `ECC_NIST_P256` in production, local Ed25519 offline); a
+  third party checks the fingerprints, the audit chain and the signature —
+  through the public route or offline with `scripts/verify-pack.sh` — without
+  ever receiving the content ([`docs/SECURITY.md`](docs/SECURITY.md) §5).
+- **Bounded auditor access.** An external auditor gets a share token instead of
+  an archive by e-mail: scoped to one pack or one framework, 1–168 h, revocable,
+  watermarked, and journalled at every use
+  ([`docs/SECURITY.md`](docs/SECURITY.md) §6).
+- **One evidence serves every framework.** Equivalences between controls of two
+  frameworks are proposed with two code-verified quotes and never applied
+  automatically; a human-validated mapping *proposes* the attachment on the
+  other framework, and reuse is measured — demonstrated against a second,
+  fictional 12-control framework ([`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
+  §2.2, [`docs/EVALUATION.md`](docs/EVALUATION.md) §6).
+- **Real freshness, and a draft that is never a proof.** Collectors produce
+  daily machine attestations and drift detection moves a control within the day;
+  a missing human document gets a pre-filled, watermarked draft — never
+  attached, never counted as evidence ([`docs/HLD.md`](docs/HLD.md) §8.3).
+- **The system measures itself.** Every proposal is stamped with its prompt
+  version, every evaluation is recorded and trended per subject, and a measured
+  metric below its target pushes the effective confidence threshold above 1:
+  nothing is auto-applied until the measure passes again
+  ([`docs/EVALUATION.md`](docs/EVALUATION.md) §8,
+  [`docs/OPERATIONS.md`](docs/OPERATIONS.md) §7.6).
 
 ## Licence
 

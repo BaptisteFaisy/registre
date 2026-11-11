@@ -12,6 +12,7 @@
 import type { Answer, ControlState, ControlStatus, Pack, ReadinessSnapshot, Reminder, ValidationItem } from '../../src/domain/types.ts';
 import { NO_EVIDENCE_ANSWER } from '../../src/domain/types.ts';
 import { SEEDED_SITUATIONS } from '../../eval/catalogue.ts';
+import type { ExtensionFacts } from './extensions.ts';
 
 /** Facts the renderer needs; `summary` is the machine-readable twin. */
 export interface DemoFacts {
@@ -27,6 +28,8 @@ export interface DemoFacts {
   reminders: Reminder[];
   answered: Answer;
   refused: Answer;
+  /** The three extensions and the measured quality of this run. */
+  extensions: ExtensionFacts;
   pack: Pack;
   totalCostUsd: number;
   costPerEvidenceUsd: number;
@@ -50,6 +53,20 @@ export interface DemoSummary {
   costs: { totalUsd: number; perEvidenceUsd: number };
   seededSituations: Array<{ kind: string; controlId: string | null; state: ControlState | null; scenario: string }>;
   questions: { answered: boolean; refused: boolean };
+  extensions: {
+    drifts: number;
+    driftKinds: string[];
+    mappingsProposed: number;
+    mappingsValidated: number;
+    reuseFactor: number;
+    targetReuseFactor: number;
+    carriedAttachments: number;
+    avoidedDeposits: number;
+    draftControlId: string | null;
+    draftSectionsToComplete: number;
+    qualityRecords: number;
+    verified: { checksumsOk: boolean; chainOk: boolean; signatureOk: boolean | null } | null;
+  };
 }
 
 const STATE_ORDER: readonly ControlState[] = ['COVERED', 'TO_RENEW', 'TO_VERIFY', 'EXPIRED', 'NO_EVIDENCE'];
@@ -81,13 +98,19 @@ export function buildFacts(input: Omit<DemoFacts, 'summary'>): DemoFacts {
       state: stateOf(input.statuses, situation.controlId),
       scenario: situation.scenario
     })),
-    questions: { answered: !input.answered.noEvidence, refused: input.refused.noEvidence }
+    questions: { answered: !input.answered.noEvidence, refused: input.refused.noEvidence },
+    extensions: summariseExtensions(input.extensions)
   };
   return { ...input, summary };
 }
 
 /** Renders the markdown report (English, the language of the submission). */
 export function buildReport(facts: DemoFacts): string {
+  return [...reportHeader(facts), ...reportExtensions(facts), ...reportPack(facts)].join('\n');
+}
+
+/** Problem statement, readiness, costs and seeded situations. */
+function reportHeader(facts: DemoFacts): string[] {
   return [
     '# Registre - offline demonstration report',
     '',
@@ -124,7 +147,39 @@ export function buildReport(facts: DemoFacts): string {
     ...answerLines('Question with evidence', facts.answered),
     '',
     ...answerLines('Question without evidence', facts.refused),
+    ''
+  ];
+}
+
+/** The three extensions and the measured quality of this very run. */
+function reportExtensions(facts: DemoFacts): string[] {
+  return [
+    '## Machine attestations and drift (axis 3a)',
     '',
+    ...driftLines(facts.extensions),
+    '',
+    '## Cross-framework reuse (axis 2)',
+    '',
+    ...mappingLines(facts.extensions),
+    '',
+    '## Pre-filled draft (axis 3b)',
+    '',
+    ...draftLines(facts.extensions),
+    '',
+    '## Measured quality of this run',
+    '',
+    ...qualityLines(facts.extensions),
+    '',
+    '## Third-party verification (axis 1)',
+    '',
+    ...verificationLines(facts.extensions),
+    ''
+  ];
+}
+
+/** The frozen audit pack and how a third party checks it. */
+function reportPack(facts: DemoFacts): string[] {
+  return [
     '## Audit pack (EF-DOS-01/02)',
     '',
     `- id: \`${facts.pack.id}\``,
@@ -134,7 +189,7 @@ export function buildReport(facts: DemoFacts): string {
     `- checksums verified: ${facts.pack.checksumsVerified ? 'yes' : 'no'}`,
     `- archive: ${facts.pack.archive.uri} (${facts.pack.archive.sizeBytes} bytes)`,
     ''
-  ].join('\n');
+  ];
 }
 
 /** The five states with counts and shares; the only vocabulary allowed. */
@@ -188,6 +243,32 @@ export function answerLines(label: string, answer: Answer): string[] {
   return lines;
 }
 
+/** Machine-readable summary of the three extensions and the quality run. */
+function summariseExtensions(facts: DemoFacts['extensions']): DemoSummary['extensions'] {
+  const reuse = facts.mappings.reuse;
+  return {
+    drifts: facts.drifts.length,
+    driftKinds: facts.drifts.map((drift) => drift.kind),
+    mappingsProposed: facts.mappings.proposed,
+    mappingsValidated: facts.mappings.validated,
+    reuseFactor: reuse?.reuseFactor ?? 0,
+    targetReuseFactor: facts.mappings.targetReuse?.reuseFactor ?? 0,
+    carriedAttachments: facts.mappings.targetReuse?.carriedAttachments ?? 0,
+    avoidedDeposits: facts.mappings.targetReuse?.avoidedDeposits ?? 0,
+    draftControlId: facts.draft?.controlId ?? null,
+    draftSectionsToComplete: facts.draft?.sections.filter((section) => section.toComplete).length ?? 0,
+    qualityRecords: facts.quality.length,
+    verified:
+      facts.verification === null
+        ? null
+        : {
+            checksumsOk: facts.verification.checksumsOk,
+            chainOk: facts.verification.chainOk,
+            signatureOk: facts.verification.signatureOk
+          }
+  };
+}
+
 function stateOf(statuses: ControlStatus[], controlId: string | null): ControlState | null {
   if (!controlId) return null;
   return statuses.find((status) => status.controlId === controlId)?.state ?? null;
@@ -195,4 +276,67 @@ function stateOf(statuses: ControlStatus[], controlId: string | null): ControlSt
 
 function round(value: number): number {
   return Math.round(value * 10000) / 10000;
+}
+
+/** Two collector runs a day apart, and the drifts they raised. */
+export function driftLines(facts: DemoFacts['extensions']): string[] {
+  if (facts.drifts.length === 0) return ['No drift detected on the simulated collector runs.'];
+  return facts.drifts.map(
+    (drift) =>
+      `- \`${drift.kind}\` on ${drift.controlId}: ${drift.detail}` +
+      (drift.previous ? ` (previous: ${drift.previous})` : '')
+  );
+}
+
+/** What one deposited evidence is worth once mappings are validated. */
+export function mappingLines(facts: DemoFacts['extensions']): string[] {
+  const source = facts.mappings.reuse;
+  const target = facts.mappings.targetReuse;
+  if (source === null || target === null) return ['No mapping run.'];
+  return [
+    `- equivalences proposed between demo-msp and demo-iso: ${facts.mappings.proposed}`,
+    `- validated by the quality lead during the run: ${facts.mappings.validated}`,
+    `- attachments carried over to demo-iso: ${target.carriedAttachments} (proposals only, never applied)`,
+    `- deposits avoided on demo-iso: ${target.avoidedDeposits} — it has ${target.evidenceCount} deposited evidence of its own`,
+    `- reuse factor on demo-msp: ${source.reuseFactor} attachments per deposited evidence` +
+      (target.evidenceCount === 0
+        ? ' (demo-iso has none of its own: everything came from a mapping)'
+        : `, ${target.reuseFactor} on demo-iso`)
+  ];
+}
+
+/** The draft is a starting point, never an evidence. */
+export function draftLines(facts: DemoFacts['extensions']): string[] {
+  const draft = facts.draft;
+  if (draft === null) return ['No control needed a draft on this run.'];
+  const carried = draft.sections.filter((section) => !section.toComplete).length;
+  return [
+    `- control ${draft.controlId}: ${draft.sections.length} sections, ${carried} carried over from the previous version, ${draft.sections.length - carried} left to complete`,
+    `- watermarked "${draft.watermark}", attachable: ${draft.attachable}`,
+    '- stored nowhere: no fingerprint, no vault write, no attachment'
+  ];
+}
+
+/** The measurements this run recorded about itself. */
+export function qualityLines(facts: DemoFacts['extensions']): string[] {
+  if (facts.quality.length === 0) return ['No measurement recorded.'];
+  return facts.quality.map(
+    (record) =>
+      `- ${record.subject.kind} \`${record.metric}\`: ${(record.value * 100).toFixed(1)}% ` +
+        `(target ${(record.target * 100).toFixed(1)}%, ${record.verdict.toLowerCase()}, n=${record.sampleCount}) ` +
+        `[${record.subject.promptVersion}]`
+  );
+}
+
+/** The verdict a third party can reproduce with scripts/verify-pack.sh. */
+export function verificationLines(facts: DemoFacts['extensions']): string[] {
+  const result = facts.verification;
+  if (result === null) return ['No pack verified.'];
+  const signature =
+    result.signatureOk === null ? 'no signing key configured' : result.signatureOk ? 'valid' : 'INVALID';
+  return [
+    `- root hash: \`${result.rootHash}\``,
+    `- checksums: ${result.checksumsOk ? 'ok' : 'FAILED'} · audit chain: ${result.chainOk ? 'ok' : 'BROKEN'} · signature: ${signature}`,
+    `- exported to \`${facts.packDirectory ?? 'demo-out/pack'}\`, verifiable offline with \`scripts/verify-pack.sh\``
+  ];
 }

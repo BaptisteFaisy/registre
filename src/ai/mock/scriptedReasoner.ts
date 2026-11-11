@@ -19,6 +19,8 @@ import type { AttachmentRequest, ProposedAttachment, Reasoner } from '../../port
 import type { Control, Evidence, SufficiencyElement } from '../../domain/types.ts';
 import { similarity } from '../../support/normalize.ts';
 import { bestSentence } from '../textMatch.ts';
+import type { VersionedAttachmentProposal } from '../versioning.ts';
+import { stampAttachmentVersion } from '../versioning.ts';
 
 /** Minimum similarity for the heuristic to claim support. */
 export const ATTACH_MIN_SCORE = 0.12;
@@ -95,10 +97,10 @@ export class ScriptedReasoner implements Reasoner {
   }
 
   /** Annex C proposals, from the script or from the heuristic (EF-RAT-01). */
-  async proposeAttachments(request: AttachmentRequest): Promise<ProposedAttachment[]> {
+  async proposeAttachments(request: AttachmentRequest): Promise<VersionedAttachmentProposal[]> {
     const scripted = this.script.attachments?.get(request.evidence.id);
-    if (scripted) return scripted.map((proposal) => ({ ...proposal }));
-    return heuristicProposals(request.evidence, request.candidates);
+    const proposals = scripted ?? heuristicProposals(request.evidence, request.candidates);
+    return proposals.map(stampAttachmentVersion);
   }
 
   /** Annex D elements, from the script or from the heuristic (EF-SUF-01). */

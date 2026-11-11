@@ -19,9 +19,12 @@ const NAV: NavEntry[] = [
   { path: '/controls', label: 'Controls', capability: 'controls', group: 'Monitor' },
   { path: '/validation', label: 'Validation queue', capability: 'validation', group: 'Operate' },
   { path: '/ask', label: 'Ask', capability: 'ask', group: 'Operate' },
+  { path: '/mappings', label: 'Mappings', capability: 'mappings', group: 'Operate' },
   { path: '/reminders', label: 'Reminders', capability: 'reminders', group: 'Operate' },
   { path: '/packs', label: 'Audit pack', capability: 'packs', group: 'Deliver' },
+  { path: '/verify', label: 'Verify & share', capability: 'verify', group: 'Deliver' },
   { path: '/audit', label: 'Audit log', capability: 'audit', group: 'Deliver' },
+  { path: '/quality', label: 'Measured quality', capability: 'quality', group: 'Admin' },
   { path: '/settings', label: 'Settings', capability: 'settings', group: 'Admin' }
 ];
 

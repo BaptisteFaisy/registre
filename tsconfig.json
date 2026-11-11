@@ -44,6 +44,9 @@
       ],
       "@smithy/node-http-handler": [
         "src/types/aws-sdk/smithy-node-http-handler.d.ts"
+      ],
+      "@aws-sdk/client-kms": [
+        "src/types/aws-sdk/kms.d.ts"
       ]
     }
   },

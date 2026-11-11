@@ -8,6 +8,7 @@ import { stateColor, stateLabel } from '../../lib/states.ts';
 import { EvidenceColumn } from './EvidenceColumn.tsx';
 import { StateColumn } from './StateColumn.tsx';
 import { ReminderAction } from './ReminderAction.tsx';
+import { DraftAction } from './DraftAction.tsx';
 
 export function ControlBody({ data }: { data: ControlWithRelations }) {
   const { control, status } = data;
@@ -16,7 +17,12 @@ export function ControlBody({ data }: { data: ControlWithRelations }) {
       <PageHeader
         title={`${control.id} — ${control.title}`}
         subtitle={control.requirement}
-        actions={<ReminderAction controlId={control.id} state={status.state} />}
+        actions={
+          <div className="row">
+            <DraftAction controlId={control.id} />
+            <ReminderAction controlId={control.id} state={status.state} />
+          </div>
+        }
       />
       <div className="detail-head" style={{ marginBottom: 16 }}>
         <Badge label={stateLabel(status.state)} color={stateColor(status.state)} />

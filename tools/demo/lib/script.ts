@@ -46,16 +46,17 @@ export function buildReasonerScript(rootDir: string, isCsv: (fileName: string) =
       continue;
     }
     const needsReview = index % REVIEW_SAMPLE_EVERY === 0;
-    attachments.set(id, proposalsFor(item.id, text, item.expectedControls, needsReview));
+    attachments.set(id, scriptedProposals(item.id, text, item.expectedControls, needsReview));
     for (const controlId of item.expectedControls) {
-      const elements = elementsFor(text, controlId, item.missingElements);
+      const elements = scriptedElements(text, controlId, item.missingElements);
       if (elements) sufficiency.set(`${id}|${controlId}`, elements);
     }
   }
   return { attachments, sufficiency };
 }
 
-function proposalsFor(
+/** Annex C proposals for the controls a document supports. */
+export function scriptedProposals(
   evidenceRef: string,
   text: string,
   controlIds: readonly string[],
@@ -79,7 +80,8 @@ function proposalsFor(
   return out;
 }
 
-function elementsFor(
+/** Annex D elements for one control, minus the gaps the catalogue seeds. */
+export function scriptedElements(
   text: string,
   controlId: string,
   gaps: readonly { controlId: string; expected: string }[]
@@ -94,4 +96,31 @@ function elementsFor(
     const match = bestSentence(text, expected);
     return match ? { expected, present: true, quote: match.sentence } : { expected, present: false, quote: null };
   });
+}
+
+/** One script entry for a document that is not part of the catalogue. */
+export function scriptEntryFor(input: {
+  evidenceId: string;
+  reference: string;
+  text: string;
+  controlIds: readonly string[];
+  gaps?: readonly { controlId: string; expected: string }[];
+}): { proposals: ProposedAttachment[]; elements: Map<string, SufficiencyElement[]> } {
+  const elements = new Map<string, SufficiencyElement[]>();
+  for (const controlId of input.controlIds) {
+    const built = scriptedElements(input.text, controlId, input.gaps ?? []);
+    if (built !== null) elements.set(`${input.evidenceId}|${controlId}`, built);
+  }
+  return {
+    proposals: scriptedProposals(input.reference, input.text, input.controlIds, false),
+    elements
+  };
+}
+
+/** Merges two scripts; entries of `extra` win over those of `base`. */
+export function mergeScripts(base: ReasonerScript, extra: ReasonerScript): ReasonerScript {
+  return {
+    attachments: new Map([...(base.attachments ?? []), ...(extra.attachments ?? [])]),
+    sufficiency: new Map([...(base.sufficiency ?? []), ...(extra.sufficiency ?? [])])
+  };
 }

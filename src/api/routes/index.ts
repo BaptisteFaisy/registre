@@ -15,6 +15,9 @@ import { packRoutes } from './packs.ts';
 import { reminderRoutes } from './reminders.ts';
 import { auditRoutes } from './audit.ts';
 import { settingsRoutes } from './settings.ts';
+import { verifyRoutes } from './verify.ts';
+import { mappingRoutes } from './mappings.ts';
+import { extensionRoutes } from './extensions.ts';
 
 /** Every served route, in declaration order. */
 export const ROUTES: readonly RouteDefinition[] = [
@@ -29,7 +32,10 @@ export const ROUTES: readonly RouteDefinition[] = [
   ...packRoutes,
   ...reminderRoutes,
   ...auditRoutes,
-  ...settingsRoutes
+  ...settingsRoutes,
+  ...verifyRoutes,
+  ...mappingRoutes,
+  ...extensionRoutes
 ];
 
 /** One `METHOD path` line per route, for the startup log. */

@@ -165,7 +165,7 @@ export const FEATURED_SPECS: EvidenceSpec[] = [
   ev('ev-024', ['SEC-01'], 'POLICY', 'Information security policy v2', '2025-05-04', 'Sofia Novak', 'Claire Fontaine', [
     'Information security policy, version 2. It states the security commitments: least privilege, encryption of data at rest and in transit, yearly awareness training, and a documented review of the policy.',
     'Approved on 4 May 2025 by the managing director. Next review was due in May 2026 and has not been recorded yet.'
-  ]),
+  ], { missing: ['review date', 'employee acknowledgement'], note: 'The review due in May 2026 was never recorded and no acknowledgement sheet is attached.' }),
   ev('ev-025', ['SEC-02'], 'LIST', 'Access control matrix review', '2026-06-15', 'Sofia Novak', 'Claire Fontaine', [
     'Access control matrix reviewed on 15 June 2026. The matrix lists the systems, the roles and their permissions, and the outcome of the six-monthly review: twelve accounts removed, three privileges reduced.',
     'Approved by the security officer.'

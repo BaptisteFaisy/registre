@@ -43,11 +43,12 @@ test('the validation queue holds four pending items of three kinds', () => {
   assert.equal(new Set(pending.map((item) => item.kind)).size, 3);
 });
 
-test('two reminders and one frozen pack are seeded', () => {
+test('two reminders and two frozen packs are seeded', () => {
   assert.equal(store.reminders.length, 2);
-  assert.equal(store.packs.length, 1);
+  assert.equal(store.packs.length, 2);
   assert.equal(store.packs[0]?.index.length, 30);
   assert.ok((store.packs[0]?.knownGaps.length ?? 0) > 0);
+  assert.equal(store.packs[1]?.id, 'pk-002');
 });
 
 test('the audit trail is hash-chained', () => {

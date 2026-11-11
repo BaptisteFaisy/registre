@@ -26,6 +26,10 @@ import { attachmentId } from '../support/ids.ts';
 import { verifyQuoteInPages } from '../domain/citation.ts';
 import { record } from '../audit/log.ts';
 import { attachmentItem } from './queue.ts';
+import { attachmentThreshold } from './quality.ts';
+
+/** A proposal as the reasoners return it, stamped with its prompt version. */
+type StampedProposal = ProposedAttachment & { promptVersion?: string };
 
 /** What the attachment step produced for one evidence — EF-RAT-01..05. */
 export interface AttachOutcome {
@@ -93,15 +97,18 @@ export async function proposeAttachments(
   if (candidates.length === 0) return { attachments: [], validationItems: [], candidateCount: 0 };
   const proposals = await services.reasoner.proposeAttachments({ evidence, candidates });
   const now = services.clock.now();
+  // Measured quality decides the threshold in effect: a failing measurement
+  // pushes it above 1 and every attachment goes to the validation queue.
+  const threshold = await attachmentThreshold(services);
   const outcome: AttachOutcome = { attachments: [], validationItems: [], candidateCount: candidates.length };
 
   for (const proposal of proposals) {
     const candidate = candidates.find((item) => item.control.id === proposal.controlId);
     if (!candidate || !proposal.supports) continue;
-    const attachment = buildAttachment(services, evidence, candidate.control, proposal, now);
+    const attachment = buildAttachment(services, evidence, candidate.control, proposal, now, threshold);
     await services.state.putAttachment(attachment);
     outcome.attachments.push(attachment);
-    const item = await journal(services, actor, attachment);
+    const item = await journal(services, actor, attachment, threshold);
     if (item) outcome.validationItems.push(item);
   }
   return outcome;
@@ -112,11 +119,12 @@ function buildAttachment(
   services: Services,
   evidence: Evidence,
   control: Control,
-  proposal: ProposedAttachment,
-  now: string
+  proposal: StampedProposal,
+  now: string,
+  threshold: number
 ): Attachment {
   const check = verifyQuoteInPages(evidence.textPages, proposal.quote);
-  const autoApplied = check.found && proposal.confidence >= services.settings.confidenceThreshold;
+  const autoApplied = check.found && proposal.confidence >= threshold;
   return {
     id: attachmentId(evidence.id, control.id),
     evidenceId: evidence.id,
@@ -132,6 +140,7 @@ function buildAttachment(
     ...(check.found ? {} : { rejectionReason: 'CITATION_NOT_FOUND' as const }),
     autoApplied,
     model: services.reasoner.id,
+    ...(proposal.promptVersion === undefined ? {} : { promptVersion: proposal.promptVersion }),
     createdAt: now
   };
 }
@@ -143,7 +152,12 @@ function statusOf(citationFound: boolean, autoApplied: boolean): AttachmentStatu
 }
 
 /** Journals the outcome and queues the review a proposal needs — EF-RAT-03, EF-ADM-02. */
-async function journal(services: Services, actor: string, attachment: Attachment): Promise<ValidationItem | null> {
+async function journal(
+  services: Services,
+  actor: string,
+  attachment: Attachment,
+  threshold: number
+): Promise<ValidationItem | null> {
   const detail = { controlId: attachment.controlId, confidence: attachment.confidence, page: attachment.quoteLocation.page };
   if (attachment.status === 'REJECTED') {
     await record(services, actor, 'ATTACHMENT_REJECTED', 'attachment', attachment.id, {
@@ -158,9 +172,9 @@ async function journal(services: Services, actor: string, attachment: Attachment
   }
   await record(services, actor, 'ATTACHMENT_PROPOSED', 'attachment', attachment.id, {
     ...detail,
-    threshold: services.settings.confidenceThreshold
+    threshold
   });
-  const item = attachmentItem(attachment, services.settings.confidenceThreshold, attachment.createdAt);
+  const item = attachmentItem(attachment, threshold, attachment.createdAt);
   await services.state.putValidation(item);
   return item;
 }

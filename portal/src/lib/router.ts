@@ -16,6 +16,9 @@ export type Route =
   | { name: 'validation' }
   | { name: 'ask' }
   | { name: 'packs' }
+  | { name: 'verify'; packId?: string }
+  | { name: 'mappings' }
+  | { name: 'quality' }
   | { name: 'reminders' }
   | { name: 'audit' }
   | { name: 'settings' }
@@ -38,6 +41,9 @@ export function parseRoute(pathname: string): Route {
   if (head === 'validation') return { name: 'validation' };
   if (head === 'ask') return { name: 'ask' };
   if (head === 'packs') return { name: 'packs' };
+  if (head === 'verify') return second ? { name: 'verify', packId: second } : { name: 'verify' };
+  if (head === 'mappings') return { name: 'mappings' };
+  if (head === 'quality') return { name: 'quality' };
   if (head === 'reminders') return { name: 'reminders' };
   if (head === 'audit') return { name: 'audit' };
   if (head === 'settings') return { name: 'settings' };
@@ -61,6 +67,12 @@ export function routeToPath(route: Route): string {
       return '/ask';
     case 'packs':
       return '/packs';
+    case 'verify':
+      return route.packId ? `/verify/${route.packId}` : '/verify';
+    case 'mappings':
+      return '/mappings';
+    case 'quality':
+      return '/quality';
     case 'reminders':
       return '/reminders';
     case 'audit':

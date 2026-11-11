@@ -21,7 +21,8 @@ import type {
   Sufficiency,
   SufficiencyClass
 } from './types.ts';
-import { computeFreshness, RENEWAL_LEAD_DAYS } from './freshness.ts';
+import { computeFreshness, machinePeriodicityFor, RENEWAL_LEAD_DAYS } from './freshness.ts';
+import { provenanceOf } from './verification.ts';
 
 /** Machine-readable note codes carried by `ControlStatus.notes` — EF-FRA-02. */
 export const STATE_NOTES = {
@@ -93,7 +94,11 @@ function collectCandidates(applied: readonly Attachment[], input: ControlEvaluat
     if (!evidence) continue;
     const { freshness, expiresAt } = computeFreshness(
       evidence,
-      input.control.periodicity,
+      // A machine attestation expires on the collector's cadence, not on the
+      // control's declared periodicity (axis 3a).
+      provenanceOf(evidence.provenance) === 'MACHINE_ATTESTATION'
+        ? machinePeriodicityFor()
+        : input.control.periodicity,
       input.now,
       input.leadDays ?? RENEWAL_LEAD_DAYS
     );

@@ -42,3 +42,48 @@ export {
   refreshValidationQueue,
   sufficiencyItem
 } from './queue.ts';
+
+/* ------------------------------------------------------------- extensions */
+
+export { checkPack, verifyByToken, verifyPack, verdictLine } from './verify.ts';
+export {
+  MAX_TTL_HOURS,
+  MIN_TTL_HOURS,
+  SHARE_TOKEN_PREFIX,
+  createShare,
+  isShareCredential,
+  listShares,
+  newShareToken,
+  resolveShare,
+  revokeShare,
+  stripPrefix,
+  watermarked,
+  watermarkOf
+} from './share.ts';
+export type { CreateShareInput } from './share.ts';
+export {
+  MAPPING_MIN_SCORE,
+  PROPAGATION_MODEL,
+  controlSignature,
+  controlSimilarity,
+  decideMapping,
+  propagateAttachment,
+  proposeMappings,
+  requirementQuote,
+  reuseMetric,
+  validatedMappingsFor
+} from './crossmap.ts';
+export type { MappingDecisionInput, ProposeInput } from './crossmap.ts';
+export {
+  acknowledgeDrift,
+  ageInDays,
+  attestationsOf,
+  classify,
+  describe,
+  driftSummary,
+  isFailureState,
+  missingRuns,
+  observeAttestation
+} from './drift.ts';
+export type { DriftSummary, ObserveInput } from './drift.ts';
+export { CARRY_MIN_SCORE, MAX_CARRIED_CHARS, generateDraft, previousVersion } from './draft.ts';

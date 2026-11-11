@@ -100,6 +100,7 @@ test('demo: the offline run completes and writes its artefacts', async (t) => {
     reminders: result.reminders,
     answered: result.answered,
     refused: result.refused,
+    extensions: result.extensions,
     pack: result.pack,
     totalCostUsd: result.totalCostUsd,
     costPerEvidenceUsd: result.costPerEvidenceUsd

@@ -5,6 +5,8 @@
  * one public contract, and so the API layer and the demo never rebuild them.
  */
 
+import type { EvidenceProvenance } from '../domain/verification.ts';
+import type { RefreshPolicy } from '../domain/quality.ts';
 import type {
   Attachment,
   ControlStatus,
@@ -27,6 +29,15 @@ export interface IngestInput {
   fileDate?: string | null;
   /** Control the depositor targets, when the source knows it (EF-COL-02). */
   suggestedControlId?: string | null;
+  /**
+   * A collector's dated report is a machine attestation: it is refreshed on its
+   * own cadence and can drift (axis 3a). Absent means a human document.
+   */
+  provenance?: EvidenceProvenance;
+  /** The state the collector observed, compared run over run. */
+  attestedState?: string | null;
+  /** Expected cadence of the collector; defaults to one run a day. */
+  refreshPolicy?: RefreshPolicy;
 }
 
 /** What reading, attaching, assessing and recomputing produced for one evidence. */

@@ -14,6 +14,7 @@
 import { readFileSync, readdirSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { createServices } from '../../src/bootstrap.ts';
+import type { Services } from '../../src/ports/index.ts';
 import {
   askQuestion,
   assemblePack,
@@ -42,8 +43,17 @@ import type { CatalogueEvidence } from '../../eval/catalogue/types.ts';
 import { EVIDENCE, findEvidence } from '../../eval/catalogue.ts';
 import { isCsvDocument } from './lib/document.ts';
 import { buildReasonerScript } from './lib/script.ts';
+import { machineRuns, withMachineScript } from './extensions.ts';
 import { EVIDENCE_DIR, FRAMEWORK_PATH } from './generate.ts';
 import { buildFacts, buildReport, type DemoFacts } from './report.ts';
+import {
+  exportAndVerifyPack,
+  recordRunQuality,
+  runDraft,
+  runMachineAttestations,
+  runMappings,
+  type ExtensionFacts
+} from './extensions.ts';
 
 /**
  * Relevance floor of the offline evidence search. Below it a question is
@@ -81,6 +91,8 @@ export interface DemoResult {
   reminders: Reminder[];
   answered: Answer;
   refused: Answer;
+  /** The three extensions and the measured quality of this very run. */
+  extensions: ExtensionFacts;
   pack: Pack;
   costPerEvidenceUsd: number;
   totalCostUsd: number;
@@ -96,17 +108,58 @@ export async function runDemo(rootDir = process.cwd()): Promise<DemoResult> {
 
   const answered = await askQuestion(services, DEMO_PRINCIPAL, questionWithEvidence());
   const refused = await askQuestion(services, DEMO_PRINCIPAL, trapQuestion());
+  const extensions = await runExtensions(services, run, answered, refused);
   const pack = await assemblePack(services, 'demo-msp', DEMO_ACTOR);
+  const exported = await exportAndVerifyPack(services, pack, join(rootDir, 'demo-out'));
+  extensions.verification = exported.verification;
+  extensions.packDirectory = exported.directory;
 
   const costs = services.costs.report();
   return {
     ...run,
     answered,
     refused,
+    extensions,
     pack,
     costPerEvidenceUsd: run.ingested === 0 ? 0 : costs.totalUsd / run.ingested,
     totalCostUsd: costs.totalUsd
   };
+}
+
+/** Runs the three extensions and the quality measurement on the seeded run. */
+async function runExtensions(
+  services: Awaited<ReturnType<typeof createServices>>['services'],
+  run: { attachments: number; decisions: number },
+  answered: Answer,
+  refused: Answer
+): Promise<ExtensionFacts> {
+  // Axis 3a: two collector runs a day apart; the second reports a failure.
+  const drifts = await runMachineAttestations(services, DEMO_ACTOR, DEMO_NOW);
+  setDemoClock(services, DEMO_NOW);
+  await recomputeFramework(services, 'demo-msp');
+
+  // Axis 2: a second framework, proposed equivalences, three validated.
+  const mappings = await runMappings(services, DEMO_ACTOR, 'demo-msp');
+
+  // Axis 3b: the missing document, pre-filled for its owner.
+  const draft = await runDraft(services, DEMO_ACTOR);
+
+  // Bonus: what this very run measured, recorded as the quality baseline.
+  const quality = await recordRunQuality(services, {
+    answered: !answered.noEvidence,
+    refused: refused.noEvidence,
+    // Every proposal the quality lead accepted as-is counts as accepted without
+    // correction; only a rejection or a correction would lower the ratio.
+    acceptedWithoutCorrection: run.attachments,
+    totalAttachments: run.attachments
+  });
+
+  return { drifts, mappings, draft, quality, verification: null, packDirectory: null };
+}
+
+/** Restores the frozen instant after the collector runs moved the clock. */
+function setDemoClock(services: Services, instant: string): void {
+  (services.clock as { set?: (value: string) => void }).set?.(instant);
 }
 
 /**
@@ -129,10 +182,13 @@ export async function demoServices(
   rmSync(vaultRoot, { recursive: true, force: true });
 
   const byName = new Map(EVIDENCE.map((item) => [item.fileName, item]));
-  const script = buildReasonerScript(rootDir, (fileName) => {
+  const catalogueScript = buildReasonerScript(rootDir, (fileName) => {
     const item = byName.get(fileName);
     return item ? isCsvDocument(item) : false;
   });
+  // The two simulated collector reports are scripted like the catalogue
+  // documents, so the drift demonstration is deterministic too.
+  const script = withMachineScript(catalogueScript, machineRuns(DEMO_NOW));
   const { services } = await createServices({
     provider: 'mock',
     now: DEMO_NOW,
@@ -170,7 +226,7 @@ async function processDemonstration(
   services: Awaited<ReturnType<typeof createServices>>['services'],
   evidenceIndex: Evidence[],
   rootDir: string
-): Promise<Omit<DemoResult, 'answered' | 'refused' | 'pack' | 'totalCostUsd' | 'costPerEvidenceUsd'>> {
+): Promise<Omit<DemoResult, 'answered' | 'refused' | 'extensions' | 'pack' | 'totalCostUsd' | 'costPerEvidenceUsd'>> {
   const ingested = await ingestAll(services, evidenceIndex, rootDir);
   await recomputeFramework(services, 'demo-msp');
 
@@ -307,6 +363,7 @@ export async function writeArtifacts(result: DemoResult, rootDir = process.cwd()
     reminders: result.reminders,
     answered: result.answered,
     refused: result.refused,
+    extensions: result.extensions,
     pack: result.pack,
     totalCostUsd: result.totalCostUsd,
     costPerEvidenceUsd: result.costPerEvidenceUsd

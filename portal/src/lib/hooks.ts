@@ -63,6 +63,28 @@ export function describeError(cause: unknown): string {
   return 'Unexpected error.';
 }
 
+/**
+ * Runs one write action against the API, reloads the viewers on success and
+ * returns the failure as readable text (or `null` when it worked). Shared by
+ * every screen action so no screen re-implements the busy/error dance.
+ */
+export async function runAction(
+  action: () => Promise<unknown>,
+  reload: () => void,
+  setBusy: (busy: boolean) => void
+): Promise<string | null> {
+  setBusy(true);
+  try {
+    await action();
+    reload();
+    return null;
+  } catch (cause) {
+    return describeError(cause);
+  } finally {
+    setBusy(false);
+  }
+}
+
 /** Debounces a value; used by the search inputs of the filterable lists. */
 export function useDebounced<T>(value: T, delayMs = 200): T {
   const [debounced, setDebounced] = useState(value);

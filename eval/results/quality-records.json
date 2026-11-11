@@ -1,0 +1,98 @@
+[
+  {
+    "id": "qr-96432319bc77",
+    "measuredAt": "2026-11-11T17:19:28.747Z",
+    "subject": {
+      "kind": "READING",
+      "modelId": "fixture",
+      "promptVersion": "reading-v1"
+    },
+    "metric": "FIELD_ACCURACY",
+    "value": 1,
+    "target": 0.9,
+    "sampleCount": 840,
+    "datasetVersion": "ds-71100938b838",
+    "jobId": null,
+    "verdict": "PASS"
+  },
+  {
+    "id": "qr-ec5ee01d21b5",
+    "measuredAt": "2026-11-11T17:19:28.750Z",
+    "subject": {
+      "kind": "ATTACHMENT",
+      "modelId": "fixture",
+      "promptVersion": "attachment-v1"
+    },
+    "metric": "ACCEPTED_WITHOUT_CORRECTION",
+    "value": 1,
+    "target": 0.85,
+    "sampleCount": 60,
+    "datasetVersion": "ds-71100938b838",
+    "jobId": null,
+    "verdict": "PASS"
+  },
+  {
+    "id": "qr-7de4575daf97",
+    "measuredAt": "2026-11-11T17:19:28.750Z",
+    "subject": {
+      "kind": "ATTACHMENT",
+      "modelId": "fixture",
+      "promptVersion": "attachment-v1"
+    },
+    "metric": "WRONG_HIGH_CONFIDENCE",
+    "value": 0,
+    "target": 0,
+    "sampleCount": 60,
+    "datasetVersion": "ds-71100938b838",
+    "jobId": null,
+    "verdict": "PASS"
+  },
+  {
+    "id": "qr-fe286bac2471",
+    "measuredAt": "2026-11-11T17:19:28.750Z",
+    "subject": {
+      "kind": "SUFFICIENCY",
+      "modelId": "fixture",
+      "promptVersion": "sufficiency-v1"
+    },
+    "metric": "GAPS_DETECTED",
+    "value": 1,
+    "target": 1,
+    "sampleCount": 20,
+    "datasetVersion": "ds-71100938b838",
+    "jobId": null,
+    "verdict": "PASS"
+  },
+  {
+    "id": "qr-8f98524a4d95",
+    "measuredAt": "2026-11-11T17:19:28.750Z",
+    "subject": {
+      "kind": "QA",
+      "modelId": "fixture",
+      "promptVersion": "answer-v1"
+    },
+    "metric": "CITATION_ACCURACY",
+    "value": 1,
+    "target": 0.9,
+    "sampleCount": 20,
+    "datasetVersion": "ds-71100938b838",
+    "jobId": null,
+    "verdict": "PASS"
+  },
+  {
+    "id": "qr-fcd87b0435bb",
+    "measuredAt": "2026-11-11T17:19:28.750Z",
+    "subject": {
+      "kind": "QA",
+      "modelId": "fixture",
+      "promptVersion": "answer-v1"
+    },
+    "metric": "INVENTED_ANSWERS",
+    "value": 0,
+    "target": 0,
+    "sampleCount": 5,
+    "datasetVersion": "ds-71100938b838",
+    "jobId": null,
+    "verdict": "PASS"
+  }
+]

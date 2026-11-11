@@ -38,15 +38,20 @@ export function packIndexText(pack: Pack): string {
   return lines.join('\n');
 }
 
-/** Triggers the browser download of the index text. */
-export function downloadPackIndex(pack: Pack): void {
-  const blob = new Blob([packIndexText(pack)], { type: 'text/plain;charset=utf-8' });
+/** Triggers the browser download of a text file (shared by every screen). */
+export function downloadText(fileName: string, text: string, mime = 'text/plain;charset=utf-8'): void {
+  const blob = new Blob([text], { type: mime });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.href = url;
-  link.download = `registre-pack-${pack.id}-index.txt`;
+  link.download = fileName;
   document.body.appendChild(link);
   link.click();
   link.remove();
   URL.revokeObjectURL(url);
+}
+
+/** Triggers the browser download of the index text. */
+export function downloadPackIndex(pack: Pack): void {
+  downloadText(`registre-pack-${pack.id}-index.txt`, packIndexText(pack));
 }

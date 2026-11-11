@@ -10,24 +10,35 @@ import type {
   Answer,
   AuditEvent,
   Control,
+  ControlMapping,
   ControlWithRelations,
+  Draft,
+  DriftEvent,
   Evidence,
   EvidenceUploadInput,
   Framework,
   FrameworkImport,
+  MappingDecision,
+  MappingFilter,
   Pack,
   Principal,
+  QualityReport,
   ReadinessOverview,
   Reminder,
+  ReuseMetric,
   Settings,
+  ShareGrant,
+  ShareInput,
   ValidationDecision,
-  ValidationItem
+  ValidationItem,
+  VerificationResult
 } from '../api/types.ts';
 import { ApiError } from '../api/client.ts';
 import type { RegistreApi } from '../api/client.ts';
 import { answerQuestion, allowedLevels } from './ask.ts';
 import { appendAuditEvent, buildPack } from './activity.ts';
 import { recomputeStatuses } from './dataset.ts';
+import { MockExtensionsApi } from './clientExt.ts';
 import {
   buildTrend,
   computeByDomain,
@@ -43,21 +54,22 @@ export type PrincipalProvider = () => Principal | null;
 
 const LATENCY_MS = 90;
 
-function delay(): Promise<void> {
+/** Small artificial latency so the demo shows the loading states. */
+export function delay(): Promise<void> {
   return new Promise((resolve) => {
     setTimeout(resolve, LATENCY_MS);
   });
 }
 
-function nowIso(): string {
-  return new Date().toISOString();
-}
-
 /** Reads the principal or fails like the real API would (401). */
-function requirePrincipal(provider: PrincipalProvider): Principal {
+export function requirePrincipal(provider: PrincipalProvider): Principal {
   const principal = provider();
   if (!principal) throw new ApiError(401, 'UNAUTHORIZED', 'Sign in to continue.');
   return principal;
+}
+
+function nowIso(): string {
+  return new Date().toISOString();
 }
 
 /** Drops evidence the principal may not read, and its relations. */
@@ -83,9 +95,11 @@ function visibleRelations(db: MockStore['db'], clearance: Principal['clearance']
 /** Mock client: the same 16 endpoints, served from memory. */
 export class MockRegistreApi implements RegistreApi {
   private readonly principalOf: PrincipalProvider;
+  private readonly ext: MockExtensionsApi;
 
   constructor(principalOf: PrincipalProvider) {
     this.principalOf = principalOf;
+    this.ext = new MockExtensionsApi(principalOf);
   }
 
   async listFrameworks(): Promise<Framework[]> {
@@ -339,6 +353,63 @@ export class MockRegistreApi implements RegistreApi {
       detail: { ...patch }
     });
     return { ...next };
+  }
+
+  /* Extension endpoints — served by the sibling mock (CONTRACTS-EXT). */
+
+  verifyPack(packId: string): Promise<VerificationResult> {
+    return this.ext.verifyPack(packId);
+  }
+
+  verifyByToken(token: string): Promise<VerificationResult> {
+    return this.ext.verifyByToken(token);
+  }
+
+  createShare(packId: string, input: ShareInput): Promise<ShareGrant> {
+    return this.ext.createShare(packId, input);
+  }
+
+  listShares(): Promise<ShareGrant[]> {
+    return this.ext.listShares();
+  }
+
+  revokeShare(token: string): Promise<ShareGrant> {
+    return this.ext.revokeShare(token);
+  }
+
+  listMappings(filter?: MappingFilter): Promise<ControlMapping[]> {
+    return this.ext.listMappings(filter);
+  }
+
+  proposeMappings(input: {
+    sourceFrameworkId: string;
+    targetFrameworkId: string;
+  }): Promise<ControlMapping[]> {
+    return this.ext.proposeMappings(input);
+  }
+
+  decideMapping(id: string, decision: MappingDecision, note?: string): Promise<ControlMapping> {
+    return this.ext.decideMapping(id, decision, note);
+  }
+
+  getReuse(frameworkId: string): Promise<ReuseMetric> {
+    return this.ext.getReuse(frameworkId);
+  }
+
+  listDrifts(frameworkId?: string): Promise<DriftEvent[]> {
+    return this.ext.listDrifts(frameworkId);
+  }
+
+  ackDrift(id: string): Promise<DriftEvent> {
+    return this.ext.ackDrift(id);
+  }
+
+  generateDraft(controlId: string): Promise<Draft> {
+    return this.ext.generateDraft(controlId);
+  }
+
+  getQuality(): Promise<QualityReport> {
+    return this.ext.getQuality();
   }
 }
 

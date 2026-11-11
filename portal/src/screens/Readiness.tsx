@@ -16,6 +16,7 @@ import { formatDate, formatPercent, formatUsd } from '../lib/format.ts';
 import { STATE_ORDER, stateColor, stateLabel } from '../lib/states.ts';
 import { navigate } from '../lib/router.ts';
 import { StateMeaningCard } from './readiness/StateMeaningCard.tsx';
+import { DriftPanel } from './readiness/DriftPanel.tsx';
 import { useControlIndex, useFramework, useReadiness } from '../state/useData.ts';
 
 export function ReadinessScreen() {
@@ -78,6 +79,8 @@ function ReadinessContent({
         <CostCard overview={overview} />
         <StateMeaningCard snapshot={overview.snapshot} />
       </div>
+
+      <DriftPanel frameworkId={overview.framework.id} />
 
       <AttentionCard statuses={overview.statuses} controls={controls} />
     </>
