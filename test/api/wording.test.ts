@@ -12,7 +12,7 @@ import assert from 'node:assert/strict';
 import { containsForbiddenWord, findViolations } from '../../src/domain/vocabulary.ts';
 import { CONTROL_STATES } from '../../src/domain/types.ts';
 import { buildOpenApiDocument } from '../../src/api/openapi.ts';
-import { depositPolicy, depositRestricted, importDemoFramework } from './fixtures.ts';
+import { depositPolicy, depositRestricted, evidenceIdOf, importDemoFramework } from './fixtures.ts';
 import { TOKENS, startTestApi } from './harness.ts';
 
 /** One call of the walk: a method, a path, a body. */
@@ -28,12 +28,15 @@ function callsOf(evidenceId: string): Call[] {
     { method: 'GET', path: '/v1/frameworks' },
     { method: 'GET', path: '/v1/frameworks/demo-msp/controls' },
     { method: 'GET', path: '/v1/frameworks/demo-msp/readiness' },
+    { method: 'GET', path: '/v1/frameworks/demo-msp/diff' },
     { method: 'GET', path: `/v1/evidence/${evidenceId}` },
     { method: 'GET', path: '/v1/evidence/' + evidenceId + '?include=text' },
     { method: 'GET', path: '/v1/controls/CONT-01' },
     { method: 'GET', path: '/v1/controls/CONT-01/evidence' },
     { method: 'GET', path: '/v1/validations?status=pending' },
     { method: 'GET', path: '/v1/reminders' },
+    { method: 'GET', path: '/v1/packs' },
+    { method: 'GET', path: '/v1/auth/accounts' },
     { method: 'GET', path: '/v1/audit-log' },
     { method: 'GET', path: '/v1/settings' },
     { method: 'GET', path: '/openapi.json' },
@@ -48,7 +51,7 @@ test('ENF-IA-01: no endpoint response qualifies a control with the forbidden wor
   try {
     await importDemoFramework(api);
     const deposit = await depositPolicy(api);
-    const evidenceId = (deposit.json as { evidenceId: string }).evidenceId;
+    const evidenceId = evidenceIdOf(deposit);
     for (const call of callsOf(evidenceId)) {
       const response = await api.request(call.method, call.path, {
         token: call.path === '/healthz' || call.path === '/openapi.json' ? null : TOKENS.qualityLead,
@@ -69,7 +72,7 @@ test('ENF-IA-01: the restricted evidence response says nothing about a control e
   const api = await startTestApi();
   try {
     const deposit = await depositRestricted(api);
-    const evidenceId = (deposit.json as { evidenceId: string }).evidenceId;
+    const evidenceId = evidenceIdOf(deposit);
     const response = await api.request('GET', `/v1/evidence/${evidenceId}?include=text`, {
       token: TOKENS.qualityLead
     });
@@ -94,14 +97,15 @@ test('ENF-IA-01: the state of a control is always one of the five states', async
   const api = await startTestApi();
   try {
     await importDemoFramework(api);
-    const response = await api.request('GET', '/v1/frameworks/demo-msp/controls', {
+    // The bare listing carries no state any more: the dashboard reads the state
+    // of every control from the readiness overview.
+    const response = await api.request('GET', '/v1/frameworks/demo-msp/readiness', {
       token: TOKENS.qualityLead
     });
-    const controls = (response.json as { controls: Array<{ state: string | null }> }).controls;
-    assert.ok(controls.length >= 1);
-    for (const control of controls) {
-      if (control.state === null) continue;
-      assert.ok(CONTROL_STATES.includes(control.state as (typeof CONTROL_STATES)[number]));
+    const statuses = (response.json as { statuses: Array<{ state: string }> }).statuses;
+    assert.ok(statuses.length >= 1);
+    for (const status of statuses) {
+      assert.ok(CONTROL_STATES.includes(status.state as (typeof CONTROL_STATES)[number]));
     }
   } finally {
     await api.close();

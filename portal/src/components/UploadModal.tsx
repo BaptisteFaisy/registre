@@ -37,10 +37,13 @@ function useDeposit(onDone: (result: UploadResult) => void): DepositForm {
     setBusy(true);
     setError(null);
     try {
+      // The document travels inside the JSON envelope, so its bytes are read
+      // here and encoded by the API client (base64).
+      const bytes = new Uint8Array(await file.arrayBuffer());
       const evidence = await api.uploadEvidence({
         fileName: file.name,
         contentType: file.type || 'application/pdf',
-        sizeBytes: file.size,
+        bytes,
         suggestedControlId: controlId,
         accessLevel: access
       });

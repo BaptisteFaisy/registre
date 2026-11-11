@@ -32,12 +32,32 @@ export const FRAMEWORK_SCHEMAS = {
       source: nullableString
     }
   },
-  FrameworkList: {
+  FrameworkArray: {
+    type: 'array',
+    items: { $ref: '#/components/schemas/Framework' }
+  },
+  FrameworkDiff: {
     type: 'object',
-    required: ['frameworks', 'total'],
+    required: ['frameworkId', 'version', 'firstImport', 'diff'],
     properties: {
-      total: { type: 'integer' },
-      frameworks: { type: 'array', items: { $ref: '#/components/schemas/Framework' } }
+      frameworkId: stringSchema,
+      version: stringSchema,
+      importedAt: { type: 'string', format: 'date-time' },
+      firstImport: { type: 'boolean' },
+      diff: {
+        oneOf: [
+          {
+            type: 'object',
+            required: ['added', 'changed', 'removed'],
+            properties: {
+              added: { type: 'array', items: stringSchema },
+              changed: { type: 'array', items: stringSchema },
+              removed: { type: 'array', items: stringSchema }
+            }
+          },
+          { type: 'null' }
+        ]
+      }
     }
   },
   FrameworkImport: {
@@ -127,21 +147,19 @@ export const FRAMEWORK_SCHEMAS = {
       notes: { type: 'array', items: stringSchema }
     }
   },
-  ControlList: {
-    type: 'object',
-    required: ['frameworkId', 'total', 'controls'],
-    properties: {
-      frameworkId: stringSchema,
-      total: { type: 'integer' },
-      controls: { type: 'array', items: { $ref: '#/components/schemas/Control' } }
-    }
+  ControlArray: {
+    type: 'array',
+    items: { $ref: '#/components/schemas/Control' }
   },
-  ControlDetail: {
+  ControlWithRelations: {
     type: 'object',
-    required: ['control'],
+    required: ['control', 'status', 'attachments', 'sufficiencies', 'evidence'],
     properties: {
       control: { $ref: '#/components/schemas/Control' },
-      status: { oneOf: [{ $ref: '#/components/schemas/ControlStatus' }, { type: 'null' }] }
+      status: { oneOf: [{ $ref: '#/components/schemas/ControlStatus' }, { type: 'null' }] },
+      attachments: { type: 'array', items: { $ref: '#/components/schemas/Attachment' } },
+      sufficiencies: { type: 'array', items: { $ref: '#/components/schemas/Sufficiency' } },
+      evidence: { type: 'array', items: { $ref: '#/components/schemas/Evidence' } }
     }
   },
   ControlStatus: {
@@ -159,22 +177,44 @@ export const FRAMEWORK_SCHEMAS = {
       computedAt: { type: 'string', format: 'date-time' }
     }
   },
-  Readiness: {
+  ReadinessSnapshot: {
     type: 'object',
-    required: ['frameworkId', 'computedAt', 'total', 'counts', 'shares', 'trend'],
+    required: ['frameworkId', 'computedAt', 'total', 'counts', 'shares'],
     properties: {
       frameworkId: stringSchema,
       computedAt: { type: 'string', format: 'date-time' },
       total: { type: 'integer' },
       counts: stateRecord({ type: 'integer' }),
       shares: stateRecord({ type: 'number' }),
+    }
+  },
+  ReadinessOverview: {
+    type: 'object',
+    required: ['framework', 'snapshot', 'trend', 'statuses', 'byDomain', 'costs'],
+    properties: {
+      framework: { $ref: '#/components/schemas/Framework' },
+      snapshot: { $ref: '#/components/schemas/ReadinessSnapshot' },
       trend: {
         type: 'array',
         items: {
           type: 'object',
-          properties: { at: { type: 'string', format: 'date-time' }, counts: stateRecord({ type: 'integer' }) }
+          properties: {
+            frameworkId: stringSchema,
+            at: { type: 'string', format: 'date-time' },
+            counts: stateRecord({ type: 'integer' })
+          }
         }
-      }
+      },
+      statuses: { type: 'array', items: { $ref: '#/components/schemas/ControlStatus' } },
+      byDomain: {
+        type: 'object',
+        additionalProperties: {
+          type: 'object',
+          required: ['total', 'counts'],
+          properties: { total: { type: 'integer' }, counts: stateRecord({ type: 'integer' }) }
+        }
+      },
+      costs: { $ref: '#/components/schemas/CostReport' }
     }
   }
 } as const;

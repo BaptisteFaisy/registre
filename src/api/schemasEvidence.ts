@@ -10,7 +10,7 @@
  * from `ControlState` and nothing else.
  */
 
-import { nullableString, stringSchema } from './schemaPrimitives.ts';
+import { SUFFICIENCY_ENUM, nullableInteger, nullableString, stringSchema } from './schemaPrimitives.ts';
 
 export const EVIDENCE_SCHEMAS = {
   EvidenceDeposit: {
@@ -23,22 +23,6 @@ export const EVIDENCE_SCHEMAS = {
       frameworkId: stringSchema,
       controlId: stringSchema,
       fileDate: { type: 'string', format: 'date' }
-    }
-  },
-  EvidenceDepositResult: {
-    type: 'object',
-    required: ['evidenceId', 'sha256', 'duplicate', 'accessLevel'],
-    properties: {
-      evidenceId: stringSchema,
-      sha256: stringSchema,
-      revision: { type: 'integer' },
-      duplicate: { type: 'boolean', description: 'True when the fingerprint was already stored (R8).' },
-      accessLevel: { type: 'string', enum: ['PUBLIC', 'INTERNAL', 'RESTRICTED'] },
-      contentType: stringSchema,
-      sizeBytes: { type: 'integer' },
-      ingestedAt: { type: 'string', format: 'date-time' },
-      flags: { type: 'object', additionalProperties: true },
-      locations: { type: 'array', items: { type: 'object', additionalProperties: true } }
     }
   },
   Evidence: {
@@ -63,36 +47,35 @@ export const EVIDENCE_SCHEMAS = {
   },
   Attachment: {
     type: 'object',
+    required: ['id', 'evidenceId', 'controlId', 'frameworkId', 'supports', 'confidence', 'quote', 'status'],
     properties: {
-      attachmentId: stringSchema,
+      id: stringSchema,
       evidenceId: stringSchema,
       controlId: stringSchema,
       frameworkId: stringSchema,
-      status: { type: 'string', enum: ['PROPOSED', 'APPLIED', 'REJECTED'] },
       supports: { type: 'boolean' },
       confidence: { type: 'number' },
       quote: stringSchema,
-      quoteLocation: { type: 'object', additionalProperties: true },
+      quoteLocation: {
+        type: 'object',
+        required: ['page'],
+        properties: { page: nullableInteger }
+      },
+      reason: stringSchema,
+      status: { type: 'string', enum: ['PROPOSED', 'APPLIED', 'REJECTED'] },
       citationVerified: { type: 'boolean' },
       autoApplied: { type: 'boolean' },
-      reason: stringSchema,
-      rejectionReason: nullableString,
+      model: stringSchema,
       createdAt: { type: 'string', format: 'date-time' },
+      rejectionReason: nullableString,
       decidedBy: nullableString,
       decidedAt: nullableString,
-      sufficiency: { type: ['object', 'null'], additionalProperties: true },
-      title: nullableString,
-      documentDate: nullableString
+      decidedNote: nullableString
     }
   },
-  AttachmentList: {
-    type: 'object',
-    required: ['controlId', 'attachments'],
-    properties: {
-      controlId: stringSchema,
-      total: { type: 'integer' },
-      attachments: { type: 'array', items: { $ref: '#/components/schemas/Attachment' } }
-    }
+  EvidenceArray: {
+    type: 'array',
+    items: { $ref: '#/components/schemas/Evidence' }
   },
   ValidationItem: {
     type: 'object',
@@ -111,14 +94,9 @@ export const EVIDENCE_SCHEMAS = {
       note: nullableString
     }
   },
-  ValidationQueue: {
-    type: 'object',
-    required: ['status', 'total', 'items'],
-    properties: {
-      status: { type: 'string', enum: ['PENDING', 'DECIDED'] },
-      total: { type: 'integer' },
-      items: { type: 'array', items: { $ref: '#/components/schemas/ValidationItem' } }
-    }
+  ValidationItemArray: {
+    type: 'array',
+    items: { $ref: '#/components/schemas/ValidationItem' }
   },
   DecisionRequest: {
     type: 'object',

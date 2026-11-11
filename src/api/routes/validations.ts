@@ -14,7 +14,7 @@ import type { ApiResponse } from '../http.ts';
 import type { ApiContext, RouteDefinition } from '../types.ts';
 import { assertCanDecide, requireRole } from '../access.ts';
 import { optionalString, queryEnum, requiredEnum } from '../validate.ts';
-import { controlView, validationView } from '../views.ts';
+import { validationView } from '../views.ts';
 import { bodyObject, requireValidation } from './shared.ts';
 
 /** Roles allowed in the validation queue (EF-VAL-01). */
@@ -45,7 +45,8 @@ async function listValidations(context: ApiContext): Promise<ApiResponse> {
     context,
     queue.filter((item) => item.status === status)
   );
-  return json(200, { status, total: filtered.length, items: filtered.map(validationView) });
+  // Bare queue: the portal client is typed `Promise<ValidationItem[]>`.
+  return json(200, filtered.map(validationView));
 }
 
 /** `POST /v1/validations/{id}/decision` — record a decision (EF-VAL-02). */
@@ -64,12 +65,8 @@ async function decideValidation(context: ApiContext): Promise<ApiResponse> {
     by: context.principal.id,
     ...(note === undefined ? {} : { note })
   });
-  const controls = [];
-  for (const status of outcome.statuses) {
-    const control = await context.services.state.getControl(status.controlId);
-    if (control !== null) controls.push(controlView(control, status));
-  }
-  return json(200, { item: validationView(outcome.item), controls });
+  // Bare item: the decided item keeps its author, date and reason (EF-VAL-02).
+  return json(200, validationView(outcome.item));
 }
 
 /** The two validation routes, in table order. */
@@ -93,7 +90,7 @@ export const validationRoutes: readonly RouteDefinition[] = [
           default: 'PENDING'
         }
       ],
-      responseSchema: 'ValidationQueue',
+      responseSchema: 'ValidationItemArray',
       errors: [400, 401, 403]
     }
   },
@@ -108,7 +105,7 @@ export const validationRoutes: readonly RouteDefinition[] = [
       requirement: 'EF-VAL-02',
       roles: DECIDE_ROLES,
       requestSchema: 'DecisionRequest',
-      responseSchema: 'DecisionResult',
+      responseSchema: 'ValidationItem',
       errors: [400, 401, 403, 404, 409],
       notes: 'Author, date and note are kept on the item; CORRECT requires a target controlId.'
     }

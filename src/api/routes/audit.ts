@@ -55,15 +55,18 @@ async function listAuditLog(context: ApiContext): Promise<ApiResponse> {
     ...(objectId === undefined ? {} : { objectId })
   });
   const page = events.slice(offset, offset + limit);
-  const payload: Record<string, unknown> = {
-    total: events.length,
-    limit,
-    offset,
-    nextOffset: offset + page.length < events.length ? offset + page.length : null,
-    events: page.map(auditEventView)
+  const headers: Record<string, string> = {
+    'x-audit-total': String(events.length),
+    'x-audit-limit': String(limit),
+    'x-audit-offset': String(offset)
   };
-  if (verify === 'chain') payload.chain = await context.services.audit.verifyChain();
-  return json(200, payload);
+  if (verify === 'chain') {
+    const chain = await context.services.audit.verifyChain();
+    headers['x-audit-chain'] = chain.ok ? 'ok' : `broken:${chain.brokenAt ?? 'unknown'}`;
+  }
+  // Bare list: the portal client is typed `Promise<AuditEvent[]>`. Pagination
+  // and the chain verdict travel in the headers.
+  return { status: 200, headers: { 'content-type': 'application/json', ...headers }, body: JSON.stringify(page.map(auditEventView)) };
 }
 
 /** The audit-log route. */
@@ -95,7 +98,7 @@ export const auditRoutes: readonly RouteDefinition[] = [
           values: ['chain']
         }
       ],
-      responseSchema: 'AuditPage',
+      responseSchema: 'AuditEventArray',
       errors: [400, 401, 403],
       notes: 'nextOffset is null on the last page; chain reports the first broken sequence when verified.'
     }

@@ -10,6 +10,7 @@
 import type { Principal, Role } from '../domain/types.ts';
 import type { Services } from '../ports/index.ts';
 import type { ApiRequest, ApiResponse, HttpMethod } from './http.ts';
+import type { CredentialDirectory } from './auth.ts';
 import type { PipelineApi } from './pipeline.ts';
 
 /** Who acts, as handed to the pipeline (the resolved principal). */
@@ -59,6 +60,8 @@ export interface RouteMeta {
 export interface ApiContext {
   services: Services;
   pipeline: PipelineApi;
+  /** Demonstration credentials; the session routes verify against it. */
+  directory: CredentialDirectory;
   principal: Principal;
   params: Readonly<Record<string, string>>;
   query: Readonly<Record<string, string>>;

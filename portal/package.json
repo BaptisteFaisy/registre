@@ -9,7 +9,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "node --test src/lib/ src/mocks/",
+    "test": "node --test src/lib/ src/mocks/ src/api/ src/state/",
     "check:wording": "node scripts/check-wording.mjs",
     "check:sizes": "node scripts/check-sizes.mjs",
     "check": "npm run typecheck && npm run check:sizes && npm run check:wording && npm test && npm run build",

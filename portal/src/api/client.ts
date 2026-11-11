@@ -13,6 +13,7 @@ import type {
   Control,
   ControlWithRelations,
   Evidence,
+  EvidenceUploadInput,
   Framework,
   FrameworkImport,
   Pack,
@@ -22,6 +23,7 @@ import type {
   ValidationDecision,
   ValidationItem
 } from './types.ts';
+import { buildEvidencePayload } from './evidencePayload.ts';
 
 /** HTTP failure surfaced to the screens. */
 export class ApiError extends Error {
@@ -52,13 +54,7 @@ export interface RegistreApi {
   getReadiness(frameworkId: string): Promise<ReadinessOverview>;
 
   /* evidence */
-  uploadEvidence(input: {
-    fileName: string;
-    contentType: string;
-    sizeBytes: number;
-    suggestedControlId?: string;
-    accessLevel?: string;
-  }): Promise<Evidence>;
+  uploadEvidence(input: EvidenceUploadInput): Promise<Evidence>;
   getEvidence(evidenceId: string): Promise<Evidence>;
 
   /* controls */
@@ -102,6 +98,11 @@ export interface HttpClientOptions {
   baseUrl: string;
   tokens?: TokenProvider;
   fetchImpl?: typeof fetch;
+  /**
+   * Called when the API answers 401: the session is over and the portal must
+   * drop back to the sign-in screen.
+   */
+  onUnauthorized?: () => void;
 }
 
 /** Thin JSON client over `fetch`, with HTTP status mapping (chapter 15). */
@@ -109,11 +110,13 @@ export class HttpClient {
   private readonly baseUrl: string;
   private readonly tokens: TokenProvider;
   private readonly fetchImpl: typeof fetch;
+  private readonly onUnauthorized: (() => void) | undefined;
 
   constructor(options: HttpClientOptions) {
     this.baseUrl = options.baseUrl.endsWith('/') ? options.baseUrl.slice(0, -1) : options.baseUrl;
     this.tokens = options.tokens ?? { token: () => null };
     this.fetchImpl = options.fetchImpl ?? globalThis.fetch.bind(globalThis);
+    this.onUnauthorized = options.onUnauthorized;
   }
 
   /** Performs one call and unwraps the JSON body. */
@@ -125,7 +128,12 @@ export class HttpClient {
     return this.unwrap<T>(response);
   }
 
-  private headers(init: RequestInit): HeadersInit {
+  /**
+   * Request headers. Typed as a plain record instead of the DOM `HeadersInit`
+   * so this module also compiles under the repository-root tsconfig, which has
+   * no DOM lib (the contract test imports it from Node).
+   */
+  private headers(init: RequestInit): Record<string, string> {
     const headers: Record<string, string> = { Accept: 'application/json' };
     if (init.body) headers['Content-Type'] = 'application/json';
     const token = this.tokens.token();
@@ -137,7 +145,10 @@ export class HttpClient {
   private async unwrap<T>(response: Response): Promise<T> {
     const text = await response.text();
     const payload = text ? safeParse(text) : null;
-    if (!response.ok) throw toApiError(response.status, payload);
+    if (!response.ok) {
+      if (response.status === 401) this.onUnauthorized?.();
+      throw toApiError(response.status, payload);
+    }
     return payload as T;
   }
 }
@@ -203,16 +214,10 @@ export class HttpRegistreApi implements RegistreApi {
     return this.http.request<ReadinessOverview>(`/v1/frameworks/${encodeURIComponent(frameworkId)}/readiness`);
   }
 
-  uploadEvidence(input: {
-    fileName: string;
-    contentType: string;
-    sizeBytes: number;
-    suggestedControlId?: string;
-    accessLevel?: string;
-  }): Promise<Evidence> {
+  uploadEvidence(input: EvidenceUploadInput): Promise<Evidence> {
     return this.http.request<Evidence>('/v1/evidence', {
       method: 'POST',
-      body: JSON.stringify(input)
+      body: JSON.stringify(buildEvidencePayload(input))
     });
   }
 

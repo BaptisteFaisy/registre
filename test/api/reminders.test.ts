@@ -1,8 +1,8 @@
 /**
  * Reminder route — EF-REL-01/02/03.
  *
- * The log lists the reminders the pipeline sent, newest first; a control owner
- * only sees the reminders of its own controls.
+ * The body is the bare list of reminders the pipeline sent, newest first; a
+ * control owner only sees the reminders of its own controls.
  */
 
 import test from 'node:test';
@@ -43,9 +43,10 @@ test('EF-REL-01: GET /v1/reminders lists the reminders', async () => {
     await seedReminder(services);
     const response = await api.request('GET', '/v1/reminders', { token: TOKENS.qualityLead });
     assert.equal(response.status, 200);
-    const body = response.json as { total: number; reminders: Array<{ id: string; reason: string }> };
-    assert.equal(body.total, 1);
-    assert.equal(body.reminders[0]?.reason, 'NO_EVIDENCE');
+    const reminders = response.json as Array<{ id: string; reason: string; status: string }>;
+    assert.equal(reminders.length, 1);
+    assert.equal(reminders[0]?.reason, 'NO_EVIDENCE');
+    assert.equal(reminders[0]?.status, 'SENT');
   } finally {
     await api.close();
   }
@@ -58,11 +59,11 @@ test('EF-REL-01: the reminder list filters on status and control', async () => {
     await seedReminder(services, { id: 'rm-1', controlId: 'CONT-01', status: 'SENT' });
     await seedReminder(services, { id: 'rm-2', controlId: 'CONT-03', status: 'CLOSED' });
     const closed = await api.request('GET', '/v1/reminders?status=CLOSED', { token: TOKENS.qualityLead });
-    assert.equal((closed.json as { total: number }).total, 1);
+    assert.equal((closed.json as unknown[]).length, 1);
     const byControl = await api.request('GET', '/v1/reminders?controlId=CONT-01', {
       token: TOKENS.qualityLead
     });
-    assert.equal((byControl.json as { total: number }).total, 1);
+    assert.equal((byControl.json as unknown[]).length, 1);
     const invalid = await api.request('GET', '/v1/reminders?status=LOST', { token: TOKENS.qualityLead });
     assert.equal(invalid.status, 400);
     const badLimit = await api.request('GET', '/v1/reminders?limit=0', { token: TOKENS.qualityLead });
@@ -80,9 +81,9 @@ test('EF-REL-01: a control owner sees only the reminders of its own controls', a
     await seedReminder(services, { id: 'rm-2', controlId: 'CONT-99' });
     const response = await api.request('GET', '/v1/reminders', { token: TOKENS.controlOwner });
     assert.equal(response.status, 200);
-    const body = response.json as { reminders: Array<{ controlId: string }> };
-    assert.equal(body.reminders.length, 1);
-    assert.equal(body.reminders[0]?.controlId, 'CONT-01');
+    const reminders = response.json as Array<{ controlId: string }>;
+    assert.equal(reminders.length, 1);
+    assert.equal(reminders[0]?.controlId, 'CONT-01');
   } finally {
     await api.close();
   }
@@ -99,9 +100,9 @@ test('EF-REL-02: a real run records its reminders in the log', async () => {
       token: TOKENS.qualityLead
     });
     assert.equal(response.status, 200);
-    const body = response.json as { reminders: Array<{ message: string }> };
-    assert.ok(body.reminders.length >= 1);
-    assert.ok((body.reminders[0]?.message.length ?? 0) > 0);
+    const reminders = response.json as Array<{ message: string }>;
+    assert.ok(reminders.length >= 1);
+    assert.ok((reminders[0]?.message.length ?? 0) > 0);
   } finally {
     await api.close();
   }

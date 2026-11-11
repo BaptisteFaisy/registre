@@ -246,3 +246,71 @@ between a reminder and a notification. The weekly digest reuses the same text
 builder, so there is one phrasing to maintain.
 
 **Rejected.** A generic reminder with a link to the control.
+
+---
+
+## ADR-14 — The portal client is the API contract
+
+**Context.** The API and the portal were written in parallel, and each kept its
+own copy of the shapes: `src/api/views.ts` on the producer side,
+`portal/src/api/types.ts` on the consumer side. The first revision of
+`docs/API.md` described what the producer happened to send — envelopes, mixed
+reads, a diff glued to the import — and the portal read none of it. One of the
+two had to become the reference.
+
+**Decision.** The portal client is the contract. `portal/src/api/types.ts`
+names the shapes, `portal/src/api/client.ts` names the routes, and the API
+adapts to them — never the other way round. `docs/API.md` §3 documents one
+route per client method and §4 restates the shapes field by field. The route
+table in `src/api/routes/table.ts` and the OpenAPI document are generated from
+the same source, and `test/contract/api-portal.test.ts` drives the real client
+against the real server.
+
+**Consequences.** One shape per route, no adapter layer in the portal, and the
+offline mock (`portal/src/mocks/client.ts`) and the HTTP client implement the
+same `RegistreApi` interface, so every screen runs both ways. The cost is that
+the API loses the freedom to answer with richer payloads: anything the portal
+does not read is not part of the contract, and adding it means a new field in
+`types.ts` plus a client method, not a server-side extra. The second cost is
+that `types.ts` became a shared artefact — changing it is a contract change and
+is documented here, not slipped into a feature branch.
+
+**Rejected.** (a) The API defines the contract and the portal adapts: the
+portal would then need an adapter per route and the mock would drift from the
+HTTP client, which is exactly the two-copies problem this decision removes.
+(b) An OpenAPI-first codegen pipeline: for twenty-four routes the generator
+would own the shapes and the mock would have to be generated too — more moving
+parts than value.
+
+---
+
+## ADR-15 — Bare arrays instead of envelopes
+
+**Context.** The first revision answered lists with envelopes: `{frameworks,
+total}`, `{controls, total}`, `{items, total, status}`, `{reminders, total}`,
+`{events, total, limit, offset, nextOffset}`, `{attachments, controlId, total}`;
+and reads with mixed objects: `{control, status}`, `{framework, controls,
+diff}`, `{item, controls}`, `{controlId, sent, reminders}`. Two of the list
+envelopes already disagreed with each other (`{items}` on one route, `{events}`
+on another), which is the usual beginning of a drift nobody owns.
+
+**Decision.** A list route answers with the array itself, a read route answers
+with the object itself, and paging or filtering happens through query
+parameters (`?limit=`, `?action=`, `?status=`, `?frameworkId=`, `?controlId=`).
+Where a screen genuinely needs several entities at once, the answer is one
+named shape — `ReadinessOverview`, `ControlWithRelations` — rather than loose
+keys in an object.
+
+**Consequences.** The client writes `await api.listFrameworks()` and receives
+`Framework[]`: nothing to unwrap, no `total` to keep in step with the array, no
+`nextOffset` arithmetic. The cost is that there is no place left for pagination
+metadata: a caller that needs more asks for a bigger `limit`, and a real cursor
+would mean a new route rather than a new field on an existing one. The second
+cost is visible on `GET /v1/audit-log`, which can no longer carry the
+chain-verification report beside the events — that report now has its own
+question.
+
+**Rejected.** Keeping envelopes "for future pagination": a wrapper nobody reads
+today is a shape to maintain today, and the portal is the only consumer. Also
+rejected, a hybrid where reads keep envelopes and lists do not — it would
+reintroduce two shapes per route and the drift that comes with them.

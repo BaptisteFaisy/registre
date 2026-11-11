@@ -106,13 +106,45 @@ test('an upload is read, attached twice and queued for review', async () => {
   const evidence = await api.uploadEvidence({
     fileName: 'restore-test.pdf',
     contentType: 'application/pdf',
-    sizeBytes: 240_000
+    bytes: new Uint8Array([0x25, 0x50, 0x44, 0x46, 0x2d, 0x31, 0x2e, 0x34])
   });
   assert.match(evidence.id, /^ev-up-/);
   const detail = await api.getControl('BCP-02');
   assert.ok(detail.attachments.some((item) => item.evidenceId === evidence.id));
   const pending = await api.listValidations('PENDING');
   assert.ok(pending.some((item) => item.evidenceId === evidence.id));
+});
+
+test('the mock deposit stamps the received bytes on the evidence', async () => {
+  const api = new MockRegistreApi(() => qualityLead);
+  const bytes = new Uint8Array([0x25, 0x50, 0x44, 0x46, 0x00, 0x7f, 0x80, 0xff, 0x01]);
+
+  const first = await api.uploadEvidence({
+    fileName: 'restore-test.pdf',
+    contentType: 'application/pdf',
+    bytes,
+    accessLevel: 'INTERNAL',
+    fileDate: '2026-10-30'
+  });
+  assert.equal(first.sizeBytes, bytes.length, 'the size comes from the bytes');
+  assert.equal(first.contentType, 'application/pdf');
+  assert.equal(first.fields.documentDate, '2026-10-30');
+  assert.match(first.sha256, /^[0-9a-f]{64}$/);
+
+  const second = await api.uploadEvidence({
+    fileName: 'another-name.pdf',
+    contentType: 'text/plain',
+    bytes
+  });
+  assert.equal(second.sha256, first.sha256, 'the same bytes carry the same fingerprint');
+  assert.equal(second.contentType, 'text/plain', 'the declared type is kept');
+
+  const other = await api.uploadEvidence({
+    fileName: 'restore-test.pdf',
+    contentType: 'application/pdf',
+    bytes: new Uint8Array([...bytes, 0x02])
+  });
+  assert.notEqual(other.sha256, first.sha256, 'different bytes carry a different fingerprint');
 });
 
 test('the audit log is returned newest first and filtered by action', async () => {

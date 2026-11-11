@@ -382,8 +382,18 @@ export interface ControlWithRelations {
   evidence: Evidence[];
 }
 
+/**
+ * What the portal sends when a document is deposited.
+ *
+ * The bytes travel with the request: the API receives a JSON envelope whose
+ * `contentBase64` field holds the document (docs/API.md §5), so the deposit
+ * works in real mode and the offline mock fingerprints the same bytes.
+ */
 export interface EvidenceUploadInput {
-  file: File;
+  fileName: string;
+  contentType: string;
+  bytes: Uint8Array;
   suggestedControlId?: string;
   accessLevel?: AccessLevel;
+  fileDate?: string | null;
 }

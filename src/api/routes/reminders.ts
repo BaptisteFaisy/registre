@@ -45,7 +45,8 @@ async function listReminders(context: ApiContext): Promise<ApiResponse> {
     .slice()
     .sort((left, right) => right.createdAt.localeCompare(left.createdAt))
     .slice(0, limit);
-  return json(200, { total: visible.length, reminders: visible.map(reminderView) });
+  // Bare list: the portal client is typed `Promise<Reminder[]>`.
+  return json(200, visible.map(reminderView));
 }
 
 /** The reminder route. */
@@ -70,7 +71,7 @@ export const reminderRoutes: readonly RouteDefinition[] = [
         { name: 'controlId', description: 'Keep only reminders about this control', schema: 'string' },
         { name: 'limit', description: 'Maximum number of reminders returned', schema: 'integer', default: DEFAULT_LIMIT }
       ],
-      responseSchema: 'ReminderList',
+      responseSchema: 'ReminderArray',
       errors: [400, 401, 403],
       notes: 'reason is EXPIRING_SOON, NO_EVIDENCE or MISSING_ELEMENTS; missing lists what to provide.'
     }

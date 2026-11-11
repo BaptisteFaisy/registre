@@ -1,27 +1,49 @@
 /**
  * Evidence routes — EF-COL-02/05, EF-LEC-03/04, ENF-CONF-01/02.
  *
- * Acceptance: a deposit then a read returns the same evidence (R2), a second
- * deposit of the same bytes is a duplicate (R8), and a RESTRICTED evidence is
- * refused to a principal without that clearance (R13).
+ * Acceptance: a deposit answers the whole evidence (R2), a second deposit of the
+ * same bytes answers the same one with `duplicate: true` (R8), and a RESTRICTED
+ * evidence is refused to a principal without that clearance (R13).
  */
 
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { makeTestServices } from './fakeServices.ts';
-import { depositPolicy, depositRestricted, importDemoFramework, policyBytes, policyText } from './fixtures.ts';
+import {
+  depositPolicy,
+  depositRestricted,
+  evidenceIdOf,
+  importDemoFramework,
+  policyBytes,
+  policyText
+} from './fixtures.ts';
 import { TOKENS, startTestApi } from './harness.ts';
+
+/** The evidence a deposit or a read answers, `textPages` included. */
+interface EvidencePayload {
+  id: string;
+  sha256: string;
+  duplicate?: boolean;
+  accessLevel: string;
+  contentType: string;
+  locations: unknown[];
+  fields: { title: string | null; documentDate: string | null; approver: string | null };
+  flags: { unreadable: boolean };
+  textPages: Array<{ page: number; text: string }>;
+  excerptsMasked?: boolean;
+}
 
 test('EF-COL-02: a JSON deposit with base64 bytes returns 201 and the evidence id', async () => {
   const api = await startTestApi();
   try {
     const response = await depositPolicy(api);
     assert.equal(response.status, 201);
-    const body = response.json as { evidenceId: string; sha256: string; duplicate: boolean; accessLevel: string };
-    assert.match(body.evidenceId, /^ev-/);
+    const body = response.json as EvidencePayload;
+    assert.match(body.id, /^ev-/);
     assert.equal(body.sha256.length, 64);
     assert.equal(body.duplicate, false);
     assert.equal(body.accessLevel, 'INTERNAL');
+    assert.ok(Array.isArray(body.textPages), 'the portal evidence always carries its page excerpts');
   } finally {
     await api.close();
   }
@@ -36,8 +58,9 @@ test('EF-COL-02: a raw binary deposit uses the file own Content-Type', async () 
       headers: { 'content-type': 'text/plain' }
     });
     assert.equal(response.status, 201);
-    const body = response.json as { evidenceId: string; contentType: string };
+    const body = response.json as EvidencePayload;
     assert.equal(body.contentType, 'text/plain');
+    assert.match(body.id, /^ev-/);
   } finally {
     await api.close();
   }
@@ -50,10 +73,11 @@ test('EF-COL-05 (R8): the same bytes twice give one evidence and two locations',
     const second = await depositPolicy(api);
     assert.equal(first.status, 201);
     assert.equal(second.status, 200);
-    const firstBody = first.json as { evidenceId: string };
-    const secondBody = second.json as { evidenceId: string; duplicate: boolean; locations: unknown[] };
-    assert.equal(secondBody.evidenceId, firstBody.evidenceId);
+    const firstBody = first.json as EvidencePayload;
+    const secondBody = second.json as EvidencePayload;
+    assert.equal(secondBody.id, firstBody.id);
     assert.equal(secondBody.duplicate, true);
+    assert.equal(firstBody.duplicate, false);
     assert.equal(secondBody.locations.length, 2);
   } finally {
     await api.close();
@@ -82,18 +106,17 @@ test('EF-LEC-03: a deposit then a read returns the read fields', async () => {
   const api = await startTestApi();
   try {
     const deposit = await depositPolicy(api);
-    const evidenceId = (deposit.json as { evidenceId: string }).evidenceId;
+    const evidenceId = evidenceIdOf(deposit);
     const read = await api.request('GET', `/v1/evidence/${evidenceId}`, { token: TOKENS.auditor });
     assert.equal(read.status, 200);
-    const body = read.json as {
-      fields: { title: string | null; documentDate: string | null; approver: string | null };
-      flags: { unreadable: boolean };
-      accessLevel: string;
-    };
+    const body = read.json as EvidencePayload;
+    assert.equal(body.id, evidenceId);
     assert.equal(body.fields.title, 'Information security policy');
     assert.equal(body.fields.documentDate, '2026-08-01');
     assert.equal(body.flags.unreadable, false);
     assert.equal(body.accessLevel, 'INTERNAL');
+    assert.equal(body.excerptsMasked, false, 'the internal auditor may read an INTERNAL excerpt');
+    assert.ok(body.textPages.length >= 1);
   } finally {
     await api.close();
   }
@@ -104,13 +127,14 @@ test('GET /v1/evidence/{id}?include=text masks personal data in the excerpts', a
   const api = await startTestApi({ services });
   try {
     const deposit = await depositRestricted(api);
-    const evidenceId = (deposit.json as { evidenceId: string }).evidenceId;
+    const evidenceId = evidenceIdOf(deposit);
     const read = await api.request('GET', `/v1/evidence/${evidenceId}?include=text`, {
       token: TOKENS.qualityLead
     });
     assert.equal(read.status, 200);
     assert.ok(!read.text.includes('alice@msp.demo'), 'the e-mail must be masked');
     assert.ok(read.text.includes('[EMAIL]'));
+    assert.equal((read.json as EvidencePayload).excerptsMasked, false, 'the quality lead has the clearance');
   } finally {
     await api.close();
   }
@@ -121,7 +145,7 @@ test('ENF-CONF-01 (R13): a RESTRICTED evidence is 403 for an internal auditor', 
   const api = await startTestApi({ services });
   try {
     const deposit = await depositRestricted(api);
-    const evidenceId = (deposit.json as { evidenceId: string }).evidenceId;
+    const evidenceId = evidenceIdOf(deposit);
     const read = await api.request('GET', `/v1/evidence/${evidenceId}`, { token: TOKENS.auditor });
     assert.equal(read.status, 403);
     assert.equal((read.json as { error: { code: string } }).error.code, 'FORBIDDEN');

@@ -41,7 +41,18 @@ export async function importFramework(
     version: normalised.framework.version,
     controls: normalised.controls.length,
     confidentiality: normalised.framework.confidentiality,
-    ...(diff === null ? {} : { added: diff.added.length, changed: diff.changed.length, removed: diff.removed.length })
+    ...(diff === null
+      ? {}
+      : {
+          added: diff.added.length,
+          changed: diff.changed.length,
+          removed: diff.removed.length,
+          // Ids are journalled too, so `GET /v1/frameworks/{id}/diff` can answer
+          // without keeping the previous version of the framework (EF-REF-05).
+          addedIds: diff.added,
+          changedIds: diff.changed,
+          removedIds: diff.removed
+        })
   });
   await recomputeFramework(services, normalised.framework.id);
   return { framework: normalised.framework, controls: normalised.controls, diff };

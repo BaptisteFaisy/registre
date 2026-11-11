@@ -4,6 +4,7 @@
 
 import type { RouteDefinition } from '../types.ts';
 import { healthRoutes } from './health.ts';
+import { authRoutes } from './auth.ts';
 import { docsRoutes } from './docs.ts';
 import { frameworkRoutes } from './frameworks.ts';
 import { evidenceRoutes } from './evidence.ts';
@@ -18,6 +19,7 @@ import { settingsRoutes } from './settings.ts';
 /** Every served route, in declaration order. */
 export const ROUTES: readonly RouteDefinition[] = [
   ...healthRoutes,
+  ...authRoutes,
   ...docsRoutes,
   ...frameworkRoutes,
   ...evidenceRoutes,
