@@ -96,7 +96,7 @@ test('computeFreshness applies 30-day lead time rule', () => {
   assert.equal(expired.freshness, 'EXPIRED');
 });
 
-test('evaluateControl derives COVERED only when fresh, complete and validated', () => {
+function evaluationFixture(): { control: Control; att: Attachment; ev: Evidence; suf: Sufficiency } {
   const control = makeControl();
   const ev = makeEvidence();
   const att: Attachment = {
@@ -125,9 +125,12 @@ test('evaluateControl derives COVERED only when fresh, complete and validated', 
     missing: [],
     computedAt: NOW
   };
+  return { control, att, ev, suf };
+}
 
-  // Mandatory control, first time -> TO_VERIFY until human validates (spec 12.4)
-  const first = evaluateControl({
+test('evaluateControl keeps a mandatory control at TO_VERIFY until a human validates the type', () => {
+  const { control, att, ev, suf } = evaluationFixture();
+  const status = evaluateControl({
     control,
     attachments: [att],
     evidences: new Map([[ev.id, ev]]),
@@ -135,10 +138,12 @@ test('evaluateControl derives COVERED only when fresh, complete and validated', 
     isTypeValidated: false,
     now: NOW
   });
-  assert.equal(first.state, 'TO_VERIFY');
+  assert.equal(status.state, 'TO_VERIFY');
+});
 
-  // Once type is validated -> COVERED
-  const confirmed = evaluateControl({
+test('evaluateControl derives COVERED once the type is validated', () => {
+  const { control, att, ev, suf } = evaluationFixture();
+  const status = evaluateControl({
     control,
     attachments: [att],
     evidences: new Map([[ev.id, ev]]),
@@ -146,8 +151,8 @@ test('evaluateControl derives COVERED only when fresh, complete and validated', 
     isTypeValidated: true,
     now: NOW
   });
-  assert.equal(confirmed.state, 'COVERED');
-  assert.equal(confirmed.freshness, 'FRESH');
+  assert.equal(status.state, 'COVERED');
+  assert.equal(status.freshness, 'FRESH');
 });
 
 test('computeReadiness produces shares summing to 1', () => {
