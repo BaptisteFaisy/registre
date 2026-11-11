@@ -15,7 +15,7 @@ manquante qui est écrite, avec une raison tirée du diff.
 
 Bibliothèque standard uniquement. Usage :
 
-  FIREWORKS_API_KEY=... python3 scope_agent.py fix \\
+  INFERHUB_API_KEY=... python3 scope_agent.py fix \\
       --repo BaptisteFaisy/registre --pr 215 --sha <tête> \\
       --guard /tmp/check_couche0.py
 
@@ -33,8 +33,10 @@ import subprocess
 import sys
 import urllib.request
 
-MODEL_DEFAULT = "accounts/fireworks/models/minimax-m3p1-flash"
-API_DEFAULT = "https://api.fireworks.ai/inference/v1/chat/completions"
+# Fournisseur : InferHub (API compatible OpenAI), modèle `combo/cheap`.
+# Les variables `FIREWORKS_*` restent lues en repli.
+MODEL_DEFAULT = "combo/cheap"
+API_DEFAULT = "https://api.inferhub.dev/v1/chat/completions"
 MAX_FILES = 25
 MAX_EXCERPT_CHARS = 600
 MAX_EXCERPT_LINES = 5
@@ -281,13 +283,14 @@ def ecrire_corps(repo, pr, corps):
 
 def verifier_reglages():
     """Clés et coupe-circuit ; lève Skip si l'agent doit se taire."""
-    key = env_or("FIREWORKS_API_KEY", "")
-    if env_or("FIREWORKS_AGENT_SCOPE", "1") == "0":
-        raise Skip("agent de périmètre coupé (FIREWORKS_AGENT_SCOPE=0)")
+    key = env_or("INFERHUB_API_KEY", env_or("FIREWORKS_API_KEY", ""))
+    if env_or("INFERHUB_AGENT_SCOPE", env_or("FIREWORKS_AGENT_SCOPE", "1")) == "0":
+        raise Skip("agent de périmètre coupé (INFERHUB_AGENT_SCOPE=0)")
     if not key:
-        raise Skip("FIREWORKS_API_KEY absent : périmètre laissé à l'auteur")
-    return (key, env_or("FIREWORKS_MODEL", MODEL_DEFAULT),
-            env_or("FIREWORKS_BASE_URL", API_DEFAULT))
+        raise Skip("INFERHUB_API_KEY absent : périmètre laissé à l'auteur")
+    return (key,
+            env_or("INFERHUB_MODEL", env_or("FIREWORKS_MODEL", MODEL_DEFAULT)),
+            env_or("INFERHUB_BASE_URL", env_or("FIREWORKS_BASE_URL", API_DEFAULT)))
 
 
 def contexte(args, garde):

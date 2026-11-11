@@ -459,6 +459,13 @@ jobs:
           # `github-actions[bot]` n'a pas le droit de commander à Mergify.
           GH_TOKEN: ${{ github.token }}
           GH_ECRITURE: ${{ secrets.AUTOMERGE_PAT }}
+          # Fournisseur du modèle : InferHub (combo/cheap). Les variables
+          # FIREWORKS_* restent passées en repli pour un déploiement antérieur.
+          INFERHUB_API_KEY: ${{ secrets.INFERHUB_API_KEY }}
+          INFERHUB_MODEL: ${{ vars.INFERHUB_MODEL }}
+          INFERHUB_BASE_URL: ${{ vars.INFERHUB_BASE_URL }}
+          INFERHUB_AGENT_RESOLVE: ${{ vars.INFERHUB_AGENT_RESOLVE }}
+          INFERHUB_AGENT_SCOPE: ${{ vars.INFERHUB_AGENT_SCOPE }}
           FIREWORKS_API_KEY: ${{ secrets.FIREWORKS_API_KEY }}
           FIREWORKS_MODEL: ${{ vars.FIREWORKS_MODEL }}
           FIREWORKS_AGENT_RESOLVE: ${{ vars.FIREWORKS_AGENT_RESOLVE }}

@@ -50,8 +50,11 @@ quota = _charger("quota")
 # v3 : porte de compilation à côté (`compilation_gate.py`) : plafond de 500 lignes.
 compilation_gate = _charger("compilation_gate")
 
-MODEL_DEFAULT = "accounts/fireworks/models/minimax-m3p1-flash"
-API_DEFAULT = "https://api.fireworks.ai/inference/v1/chat/completions"
+# Fournisseur : InferHub (https://api.inferhub.dev/v1, API compatible
+# OpenAI `chat/completions`), modèle méta-routeur `combo/cheap`. Les variables
+# `FIREWORKS_*` restent lues en repli pour ne pas casser un déploiement ancien.
+MODEL_DEFAULT = "combo/cheap"
+API_DEFAULT = "https://api.inferhub.dev/v1/chat/completions"
 MAX_FILES = 100
 MAX_FILE_BYTES = 200_000
 MAX_HUNKS = 20
@@ -299,13 +302,28 @@ def env_or(name, default):
     return os.environ.get(name) or default
 
 
+def provider_key():
+    """Clé InferHub d'abord, Fireworks en repli (déploiement ancien)."""
+    return os.environ.get("INFERHUB_API_KEY") or os.environ.get("FIREWORKS_API_KEY") or ""
+
+
+def provider_model():
+    """Modèle InferHub d'abord, puis Fireworks, puis le défaut `combo/cheap`."""
+    return env_or("INFERHUB_MODEL", env_or("FIREWORKS_MODEL", MODEL_DEFAULT))
+
+
+def provider_api_url():
+    """Point d'API InferHub d'abord, puis Fireworks, puis le défaut."""
+    return env_or("INFERHUB_BASE_URL", env_or("FIREWORKS_BASE_URL", API_DEFAULT))
+
+
 def preflight(repo, pr, sha, dry_run, now):
     """Garde-fous et lecture des fichiers en conflit. Rend (clé, modèle, url, fichiers)."""
-    if os.environ.get("FIREWORKS_AGENT_RESOLVE", "1") == "0":
-        raise Skip("désactivé (FIREWORKS_AGENT_RESOLVE=0)")
-    key = os.environ.get("FIREWORKS_API_KEY", "")
+    if env_or("INFERHUB_AGENT_RESOLVE", env_or("FIREWORKS_AGENT_RESOLVE", "1")) == "0":
+        raise Skip("désactivé (INFERHUB_AGENT_RESOLVE=0)")
+    key = provider_key()
     if not key and not dry_run:
-        raise Skip("pas de clé FIREWORKS_API_KEY")
+        raise Skip("pas de clé INFERHUB_API_KEY")
     if quota is not None:
         quota.gc_stamps(now)
     labels = pr_labels(repo, pr)
@@ -320,8 +338,8 @@ def preflight(repo, pr, sha, dry_run, now):
     if not files:
         raise Skip("aucun fichier en conflit")
     check_round_files(files)
-    model = env_or("FIREWORKS_MODEL", MODEL_DEFAULT)
-    api_url = env_or("FIREWORKS_BASE_URL", API_DEFAULT)
+    model = provider_model()
+    api_url = provider_api_url()
     return key, model, api_url, files
 
 

@@ -314,3 +314,26 @@ question.
 today is a shape to maintain today, and the portal is the only consumer. Also
 rejected, a hybrid where reads keep envelopes and lists do not — it would
 reintroduce two shapes per route and the drift that comes with them.
+
+## ADR — the conflict agent runs on InferHub
+
+**Date.** 2026-11-11. **Status.** accepted.
+
+**Context.** The pull-request conflict agent (`.github/fireworks/conflict_agent.py`,
+called by the `pr-auto-merge` sweep when a rebase fails) was wired to Fireworks.
+The rest of the tooling already runs on InferHub, so two model providers had to
+be provisioned, two keys rotated, and two failure modes watched.
+
+**Decision.** InferHub is the provider: `https://api.inferhub.dev/v1/chat/completions`
+(OpenAI-compatible) with the meta-router model `combo/cheap`. Resolution order in
+the agent is `INFERHUB_API_KEY` → `FIREWORKS_API_KEY`, `INFERHUB_MODEL` →
+`FIREWORKS_MODEL` → `combo/cheap`, `INFERHUB_BASE_URL` → `FIREWORKS_BASE_URL` →
+the InferHub endpoint. An empty GitHub variable falls back exactly like an
+absent one, so a half-configured repository degrades to the previous provider
+instead of sending an empty model name.
+
+**Consequences.** One secret and one model to operate. The directory keeps its
+`fireworks/` name because three workflows reference those paths; renaming it is
+cosmetic and would touch guarded files for no behavioural gain. The kill switch
+is `INFERHUB_AGENT_RESOLVE=0`. Without any key the agent skips cleanly and the
+pull request waits for a human rebase — it never merges on its own.
