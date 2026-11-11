@@ -51,8 +51,10 @@ FORBIDDEN_PATTERNS = [
     (r"sk_[a-f0-9]{32}", "clé API sk_… en clair", None),
     (r"ghp_[A-Za-z0-9]{36}", "jeton GitHub ghp_… en clair", None),
     (r"^sdk\.dir=", "sdk.dir en dur (local.properties ne se versionne pas)", None),
-    (r"2026-10-2[0-5]\b|\b2[0-5]/10\b",
-     "date antérieure au 26/10 19 h (citer « relevé antérieur, hors de cet arbre »)", None),
+    # Motif « date ancienne » retiré pour ce dépôt : il venait des conventions
+    # d'un autre projet (relevés horodatés à citer). Ici les fixtures de
+    # démonstration et les jeux d'évaluation portent légitimement des dates
+    # d'octobre, ce qui ne produisait que des faux positifs.
 ]
 
 

@@ -108,21 +108,6 @@ class ForbiddenTest(unittest.TestCase):
             [fichier(".github/workflows/ci-native.yml")], corps, erreurs)
         self.assertEqual(erreurs, [])
 
-    def test_date_ancienne_refusee(self):
-        # Fragmenté exprès : la garde scanne les lignes ajoutées du diff,
-        # le cas de test ne doit pas se faire refuser lui-même.
-        vieux = "2026-10-2" + "4"
-        erreurs = []
-        check_couche0.check_forbidden(
-            [fichier("docs/N.md", "+ relevé du " + vieux)], "corps", erreurs)
-        self.assertEqual(len(erreurs), 1)
-
-    def test_date_recente_acceptee(self):
-        erreurs = []
-        check_couche0.check_forbidden(
-            [fichier("docs/N.md", "+ relevé du 2026-10-29")], "corps", erreurs)
-        self.assertEqual(erreurs, [])
-
     def test_cle_api_refusee(self):
         fausse = "sk-" + "a" * 24
         erreurs = []
