@@ -1,0 +1,40 @@
+{
+  "jobName": "registre-qa-knowledge-base",
+  "roleArn": "<BEDROCK_EVALUATION_ROLE_ARN>",
+  "evaluationConfig": {
+    "knowledgeBase": {
+      "knowledgeBaseId": "<BEDROCK_KNOWLEDGE_BASE_ID>",
+      "datasetMetricConfigs": [
+        {
+          "taskType": "Custom",
+          "dataset": {
+            "name": "registre-qa",
+            "datasetLocation": {
+              "s3Uri": "s3://<evidence-bucket>/eval/qa-dataset.jsonl"
+            }
+          },
+          "metricNames": [
+            "Correctness",
+            "Completeness",
+            "Helpfulness",
+            "Faithfulness"
+          ]
+        }
+      ]
+    }
+  },
+  "inferenceConfig": {
+    "ragConfigs": [
+      {
+        "knowledgeBaseConfig": {
+          "retrieveAndGenerateConfig": {
+            "type": "KNOWLEDGE_BASE",
+            "knowledgeBase": {
+              "knowledgeBaseId": "<BEDROCK_KNOWLEDGE_BASE_ID>"
+            }
+          }
+        }
+      }
+    ]
+  }
+}
