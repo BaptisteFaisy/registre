@@ -74,18 +74,29 @@ export class PipelineStack extends cdk.Stack {
   /** Shared environment every task receives; no stack ever repeats these keys. */
   private taskEnvironment(props: PipelineStackProps): Record<string, string> {
     const { config } = props;
+    // Names are exactly the ones `src/bootstrap.ts` reads: a Lambda and a
+    // laptop then run the same composition root. `REGISTRE_SES_FROM` is left
+    // unset on purpose - until a sender identity is verified, reminders are
+    // captured instead of sent (docs/OPERATIONS.md).
     return {
+      REGISTRE_PROVIDER: 'bedrock',
       REGISTRE_REGION: config.region,
-      TABLE_NAME: props.table.tableName,
-      VAULT_BUCKET: props.vaultBucket.bucketName,
-      FRAMEWORKS_KB_ID: props.frameworksKnowledgeBaseId,
-      EVIDENCE_KB_ID: props.evidenceKnowledgeBaseId,
-      GUARDRAIL_ID: props.guardrailId,
-      DATA_AUTOMATION_PROJECT_ARN: props.dataAutomationProjectArn,
-      CONFIDENCE_THRESHOLD: String(config.confidenceThreshold),
-      REMINDER_LEAD_DAYS: String(config.reminderLeadDays),
-      REASONING_MODEL: config.models.reasoning,
-      ANSWER_MODEL: config.models.answer
+      REGISTRE_TABLE: props.table.tableName,
+      REGISTRE_VAULT_BUCKET: props.vaultBucket.bucketName,
+      REGISTRE_KB_FRAMEWORKS_ID: props.frameworksKnowledgeBaseId,
+      REGISTRE_KB_EVIDENCE_ID: props.evidenceKnowledgeBaseId,
+      REGISTRE_GUARDRAIL_ID: props.guardrailId,
+      REGISTRE_BDA_PROJECT_ARN: props.dataAutomationProjectArn,
+      REGISTRE_BDA_OUTPUT_URI: `s3://${props.vaultBucket.bucketName}/data-automation/`,
+      REGISTRE_CONFIDENCE_THRESHOLD: String(config.confidenceThreshold),
+      REGISTRE_REMINDER_LEAD_DAYS: String(config.reminderLeadDays),
+      REGISTRE_RETENTION_MONTHS: String(config.retentionMonths),
+      REGISTRE_REASONING_MODEL: config.models.reasoning,
+      REGISTRE_ANSWER_MODEL: config.models.answer,
+      // STANDARD, not FLEX: haiku 4.5 in eu-central-1 refuses the Flex tier
+      // ("The provided service tier is not supported for this model"). The
+      // reasoner degrades automatically, but paying for a failed call is silly.
+      REGISTRE_NIGHTLY_TIER: 'STANDARD'
     };
   }
 

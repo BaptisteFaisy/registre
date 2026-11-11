@@ -47,3 +47,6 @@ export type { MemoryExtensionStoreOptions } from './extensionsMemory.ts';
 
 export { DynamoExtensionStore } from './extensionsDynamo.ts';
 export type { DynamoExtensionOptions } from './extensionsDynamo.ts';
+
+export { S3EvidenceStore, SdkS3VaultGateway, parseS3Uri, uriOf, fingerprintOf } from './vaultS3.ts';
+export type { S3VaultGateway, S3EvidenceStoreOptions } from './vaultS3.ts';

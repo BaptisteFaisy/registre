@@ -35,25 +35,22 @@ import { createHandler, grantBucket } from './handlers';
 /** Cognito groups, one per role of chapter 6. */
 const ROLE_GROUPS = ['QUALITY_LEAD', 'CONTROL_OWNER', 'EXECUTIVE', 'INTERNAL_AUDITOR', 'ADMIN'] as const;
 
-/** The sixteen endpoints of chapter 15, grouped by the routes that serve them. */
-const ROUTES: ReadonlyArray<{ path: string; methods: apigwv2.HttpMethod[] }> = [
-  { path: '/v1/frameworks', methods: [apigwv2.HttpMethod.POST, apigwv2.HttpMethod.GET] },
-  { path: '/v1/frameworks/{id}/controls', methods: [apigwv2.HttpMethod.GET] },
-  { path: '/v1/frameworks/{id}/readiness', methods: [apigwv2.HttpMethod.GET] },
-  { path: '/v1/frameworks/{id}/packs', methods: [apigwv2.HttpMethod.POST] },
-  { path: '/v1/controls/{id}', methods: [apigwv2.HttpMethod.GET] },
-  { path: '/v1/controls/{id}/evidence', methods: [apigwv2.HttpMethod.GET] },
-  { path: '/v1/controls/{id}/remind', methods: [apigwv2.HttpMethod.POST] },
-  { path: '/v1/evidence', methods: [apigwv2.HttpMethod.POST] },
-  { path: '/v1/evidence/{id}', methods: [apigwv2.HttpMethod.GET] },
-  { path: '/v1/validations', methods: [apigwv2.HttpMethod.GET] },
-  { path: '/v1/validations/{id}/decision', methods: [apigwv2.HttpMethod.POST] },
-  { path: '/v1/ask', methods: [apigwv2.HttpMethod.POST] },
-  { path: '/v1/packs/{id}', methods: [apigwv2.HttpMethod.GET] },
-  { path: '/v1/reminders', methods: [apigwv2.HttpMethod.GET] },
-  { path: '/v1/audit-log', methods: [apigwv2.HttpMethod.GET] },
-  { path: '/v1/settings', methods: [apigwv2.HttpMethod.GET, apigwv2.HttpMethod.PUT] }
-];
+/**
+ * The routes the gateway serves, read from the manifest the application
+ * generates (`infra/routes.json`, produced by `tools/quality/exportRoutes.ts`).
+ *
+ * One source of truth: the gateway can never serve a path the application does
+ * not implement, and `test/infra/routes.test.ts` fails when the manifest drifts.
+ */
+interface RouteManifest {
+  readonly routes: ReadonlyArray<{
+    readonly path: string;
+    readonly methods: readonly string[];
+    readonly public: boolean;
+  }>;
+}
+
+const ROUTES_MANIFEST = require('../routes.json') as RouteManifest;
 
 export interface ApiStackProps extends cdk.StackProps {
   readonly config: RegistreConfig;
@@ -62,6 +59,7 @@ export interface ApiStackProps extends cdk.StackProps {
   readonly key: kms.IKey;
   readonly stateMachine: sfn.IStateMachine;
   readonly evidenceKnowledgeBaseId: string;
+  readonly frameworksKnowledgeBaseId: string;
   readonly guardrailId: string;
   /** Asymmetric key that signs audit-pack manifests. */
   readonly signingKey: kms.IKey;
@@ -134,15 +132,19 @@ export class ApiStack extends cdk.Stack {
       memoryMb: 1024,
       timeout: Duration.seconds(60),
       environment: {
+        REGISTRE_PROVIDER: 'bedrock',
         REGISTRE_REGION: config.region,
-        TABLE_NAME: props.table.tableName,
-        VAULT_BUCKET: props.vaultBucket.bucketName,
+        REGISTRE_TABLE: props.table.tableName,
+        REGISTRE_VAULT_BUCKET: props.vaultBucket.bucketName,
+        REGISTRE_KB_EVIDENCE_ID: props.evidenceKnowledgeBaseId,
+        REGISTRE_KB_FRAMEWORKS_ID: props.frameworksKnowledgeBaseId,
+        REGISTRE_GUARDRAIL_ID: props.guardrailId,
+        REGISTRE_CONFIDENCE_THRESHOLD: String(config.confidenceThreshold),
+        REGISTRE_RETENTION_MONTHS: String(config.retentionMonths),
+        REGISTRE_ANSWER_MODEL: config.models.answer,
+        REGISTRE_REASONING_MODEL: config.models.reasoning,
+        REGISTRE_NIGHTLY_TIER: 'STANDARD',
         STATE_MACHINE_ARN: props.stateMachine.stateMachineArn,
-        EVIDENCE_KB_ID: props.evidenceKnowledgeBaseId,
-        GUARDRAIL_ID: props.guardrailId,
-        CONFIDENCE_THRESHOLD: String(config.confidenceThreshold),
-        ANSWER_MODEL: config.models.answer,
-        REASONING_MODEL: config.models.reasoning,
         USER_POOL_ID: this.userPool.userPoolId,
         // Pack signing goes through KMS in production; the local Ed25519 signer
         // is what the offline demo and the tests use.
@@ -182,9 +184,17 @@ export class ApiStack extends cdk.Stack {
     const integration = new integrations.HttpLambdaIntegration('ApiIntegration', handler, {
       payloadFormatVersion: apigwv2.PayloadFormatVersion.VERSION_2_0
     });
-    for (const route of ROUTES) {
+    for (const route of ROUTES_MANIFEST.routes) {
       for (const method of route.methods) {
-        api.addRoutes({ path: route.path, methods: [method], integration, authorizer });
+        // Public routes (health, OpenAPI document, session, public share
+        // verification) carry no authorizer: they are what a judge or a browser
+        // reaches before any credential exists.
+        api.addRoutes({
+          path: route.path,
+          methods: [method as apigwv2.HttpMethod],
+          integration,
+          ...(route.public ? {} : { authorizer })
+        });
       }
     }
     return api;

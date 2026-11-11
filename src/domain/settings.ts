@@ -30,8 +30,11 @@ export const DEFAULT_SETTINGS: Settings = {
   region: 'eu-central-1',
   retentionMonths: 24,
   readerModel: 'bedrock-data-automation',
-  reasoningModel: 'anthropic.claude-sonnet-4-20250514-v1:0',
-  answerModel: 'anthropic.claude-sonnet-4-20250514-v1:0',
+  // EU inference profile, verified invocable in eu-central-1 on 2026-11-11.
+  // A bare model id is rejected there ("Invocation ... with on-demand throughput
+  // isn't supported"), so the profile prefix is not optional.
+  reasoningModel: 'eu.anthropic.claude-haiku-4-5-20251001-v1:0',
+  answerModel: 'eu.anthropic.claude-haiku-4-5-20251001-v1:0',
   guardrailId: null,
   nightlyServiceTier: 'FLEX'
 };

@@ -15,6 +15,7 @@
 import type { ControlId, Principal, Role } from '../domain/types.ts';
 import type { PrincipalDirectory } from '../ports/index.ts';
 import { unauthorized } from './errors.ts';
+import { principalFromGatewayHeaders } from './cognito.ts';
 import { headerOf } from './http.ts';
 import type { ApiRequest } from './http.ts';
 
@@ -190,8 +191,17 @@ export function tokenFromRequest(request: ApiRequest): string | null {
   return cookieValue(request, SESSION_COOKIE);
 }
 
-/** Authenticates a request or throws 401 (EF-ADM-03). */
+/**
+ * Authenticates a request or throws 401 (EF-ADM-03).
+ *
+ * Order matters: a token already validated by API Gateway (Cognito) arrives as
+ * internal `x-registre-*` headers that only the Lambda can set — the local
+ * server strips them from client input. The demonstration directory is the
+ * fallback, so the same code runs deployed and offline.
+ */
 export function authenticate(request: ApiRequest, directory: CredentialDirectory): Principal {
+  const fromGateway = principalFromGatewayHeaders(request.headers);
+  if (fromGateway !== null) return fromGateway;
   const token = tokenFromRequest(request);
   if (token === null) {
     throw unauthorized('no credential: send "Authorization: Bearer <token>" or the session cookie');

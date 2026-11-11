@@ -107,8 +107,8 @@ export class BedrockStack extends cdk.Stack {
       'Evidence text, chunked, with access level as metadata',
       kbRole
     );
-    this.createDataSource('FrameworksSource', this.frameworksKnowledgeBaseId, this.frameworksBucket, ['controls/'], kbRole);
-    this.createDataSource('EvidenceSource', this.evidenceKnowledgeBaseId, vaultBucket, ['evidence/'], kbRole);
+    this.createDataSource('FrameworksSource', this.frameworksKnowledgeBaseId, this.frameworksBucket, ['controls/'], kbRole, config);
+    this.createDataSource('EvidenceSource', this.evidenceKnowledgeBaseId, vaultBucket, ['evidence/'], kbRole, config);
 
     const guardrail = this.createGuardrail(config, key);
     this.guardrailId = guardrail.attrGuardrailId;
@@ -175,25 +175,48 @@ export class BedrockStack extends cdk.Stack {
     return kb.attrKnowledgeBaseId;
   }
 
-  /** S3 data source; ingestion is started by the pipeline, not on a schedule. */
+  /**
+   * S3 connector of a MANAGED knowledge base; ingestion is started by the
+   * pipeline, never on a schedule.
+   *
+   * A managed knowledge base refuses the self-managed `S3` data source type
+   * ("Unsupported data source type for MANAGED knowledge base type", seen on a
+   * real deploy in eu-central-1). The managed form is the S3 **connector**,
+   * which takes a bucket name plus the owner account, and puts the prefixes
+   * under `filterConfiguration.inclusionPrefixes`.
+   */
   private createDataSource(
     id: string,
     knowledgeBaseId: string,
     bucket: s3.IBucket,
     prefixes: string[],
-    role: iam.Role
+    role: iam.Role,
+    config: RegistreConfig
   ): void {
+    for (const prefix of prefixes) bucket.grantRead(role, `${prefix}*`);
     const source = new bedrock.CfnDataSource(this, id, {
       knowledgeBaseId,
       name: id.toLowerCase(),
       dataDeletionPolicy: 'RETAIN',
       dataSourceConfiguration: {
-        type: 'S3',
-        s3Configuration: { bucketArn: bucket.bucketArn, inclusionPrefixes: prefixes }
+        type: 'MANAGED_KNOWLEDGE_BASE_CONNECTOR',
+        managedKnowledgeBaseConnectorConfiguration: {
+          connectorParameters: {
+            type: 'S3',
+            version: '1',
+            connectionConfiguration: {
+              bucketName: bucket.bucketName,
+              bucketOwnerAccountId: config.account
+            },
+            filterConfiguration: { inclusionPrefixes: prefixes }
+          },
+          // Kept off for the demonstration so `cdk destroy` stays simple;
+          // docs/OPERATIONS.md tells a production deploy to turn it on.
+          deletionProtectionConfiguration: { deletionProtectionStatus: 'DISABLED' }
+        }
       }
     });
     source.node.addDependency(role);
-    bucket.grantRead(role, prefixes.map((p) => `${p}*`).join(','));
   }
 
   /** PII anonymisation + contextual grounding (ENF-CONF-02, ENF-IA-02). */
@@ -263,8 +286,15 @@ export class BedrockStack extends cdk.Stack {
           outputFormat: { textFormat: { types: ['PLAIN_TEXT'] }, additionalFileFormat: { state: 'DISABLED' } }
         },
         image: {
-          extraction: { category: { state: 'ENABLED' }, boundingBox: { state: 'ENABLED' } },
-          generativeField: { state: 'ENABLED' }
+          // An ENABLED category must carry at least one type, or Bedrock refuses
+          // the project (observed on a real deploy in eu-central-1:
+          // "At least 1 Image Extraction Category Type should be present").
+          // TEXT_DETECTION is what a screenshot of a dashboard needs (EF-LEC-02).
+          extraction: {
+            category: { state: 'ENABLED', types: ['TEXT_DETECTION'] },
+            boundingBox: { state: 'ENABLED' }
+          },
+          generativeField: { state: 'ENABLED', types: ['IMAGE_SUMMARY'] }
         }
       }
     });
