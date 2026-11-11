@@ -214,14 +214,20 @@ async function journalFailure(
   });
 }
 
-/** Rejects when `work` has not settled within `ms`, without leaking the timer. */
+/**
+ * Rejects when `work` has not settled within `ms`.
+ *
+ * The timer is deliberately NOT unref'd: an unref'd timer lets the event loop
+ * drain before the budget fires, and the awaiting caller (a Lambda, a test)
+ * never settles — observed as cancelled tests on Node 22. The timer is cleared
+ * as soon as `work` settles, so nothing is leaked.
+ */
 function withTimeout<T>(work: Promise<T>, ms: number, label: string): Promise<T> {
   work.catch(() => undefined);
   return new Promise<T>((resolve, reject) => {
     const timer = setTimeout(() => {
       reject(upstream(`collector ${label} exceeded its ${ms} ms budget`));
     }, ms);
-    timer.unref();
     work.then(
       (value) => {
         clearTimeout(timer);
