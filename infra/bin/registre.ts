@@ -89,7 +89,8 @@ function buildProcessing(
     stateMachine: pipeline.stateMachine,
     evidenceKnowledgeBaseId: base.bedrock.evidenceKnowledgeBaseId,
     guardrailId: base.bedrock.guardrailId,
-    description: 'HTTP API, Cognito, the sixteen endpoints of chapter 15'
+    signingKey: base.vault.signingKey,
+    description: 'HTTP API, Cognito, the endpoints of chapter 15 plus verification and sharing'
   });
   return { pipeline, api };
 }

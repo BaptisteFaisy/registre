@@ -44,3 +44,6 @@ export { dynamoConfigFromEnv } from './dynamoKeys.ts';
 
 export { MemoryExtensionStore, createMemoryExtensions } from './extensionsMemory.ts';
 export type { MemoryExtensionStoreOptions } from './extensionsMemory.ts';
+
+export { DynamoExtensionStore } from './extensionsDynamo.ts';
+export type { DynamoExtensionOptions } from './extensionsDynamo.ts';
