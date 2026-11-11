@@ -17,6 +17,7 @@ import type {
   Attachment,
   AuditEvent,
   Control,
+  ControlState,
   ControlStatus,
   Evidence,
   Framework,
@@ -127,12 +128,14 @@ export function evidenceView(
     reader: evidence.reader,
     cost: evidence.cost ?? null
   };
-  if (options.includeText === true) {
-    view.textPages = evidence.textPages.map((page) => ({
-      page: page.page,
-      text: excerptFor(page.text, principal, evidence.accessLevel, 2000)
-    }));
-  }
+  // The portal's `Evidence` always carries `textPages`: a list shows short
+  // excerpts, the detail view shows long ones, and both are masked above the
+  // caller's clearance (ENF-CONF-01/02, EF-QR-03).
+  const max = options.includeText === true ? 2000 : 400;
+  view.textPages = evidence.textPages.map((page) => ({
+    page: page.page,
+    text: excerptFor(page.text, principal, evidence.accessLevel, max)
+  }));
   return view;
 }
 
@@ -271,5 +274,153 @@ export function settingsView(settings: Settings): Record<string, unknown> {
     answerModel: settings.answerModel,
     guardrailId: settings.guardrailId,
     nightlyServiceTier: settings.nightlyServiceTier
+  };
+}
+
+/* ------------------------------------------------------- portal contract */
+
+/** Control alone, in the domain shape the portal lists — EF-REF-01. */
+export function controlOnlyView(control: Control): Record<string, unknown> {
+  return {
+    id: control.id,
+    frameworkId: control.frameworkId,
+    domain: control.domain,
+    title: control.title,
+    requirement: control.requirement,
+    expectedEvidence: [...control.expectedEvidence],
+    periodicity: control.periodicity,
+    owner: control.owner,
+    mandatory: control.mandatory
+  };
+}
+
+/** Attachment in its domain shape; only the quote is masked — EF-RAT-02. */
+export function attachmentDomainView(
+  attachment: Attachment,
+  principal: Principal,
+  level: Evidence['accessLevel']
+): Record<string, unknown> {
+  const view: Record<string, unknown> = {
+    id: attachment.id,
+    evidenceId: attachment.evidenceId,
+    controlId: attachment.controlId,
+    frameworkId: attachment.frameworkId,
+    supports: attachment.supports,
+    confidence: attachment.confidence,
+    quote: excerptFor(attachment.quote, principal, level),
+    quoteLocation: attachment.quoteLocation,
+    reason: attachment.reason,
+    status: attachment.status,
+    citationVerified: attachment.citationVerified,
+    autoApplied: attachment.autoApplied,
+    model: attachment.model,
+    createdAt: attachment.createdAt
+  };
+  if (attachment.rejectionReason !== undefined) view.rejectionReason = attachment.rejectionReason;
+  if (attachment.decidedBy !== undefined) view.decidedBy = attachment.decidedBy;
+  if (attachment.decidedAt !== undefined) view.decidedAt = attachment.decidedAt;
+  if (attachment.decidedNote !== undefined) view.decidedNote = attachment.decidedNote;
+  return view;
+}
+
+/** Sufficiency in its domain shape — EF-SUF-01/02. */
+export function sufficiencyView(sufficiency: Sufficiency): Record<string, unknown> {
+  return {
+    id: sufficiency.id,
+    attachmentId: sufficiency.attachmentId,
+    evidenceId: sufficiency.evidenceId,
+    controlId: sufficiency.controlId,
+    elements: sufficiency.elements,
+    class: sufficiency.class,
+    missing: sufficiency.missing,
+    computedAt: sufficiency.computedAt
+  };
+}
+
+/** Full control detail: what the control screen renders in one call. */
+export function controlWithRelationsView(input: {
+  control: Control;
+  status: ControlStatus | null;
+  attachments: readonly Attachment[];
+  sufficiencies: readonly Sufficiency[];
+  evidence: readonly Evidence[];
+  principal: Principal;
+  levelOf: (evidenceId: string) => Evidence['accessLevel'];
+}): Record<string, unknown> {
+  return {
+    control: controlOnlyView(input.control),
+    status: input.status,
+    attachments: input.attachments.map((attachment) =>
+      attachmentDomainView(attachment, input.principal, input.levelOf(attachment.evidenceId))
+    ),
+    sufficiencies: input.sufficiencies.map(sufficiencyView),
+    evidence: input.evidence.map((evidence) => evidenceView(evidence, input.principal))
+  };
+}
+
+/** Cost report as the portal reads it (ENF-COUT-01). */
+export function costReportView(
+  report: { totalUsd: number; bySource: Record<string, number>; count: number },
+  evidenceCount: number
+): Record<string, unknown> {
+  return {
+    totalUsd: report.totalUsd,
+    perEvidenceUsd: evidenceCount === 0 ? 0 : report.totalUsd / evidenceCount,
+    evidenceCount,
+    bySource: report.bySource
+  };
+}
+
+/** Per-domain breakdown of the states (EF-FRA-03). */
+export function byDomainView(
+  controls: readonly Control[],
+  statuses: readonly ControlStatus[]
+): Record<string, { total: number; counts: Record<ControlState, number> }> {
+  const stateOf = new Map(statuses.map((status) => [status.controlId, status.state]));
+  const out: Record<string, { total: number; counts: Record<ControlState, number> }> = {};
+  for (const control of controls) {
+    const domain = out[control.domain] ?? emptyDomain();
+    domain.total += 1;
+    domain.counts[stateOf.get(control.id) ?? 'NO_EVIDENCE'] += 1;
+    out[control.domain] = domain;
+  }
+  return out;
+}
+
+function emptyDomain(): { total: number; counts: Record<ControlState, number> } {
+  return {
+    total: 0,
+    counts: { COVERED: 0, TO_RENEW: 0, TO_VERIFY: 0, EXPIRED: 0, NO_EVIDENCE: 0 }
+  };
+}
+
+/** One dashboard call: framework, snapshot, trend, states, domains, costs. */
+export function readinessOverviewView(input: {
+  framework: Framework;
+  snapshot: ReadinessSnapshot;
+  trend: readonly ReadinessTrendPoint[];
+  statuses: readonly ControlStatus[];
+  byDomain: Record<string, { total: number; counts: Record<ControlState, number> }>;
+  costs: Record<string, unknown>;
+}): Record<string, unknown> {
+  return {
+    framework: frameworkView(input.framework),
+    snapshot: readinessView(input.snapshot, input.trend),
+    trend: input.trend.map((point) => ({ frameworkId: point.frameworkId, at: point.at, counts: point.counts })),
+    statuses: [...input.statuses],
+    byDomain: input.byDomain,
+    costs: input.costs
+  };
+}
+
+/** Principal as the session endpoint returns it (EF-ADM-03). */
+export function principalView(principal: Principal): Record<string, unknown> {
+  return {
+    id: principal.id,
+    name: principal.name,
+    email: principal.email,
+    role: principal.role,
+    clearance: principal.clearance,
+    ownedControls: [...principal.ownedControls]
   };
 }

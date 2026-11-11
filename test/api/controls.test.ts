@@ -1,17 +1,58 @@
 /**
  * Control routes — EF-FRA-02, EF-RAT-02, EF-REL-01/02.
  *
- * `GET /v1/controls/{id}` returns the control and its state, the evidence route
- * lists the attachments with their sufficiency, and `remind` sends a reminder
- * listing what the owner must provide.
+ * `GET /v1/controls/{id}` answers the control with its relations in one call:
+ * its current state, its attachments in the domain shape (quotes and sufficiency
+ * included), the sufficiencies and the evidence. The evidence route lists the
+ * bare evidence attached to the control, and `remind` answers the bare reminder
+ * it just sent — or 409 when no reminder is due.
  */
 
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { makeAttachment, makeEvidence } from '../fixtures/builders.ts';
+import { makeAttachment, makeControl, makeEvidence, makeFramework, makeSufficiency } from '../fixtures/builders.ts';
+import { makeStubPipeline } from './fakePipeline.ts';
 import { makeTestServices } from './fakeServices.ts';
 import { depositPolicy, frameworkPayload, importDemoFramework } from './fixtures.ts';
 import { TOKENS, startTestApi } from './harness.ts';
+
+/** One attachment of the control detail, in its domain shape. */
+interface DomainAttachment {
+  id: string;
+  evidenceId: string;
+  quote: string;
+  quoteLocation: { page: number | null };
+  status: string;
+  attachmentId?: unknown;
+}
+
+/** The control detail payload of `GET /v1/controls/{id}`. */
+interface ControlWithRelations {
+  control: { id: string; periodicity: string; expectedEvidence: string[] };
+  status: { controlId: string; state: string; computedAt: string } | null;
+  attachments: DomainAttachment[];
+  sufficiencies: Array<{ id: string; attachmentId: string; class: string; missing: string[] }>;
+  evidence: Array<{ id: string; sha256: string }>;
+}
+
+/** Seeds one sufficiency on the attachment the deposit created. */
+async function seedSufficiency(
+  services: ReturnType<typeof makeTestServices>,
+  controlId = 'CONT-01'
+): Promise<void> {
+  const attachments = await services.state.listAttachments({ controlId });
+  const attachment = attachments[0];
+  if (attachment === undefined) throw new Error(`no attachment on ${controlId} to make a sufficiency of`);
+  await services.state.putSufficiency(
+    makeSufficiency({
+      attachmentId: attachment.id,
+      evidenceId: attachment.evidenceId,
+      controlId,
+      class: 'PARTIAL',
+      missing: ['Approver name']
+    })
+  );
+}
 
 test('EF-FRA-02: GET /v1/controls/{id} returns the control and its state', async () => {
   const api = await startTestApi();
@@ -19,15 +60,70 @@ test('EF-FRA-02: GET /v1/controls/{id} returns the control and its state', async
     await importDemoFramework(api);
     const response = await api.request('GET', '/v1/controls/CONT-01', { token: TOKENS.auditor });
     assert.equal(response.status, 200);
-    const body = response.json as {
-      control: { id: string; periodicity: string; expectedEvidence: string[] };
-      status: { controlId: string; state: string; computedAt: string };
-    };
+    const body = response.json as ControlWithRelations;
     assert.equal(body.control.id, 'CONT-01');
     assert.equal(body.control.periodicity, 'P1Y');
-    assert.equal(body.status.controlId, 'CONT-01');
-    assert.equal(body.status.state, 'NO_EVIDENCE');
-    assert.ok(body.status.computedAt.length > 0);
+    assert.equal(body.status?.controlId, 'CONT-01');
+    assert.equal(body.status?.state, 'NO_EVIDENCE');
+    assert.ok((body.status?.computedAt ?? '').length > 0);
+  } finally {
+    await api.close();
+  }
+});
+
+test('GET /v1/controls/{id} answers the five keys of the control detail', async () => {
+  const services = makeTestServices();
+  const api = await startTestApi({ services });
+  try {
+    await importDemoFramework(api);
+    await depositPolicy(api);
+    await seedSufficiency(services);
+    const response = await api.request('GET', '/v1/controls/CONT-01', { token: TOKENS.auditor });
+    assert.equal(response.status, 200);
+    const body = response.json as Record<string, unknown>;
+    assert.deepEqual(Object.keys(body).sort(), ['attachments', 'control', 'evidence', 'status', 'sufficiencies']);
+  } finally {
+    await api.close();
+  }
+});
+
+test('EF-RAT-02: the control detail carries the quote and the sufficiency of its evidence', async () => {
+  const services = makeTestServices();
+  const api = await startTestApi({ services });
+  try {
+    await importDemoFramework(api);
+    await depositPolicy(api);
+    await seedSufficiency(services);
+    const response = await api.request('GET', '/v1/controls/CONT-01', { token: TOKENS.auditor });
+    const body = response.json as ControlWithRelations;
+    assert.ok(body.attachments.length >= 1);
+    const attachment = body.attachments[0]!;
+    assert.match(attachment.id, /^at-/, 'the attachment carries its own id in the domain shape');
+    assert.equal(attachment.attachmentId, undefined, 'no wrapper id is left in the domain shape');
+    assert.ok(attachment.quote.length > 0, 'a proposal always carries its quote (EF-RAT-02)');
+    assert.ok(['PROPOSED', 'APPLIED', 'REJECTED'].includes(attachment.status));
+    assert.ok(attachment.quoteLocation !== undefined);
+    assert.equal(body.sufficiencies.length, 1);
+    assert.equal(body.sufficiencies[0]?.attachmentId, attachment.id);
+    assert.equal(body.sufficiencies[0]?.class, 'PARTIAL');
+    assert.deepEqual(body.sufficiencies[0]?.missing, ['Approver name']);
+    assert.ok(body.evidence.length >= 1);
+  } finally {
+    await api.close();
+  }
+});
+
+test('EF-RAT-02: the evidence of a control is listed as bare evidence', async () => {
+  const api = await startTestApi();
+  try {
+    await importDemoFramework(api);
+    const deposit = await depositPolicy(api);
+    const response = await api.request('GET', '/v1/controls/CONT-01/evidence', { token: TOKENS.auditor });
+    assert.equal(response.status, 200);
+    const rows = response.json as Array<{ id: string; sha256: string }>;
+    assert.equal(rows.length, 1);
+    assert.equal(rows[0]?.id, (deposit.json as { id: string }).id);
+    assert.equal(rows[0]?.sha256.length, 64);
   } finally {
     await api.close();
   }
@@ -39,37 +135,6 @@ test('GET /v1/controls/{id} is 404 for an unknown control', async () => {
     const response = await api.request('GET', '/v1/controls/CONT-99', { token: TOKENS.auditor });
     assert.equal(response.status, 404);
     assert.equal((response.json as { error: { code: string } }).error.code, 'NOT_FOUND');
-  } finally {
-    await api.close();
-  }
-});
-
-test('EF-RAT-02: the evidence of a control carries its quote and sufficiency', async () => {
-  const api = await startTestApi();
-  try {
-    await importDemoFramework(api);
-    await depositPolicy(api);
-    const response = await api.request('GET', '/v1/controls/CONT-01/evidence', { token: TOKENS.auditor });
-    assert.equal(response.status, 200);
-    const body = response.json as {
-      controlId: string;
-      total: number;
-      attachments: Array<{
-        attachmentId: string;
-        evidenceId: string;
-        status: string;
-        quote: string;
-        citationVerified: boolean;
-        sufficiency: { class: string; missing: string[] } | null;
-      }>;
-    };
-    assert.equal(body.controlId, 'CONT-01');
-    assert.ok(body.total >= 1);
-    const attachment = body.attachments[0];
-    assert.ok(attachment);
-    assert.match(attachment.attachmentId, /^at-/);
-    assert.ok(['PROPOSED', 'APPLIED', 'REJECTED'].includes(attachment.status));
-    assert.ok(attachment.quote.length > 0, 'a proposal always carries its quote (EF-RAT-02)');
   } finally {
     await api.close();
   }
@@ -105,11 +170,11 @@ test('ENF-CONF-01: evidence above the caller clearance is omitted from the contr
     );
     const asAuditor = await api.request('GET', '/v1/controls/CONT-01/evidence', { token: TOKENS.auditor });
     assert.equal(asAuditor.status, 200);
-    const rows = (asAuditor.json as { attachments: Array<{ evidenceId: string }> }).attachments;
-    assert.ok(!rows.some((row) => row.evidenceId === restricted.id), 'the restricted evidence is omitted');
+    const rows = asAuditor.json as Array<{ id: string }>;
+    assert.ok(!rows.some((row) => row.id === restricted.id), 'the restricted evidence is omitted');
     const asLead = await api.request('GET', '/v1/controls/CONT-01/evidence', { token: TOKENS.qualityLead });
-    const leadRows = (asLead.json as { attachments: Array<{ evidenceId: string }> }).attachments;
-    assert.ok(leadRows.some((row) => row.evidenceId === restricted.id), 'the quality lead reads it');
+    const leadRows = asLead.json as Array<{ id: string }>;
+    assert.ok(leadRows.some((row) => row.id === restricted.id), 'the quality lead reads it');
   } finally {
     await api.close();
   }
@@ -126,19 +191,44 @@ test('EF-REL-02: remind sends a reminder listing what the owner must provide', a
       token: TOKENS.qualityLead,
       body: { reason: 'NO_EVIDENCE' }
     });
-    assert.equal(response.status, 202);
-    const body = response.json as {
+    assert.equal(response.status, 201);
+    const reminder = response.json as {
+      id: string;
       controlId: string;
-      sent: number;
-      reminders: Array<{ reason: string; recipient: string; message: string }>;
+      frameworkId: string;
+      reason: string;
+      recipient: string;
+      missing: string[];
+      message: string;
+      status: string;
     };
-    assert.equal(body.controlId, 'CONT-03');
-    assert.equal(body.sent, 1);
-    assert.equal(body.reminders[0]?.reason, 'NO_EVIDENCE');
-    assert.equal(body.reminders[0]?.recipient, 'ops.lead');
-    assert.ok((body.reminders[0]?.message.length ?? 0) > 0);
+    assert.match(reminder.id, /^rm-/);
+    assert.equal(reminder.controlId, 'CONT-03');
+    assert.equal(reminder.frameworkId, 'demo-msp');
+    assert.equal(reminder.reason, 'NO_EVIDENCE');
+    assert.equal(reminder.recipient, 'ops.lead');
+    assert.ok(reminder.message.length > 0);
     const sent = await services.notifier.sent();
     assert.equal(sent.length, 1, 'the reminder went through the notifier');
+  } finally {
+    await api.close();
+  }
+});
+
+test('POST /v1/controls/{id}/remind is 409 when no reminder is due', async () => {
+  const services = makeTestServices();
+  const pipeline = makeStubPipeline({ runReminders: async () => [] });
+  const api = await startTestApi({ services, pipeline });
+  try {
+    await services.state.putFramework(makeFramework());
+    await services.state.putControls([makeControl({ id: 'CONT-01' })]);
+    const response = await api.request('POST', '/v1/controls/CONT-01/remind', {
+      token: TOKENS.qualityLead,
+      body: {}
+    });
+    assert.equal(response.status, 409);
+    assert.equal((response.json as { error: { code: string } }).error.code, 'CONFLICT');
+    assert.equal((await services.notifier.sent()).length, 0, 'nothing was sent');
   } finally {
     await api.close();
   }

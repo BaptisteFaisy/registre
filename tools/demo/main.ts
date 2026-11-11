@@ -116,7 +116,8 @@ export async function runDemo(rootDir = process.cwd()): Promise<DemoResult> {
  */
 export async function demoServices(
   rootDir: string,
-  evidenceIndex: Evidence[]
+  evidenceIndex: Evidence[],
+  vaultRootOverride?: string
 ): Promise<Awaited<ReturnType<typeof createServices>>['services']> {
   const problems = validateCatalogue();
   if (problems.length > 0) {
@@ -124,7 +125,7 @@ export async function demoServices(
   }
   // The vault enforces a retention hold (ENF-INT-01): a demo run always starts
   // from an empty vault, so re-running the same command stays possible.
-  const vaultRoot = join(rootDir, '.data', 'demo-vault');
+  const vaultRoot = vaultRootOverride ?? join(rootDir, '.data', 'demo-vault');
   rmSync(vaultRoot, { recursive: true, force: true });
 
   const byName = new Map(EVIDENCE.map((item) => [item.fileName, item]));
@@ -144,6 +145,24 @@ export async function demoServices(
     vaultRoot
   });
   return services;
+}
+
+/**
+ * Seeds a bundle with the demonstration set: framework imported, 60 documents
+ * ingested, states recomputed. Used by the demo run and by the integration test
+ * that drives the real API through the real portal client.
+ */
+export async function seedDemoData(options: {
+  rootDir?: string;
+  vaultRoot?: string;
+} = {}): Promise<{ services: Awaited<ReturnType<typeof createServices>>['services']; evidenceIndex: Evidence[] }> {
+  const rootDir = options.rootDir ?? process.cwd();
+  const evidenceIndex: Evidence[] = [];
+  const services = await demoServices(rootDir, evidenceIndex, options.vaultRoot);
+  await importFramework(services, toFrameworkImport(), DEMO_ACTOR);
+  await ingestAll(services, evidenceIndex, rootDir);
+  await recomputeFramework(services, 'demo-msp');
+  return { services, evidenceIndex };
 }
 
 /** Ingest, human validation of the queue, states, reminders (spec 8.1-8.3). */

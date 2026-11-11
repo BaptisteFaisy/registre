@@ -87,18 +87,9 @@ async function depositEvidence(context: ApiContext): Promise<ApiResponse> {
   }
   const result = await context.pipeline.ingestEvidence(context.services, request, context.principal);
   const { evidence, duplicate } = result;
-  return json(duplicate ? 200 : 201, {
-    evidenceId: evidence.id,
-    sha256: evidence.sha256,
-    revision: evidence.revision,
-    duplicate,
-    accessLevel: evidence.accessLevel,
-    contentType: evidence.contentType,
-    sizeBytes: evidence.sizeBytes,
-    ingestedAt: evidence.ingestedAt,
-    flags: evidence.flags,
-    locations: evidence.locations
-  });
+  // Bare evidence: the portal client is typed `Promise<Evidence>`. `duplicate`
+  // is an extension telling the UI that the content was already filed (R8).
+  return json(duplicate ? 200 : 201, { ...evidenceView(evidence, context.principal), duplicate });
 }
 
 /** `GET /v1/evidence/{id}` — detail, `?include=text` adds masked excerpts. */
@@ -134,7 +125,7 @@ export const evidenceRoutes: readonly RouteDefinition[] = [
         { name: 'fileDate', description: 'File date (YYYY-MM-DD) when the body is raw', schema: 'string' }
       ],
       requestSchema: 'EvidenceDeposit',
-      responseSchema: 'EvidenceDepositResult',
+      responseSchema: 'Evidence',
       successStatus: 201,
       errors: [400, 401, 403, 413, 422],
       notes:

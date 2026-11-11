@@ -93,18 +93,23 @@ function importOf(log: Recorder) {
 
 /** The stubbed recomputation, with its readiness and its trend point. */
 function recomputeOf(log: Recorder, statuses: ControlStatus[]) {
-  return async (): Promise<FrameworkRecompute> =>
-    log.record('recomputeFramework', [], {
+  return async (services: Services, frameworkId: string): Promise<FrameworkRecompute> => {
+    const point = { frameworkId, at: NOW, counts: STUB_COUNTS };
+    // The readiness route reads its history from `state.listTrend`, so the stub
+    // records the point it just computed, like the real pipeline does.
+    await services.state.appendTrend(point);
+    return log.record('recomputeFramework', [frameworkId], {
       statuses,
       readiness: {
-        frameworkId: 'demo-msp',
+        frameworkId,
         computedAt: NOW,
         total: statuses.length,
         counts: STUB_COUNTS,
         shares: { COVERED: 0.5, TO_RENEW: 0, TO_VERIFY: 0, EXPIRED: 0, NO_EVIDENCE: 0.5 }
       },
-      trend: [{ frameworkId: 'demo-msp', at: NOW, counts: STUB_COUNTS }]
+      trend: [point]
     });
+  };
 }
 
 /** The stubbed validation queue. */

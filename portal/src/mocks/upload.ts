@@ -7,9 +7,11 @@
  * measured recovery time is missing — the exact sequence of the 3-minute video.
  */
 
-import type { Evidence, Principal } from '../api/types.ts';
+import type { Evidence, EvidenceUploadInput, Principal } from '../api/types.ts';
+import { bytesToBase64 } from '../lib/base64.ts';
 import { appendAuditEvent } from './activity.ts';
 import { buildAttachment, buildSufficiency, pickQuote } from './engine.ts';
+import { hexDigest } from './deterministic.ts';
 import { evidenceFromSpec } from './evidence.ts';
 import type { EvidenceSpec } from './evidenceSpecs.ts';
 import { recomputeStatuses } from './dataset.ts';
@@ -42,13 +44,12 @@ function uploadedSpec(fileName: string, today: string): EvidenceSpec {
 export function simulateUpload(
   state: MockStore,
   principal: Principal,
-  input: { fileName: string; sizeBytes: number; accessLevel?: string }
+  input: EvidenceUploadInput
 ): Evidence {
   const today = new Date().toISOString().slice(0, 10);
   const spec = uploadedSpec(input.fileName, today);
   const evidence = evidenceFromSpec({ ...spec, id: `ev-up-${state.db.evidence.length + 1}` });
-  evidence.sizeBytes = input.sizeBytes || evidence.sizeBytes;
-  if (input.accessLevel === 'RESTRICTED') evidence.accessLevel = 'RESTRICTED';
+  applyUploadedBytes(evidence, input);
   state.db.evidence.push(evidence);
 
   auditCollection(state, principal, evidence, input.fileName);
@@ -57,6 +58,15 @@ export function simulateUpload(
   attach(state, evidence, spec, SECONDARY_CONTROL, 0.79, 'PROPOSED', quote, principal);
   recomputeStatuses(state.db);
   return evidence;
+}
+
+/** Stamps the deposited bytes on the evidence: fingerprint, size, type, date. */
+function applyUploadedBytes(evidence: Evidence, input: EvidenceUploadInput): void {
+  evidence.sha256 = hexDigest(bytesToBase64(input.bytes));
+  evidence.sizeBytes = input.bytes.length;
+  evidence.contentType = input.contentType;
+  if (input.fileDate) evidence.fields.documentDate = input.fileDate;
+  if (input.accessLevel === 'RESTRICTED') evidence.accessLevel = 'RESTRICTED';
 }
 
 /** Collection and reading events of a freshly deposited document. */

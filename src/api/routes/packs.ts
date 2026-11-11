@@ -13,7 +13,7 @@ import { chunked, json } from '../http.ts';
 import type { ApiResponse } from '../http.ts';
 import type { ApiContext, RouteDefinition } from '../types.ts';
 import { requireRole } from '../access.ts';
-import { optionalString } from '../validate.ts';
+import { optionalString, queryValue } from '../validate.ts';
 import { packView } from '../views.ts';
 import { bodyObject, requireFramework, requirePack } from './shared.ts';
 
@@ -38,6 +38,23 @@ async function assemblePack(context: ApiContext): Promise<ApiResponse> {
   }
   const pack = await context.pipeline.assemblePack(context.services, frameworkId, context.principal);
   return json(201, packView(pack, downloadUrlOf(pack.id)));
+}
+
+/** `GET /v1/packs` — every pack, optionally filtered by framework. */
+async function listPacks(context: ApiContext): Promise<ApiResponse> {
+  await requireRole(context.services, context.principal, READ_ROLES, 'pack', 'list');
+  const frameworkId = queryValue(context.query, 'frameworkId');
+  const frameworks =
+    frameworkId === undefined
+      ? (await context.services.state.listFrameworks()).map((framework) => framework.id)
+      : [frameworkId];
+  const packs = [];
+  for (const id of frameworks) {
+    packs.push(...(await context.services.state.listPacks(id)));
+  }
+  packs.sort((left, right) => right.frozenAt.localeCompare(left.frozenAt));
+  // Bare list: the portal client is typed `Promise<Pack[]>`.
+  return json(200, packs.map((pack) => packView(pack, downloadUrlOf(pack.id))));
 }
 
 /** Download path of one pack, relative to the API root. */
@@ -78,6 +95,23 @@ async function downloadPack(context: ApiContext): Promise<ApiResponse> {
 
 /** The three pack routes, in table order. */
 export const packRoutes: readonly RouteDefinition[] = [
+  {
+    method: 'GET',
+    path: '/v1/packs',
+    handler: listPacks,
+    meta: {
+      operationId: 'listPacks',
+      summary: 'List the assembled audit packs, newest first',
+      tag: 'packs',
+      requirement: 'EF-DOS-02',
+      roles: READ_ROLES,
+      query: [
+        { name: 'frameworkId', description: 'Keep only the packs of this framework', schema: 'string' }
+      ],
+      responseSchema: 'PackArray',
+      errors: [401, 403]
+    }
+  },
   {
     method: 'POST',
     path: '/v1/frameworks/:id/packs',

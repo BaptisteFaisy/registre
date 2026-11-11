@@ -57,6 +57,47 @@ const SHARED = {
       region: stringSchema
     }
   },
+  Principal: {
+    type: 'object',
+    required: ['id', 'name', 'email', 'role', 'clearance', 'ownedControls'],
+    properties: {
+      id: stringSchema,
+      name: stringSchema,
+      email: stringSchema,
+      role: { type: 'string', enum: ['QUALITY_LEAD', 'CONTROL_OWNER', 'EXECUTIVE', 'INTERNAL_AUDITOR', 'ADMIN'] },
+      clearance: { type: 'string', enum: ['PUBLIC', 'INTERNAL', 'RESTRICTED'] },
+      ownedControls: { type: 'array', items: stringSchema }
+    }
+  },
+  SessionRequest: {
+    type: 'object',
+    required: ['login', 'password'],
+    properties: {
+      login: stringSchema,
+      password: { type: 'string', format: 'password' }
+    }
+  },
+  Session: {
+    type: 'object',
+    required: ['token', 'principal'],
+    properties: {
+      token: stringSchema,
+      principal: { $ref: '#/components/schemas/Principal' }
+    }
+  },
+  SessionAccount: {
+    type: 'object',
+    required: ['login', 'role', 'name'],
+    properties: {
+      login: stringSchema,
+      role: stringSchema,
+      name: stringSchema
+    }
+  },
+  SessionAccountArray: {
+    type: 'array',
+    items: { $ref: '#/components/schemas/SessionAccount' }
+  },
   Settings: {
     type: 'object',
     properties: {

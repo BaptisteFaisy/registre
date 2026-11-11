@@ -8,14 +8,22 @@
  * now, listing what the owner must provide.
  */
 
-import type { Role } from '../../domain/types.ts';
+import type { Evidence, Role } from '../../domain/types.ts';
+import { conflict } from '../../support/errors.ts';
 import { json } from '../http.ts';
 import type { ApiResponse } from '../http.ts';
 import type { ApiContext, RouteDefinition } from '../types.ts';
 import { assertControlVisible, requireRole } from '../access.ts';
 import { isLevelAllowed, maxLevel } from '../../domain/access.ts';
 import { queryEnum } from '../validate.ts';
-import { attachmentView, controlView, reminderView } from '../views.ts';
+import {
+  attachmentDomainView,
+  controlOnlyView,
+  controlWithRelationsView,
+  evidenceView,
+  reminderView,
+  sufficiencyView
+} from '../views.ts';
 import { bodyObject, requireControl, requireControlOwnership, statusOf } from './shared.ts';
 
 /** Roles that may read a control (spec chapter 6). */
@@ -31,7 +39,22 @@ const ATTACHMENT_STATUSES = ['PROPOSED', 'APPLIED', 'REJECTED'] as const;
 async function readControl(context: ApiContext): Promise<ApiResponse> {
   const control = await requireControl(context.services, context.params.id ?? '');
   await assertControlVisible(context.services, context.principal, control.id);
-  return json(200, { control: controlView(control, null), status: await statusOf(context, control) });
+  const status = await statusOf(context, control);
+  const attachments = await context.services.state.listAttachments({ controlId: control.id });
+  const sufficiencies = await context.services.state.listSufficiency({ controlId: control.id });
+  const evidence: Evidence[] = [];
+  for (const attachment of attachments) {
+    const found = await context.services.state.getEvidence(attachment.evidenceId);
+    if (found === null) continue;
+    if (!isLevelAllowed(found.accessLevel, maxLevel(context.principal))) continue;
+    evidence.push(found);
+  }
+  const levelOf = (evidenceId: string): Evidence['accessLevel'] =>
+    evidence.find((item) => item.id === evidenceId)?.accessLevel ?? 'INTERNAL';
+  return json(
+    200,
+    controlWithRelationsView({ control, status, attachments, sufficiencies, evidence, principal: context.principal, levelOf })
+  );
 }
 
 /** `GET /v1/controls/{id}/evidence` — attachments, quotes and sufficiency. */
@@ -43,17 +66,18 @@ async function listControlEvidence(context: ApiContext): Promise<ApiResponse> {
     controlId: control.id,
     ...(status === undefined ? {} : { status })
   });
-  const rows: Record<string, unknown>[] = [];
+  const rows: Evidence[] = [];
   for (const attachment of attachments) {
     const evidence = await context.services.state.getEvidence(attachment.evidenceId);
     // Evidence above the caller clearance is omitted, never redacted
     // (docs/API.md §8, ENF-CONF-01).
     if (evidence === null) continue;
     if (!isLevelAllowed(evidence.accessLevel, maxLevel(context.principal))) continue;
-    const sufficiency = await context.services.state.getSufficiencyForAttachment(attachment.id);
-    rows.push(attachmentView(attachment, evidence, sufficiency, context.principal));
+    rows.push(evidence);
   }
-  return json(200, { controlId: control.id, total: rows.length, attachments: rows });
+  // Bare evidences: the quotes and the sufficiency come with the control
+  // detail (`GET /v1/controls/{id}`).
+  return json(200, rows.map((evidence) => evidenceView(evidence, context.principal)));
 }
 
 /** `POST /v1/controls/{id}/remind` — send a reminder now (EF-REL-01/02). */
@@ -68,13 +92,10 @@ async function remindControl(context: ApiContext): Promise<ApiResponse> {
     (reminder) => reminder.controlId === control.id && (reason === undefined || reminder.reason === reason)
   );
   if (forControl.length === 0) {
-    return json(200, { controlId: control.id, reminders: [], sent: 0 });
+    throw conflict('no reminder is due for this control', { controlId: control.id });
   }
-  return json(202, {
-    controlId: control.id,
-    sent: forControl.length,
-    reminders: forControl.map(reminderView)
-  });
+  // Bare reminder: the portal client is typed `Promise<Reminder>`.
+  return json(201, reminderView(forControl[0]!));
 }
 
 /** The three control routes, in table order. */
@@ -89,7 +110,7 @@ export const controlRoutes: readonly RouteDefinition[] = [
       tag: 'controls',
       requirement: 'EF-FRA-02',
       roles: READ_ROLES,
-      responseSchema: 'ControlDetail',
+      responseSchema: 'ControlWithRelations',
       errors: [401, 403, 404]
     }
   },
@@ -111,7 +132,7 @@ export const controlRoutes: readonly RouteDefinition[] = [
           values: ATTACHMENT_STATUSES
         }
       ],
-      responseSchema: 'AttachmentList',
+      responseSchema: 'EvidenceArray',
       errors: [400, 401, 403, 404],
       notes: 'Evidence above the caller clearance is omitted, never redacted.'
     }

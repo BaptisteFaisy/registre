@@ -97,6 +97,20 @@ export async function depositPolicy(api: TestApi, controlId = 'CONT-01'): Promis
   });
 }
 
+/** Id of the evidence carried by a deposit or a read response (bare `Evidence`). */
+export function evidenceIdOf(response: TestResponse): string {
+  const id = (response.json as { id?: unknown }).id;
+  if (typeof id !== 'string') {
+    throw new Error(`the response carries no evidence id: ${response.text.slice(0, 200)}`);
+  }
+  return id;
+}
+
+/** Opens a demonstration session (EF-ADM-03); the route is public. */
+export async function openSession(api: TestApi, login: string, password: string): Promise<TestResponse> {
+  return api.request('POST', '/v1/auth/session', { token: null, body: { login, password } });
+}
+
 /** Text of a restricted evidence: personal data, so the level is RESTRICTED. */
 export function restrictedText(): string {
   return [

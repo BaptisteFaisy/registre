@@ -208,6 +208,7 @@ export class Router {
     return {
       services: this.options.services,
       pipeline: this.options.pipeline,
+      directory: this.options.directory,
       principal,
       params,
       query: request.query,

@@ -12,6 +12,7 @@ import type {
   Control,
   ControlWithRelations,
   Evidence,
+  EvidenceUploadInput,
   Framework,
   FrameworkImport,
   Pack,
@@ -120,13 +121,7 @@ export class MockRegistreApi implements RegistreApi {
     };
   }
 
-  async uploadEvidence(input: {
-    fileName: string;
-    contentType: string;
-    sizeBytes: number;
-    suggestedControlId?: string;
-    accessLevel?: string;
-  }): Promise<Evidence> {
+  async uploadEvidence(input: EvidenceUploadInput): Promise<Evidence> {
     const principal = requirePrincipal(this.principalOf);
     await delay();
     const evidence = simulateUpload(store(), principal, input);

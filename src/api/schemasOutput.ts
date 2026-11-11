@@ -80,12 +80,22 @@ export const OUTPUT_SCHEMAS = {
       channel: stringSchema
     }
   },
-  ReminderList: {
+  ReminderArray: {
+    type: 'array',
+    items: { $ref: '#/components/schemas/Reminder' }
+  },
+  PackArray: {
+    type: 'array',
+    items: { $ref: '#/components/schemas/Pack' }
+  },
+  CostReport: {
     type: 'object',
-    required: ['total', 'reminders'],
+    required: ['totalUsd', 'perEvidenceUsd', 'evidenceCount', 'bySource'],
     properties: {
-      total: { type: 'integer' },
-      reminders: { type: 'array', items: { $ref: '#/components/schemas/Reminder' } }
+      totalUsd: { type: 'number' },
+      perEvidenceUsd: { type: 'number' },
+      evidenceCount: { type: 'integer' },
+      bySource: { type: 'object', additionalProperties: { type: 'number' } }
     }
   },
   RemindRequest: {
