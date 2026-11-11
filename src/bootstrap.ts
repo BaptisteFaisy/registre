@@ -22,6 +22,9 @@ import {
   LocalEvidenceStore,
   MemoryNotifier
 } from './store/index.ts';
+import { createMemoryExtensions } from './store/extensionsMemory.ts';
+import { signerFromEnv } from './crypto/localSigner.ts';
+import type { ExtensionStore, Signer } from './ports/index.ts';
 
 export interface BootstrapOptions {
   env?: NodeJS.ProcessEnv;
@@ -35,6 +38,10 @@ export interface BootstrapOptions {
   settings?: Partial<Settings>;
   /** Vault root for the local evidence store. */
   vaultRoot?: string;
+  /** Injected signer; defaults to `signerFromEnv`. */
+  signer?: Signer;
+  /** Injected extension store; defaults to the in-memory one. */
+  extensions?: ExtensionStore;
 }
 
 export interface Bootstrapped {
@@ -58,6 +65,8 @@ export async function createServices(options: BootstrapOptions = {}): Promise<Bo
   const audit = new InMemoryAuditSink({ clock });
   const evidenceStore = new LocalEvidenceStore({ clock, root: options.vaultRoot });
   const notifier = new MemoryNotifier({ clock });
+  const signer = options.signer ?? signerFromEnv(env);
+  const extensions = options.extensions ?? createMemoryExtensions({ clock });
 
   const settings = await state.getSettings();
   const ai = createAi(env, settings, options.mock ? { mock: options.mock } : {});
@@ -81,7 +90,9 @@ export async function createServices(options: BootstrapOptions = {}): Promise<Bo
       // The AI layer meters every Bedrock call: the portal shows the same
       // numbers the deployment would report (ENF-COUT-01).
       costs: ai.costs,
-      settings
+      settings,
+      signer,
+      extensions
     }
   };
 }

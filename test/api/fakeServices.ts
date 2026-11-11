@@ -9,6 +9,8 @@
 import type { Control, Evidence } from '../../src/domain/types.ts';
 import type { EvidenceStore, Services, StoredObject } from '../../src/ports/index.ts';
 import type { Clock } from '../../src/ports/index.ts';
+import { signerFromEnv } from '../../src/crypto/localSigner.ts';
+import { createMemoryExtensions } from '../../src/store/extensionsMemory.ts';
 import { createMockAi } from '../../src/ai/mock/index.ts';
 import {
   InMemoryAuditSink,
@@ -78,6 +80,8 @@ export function makeTestServices(options: TestServicesOptions = {}): Services {
   const ai = createMockAi(options.catalog ?? {});
   return {
     clock,
+    signer: signerFromEnv({}),
+    extensions: createMemoryExtensions({ clock }),
     reader: ai.reader,
     controlRetriever: ai.controlRetriever,
     evidenceRetriever: ai.evidenceRetriever,

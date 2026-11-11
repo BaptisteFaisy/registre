@@ -8,6 +8,10 @@
  * Keep under 500 lines; no I/O here.
  */
 
+import type { ControlMapping } from '../domain/mapping.ts';
+import type { QualityRecord } from '../domain/quality.ts';
+import type { DriftEvent } from '../domain/quality.ts';
+import type { ShareGrant, VerificationResult } from '../domain/verification.ts';
 import type {
   AccessLevel,
   Answer,
@@ -303,6 +307,89 @@ export interface Services {
   notifier: Notifier;
   costs: CostMeter;
   settings: Settings;
+  /** Signs pack manifests so a third party can verify without trusting us. */
+  signer: Signer;
+  /** Shares, mappings, drifts, measured quality, verification log. */
+  extensions: ExtensionStore;
+}
+
+/* ---------------------------------------------------------------- signing */
+
+/** What a signer returns; the signature is base64, the key id is public. */
+export interface SignerOutput {
+  signature: string;
+  keyId: string;
+  algorithm: string;
+  purpose: string;
+  signedAt: string;
+}
+
+/**
+ * Signs and verifies a payload. KMS in production, a local Ed25519 key offline.
+ * The private key never leaves the implementation.
+ */
+export interface Signer {
+  readonly id: string;
+  sign(input: { payload: Uint8Array; purpose: string }): Promise<SignerOutput>;
+  verify(input: {
+    payload: Uint8Array;
+    signature: string;
+    keyId: string;
+    algorithm: string;
+  }): Promise<boolean>;
+}
+
+/* --------------------------------------------------- extension persistence */
+
+/**
+ * Persistence of everything the three extensions add: share grants, cross
+ * framework mappings, drift events, measured quality and verification log.
+ *
+ * One interface instead of five so the `Services` bundle grows by two fields,
+ * and one memory implementation keeps the whole product runnable offline.
+ */
+export interface ExtensionStore {
+  readonly id: string;
+
+  /* Auditor share grants (time-boxed, revocable, watermarked). */
+  putShare(share: ShareGrant): Promise<void>;
+  getShare(token: string): Promise<ShareGrant | null>;
+  listShares(filter?: {
+    packId?: string;
+    frameworkId?: string;
+    active?: boolean;
+    now?: string;
+  }): Promise<ShareGrant[]>;
+  /** Records one use: increments the counter and stamps the instant. */
+  touchShare(token: string, at: string): Promise<void>;
+
+  /* Cross-framework mappings (never auto-applied). */
+  putMapping(mapping: ControlMapping): Promise<void>;
+  getMapping(id: string): Promise<ControlMapping | null>;
+  listMappings(filter?: {
+    status?: ControlMapping['status'];
+    sourceFrameworkId?: string;
+    targetFrameworkId?: string;
+    controlId?: string;
+  }): Promise<ControlMapping[]>;
+
+  /* Drift of machine attestations. */
+  putDrift(event: DriftEvent): Promise<void>;
+  listDrifts(filter?: {
+    controlId?: string;
+    frameworkId?: string;
+    acknowledged?: boolean;
+    limit?: number;
+  }): Promise<DriftEvent[]>;
+  acknowledgeDrift(id: string, by: string, at: string): Promise<DriftEvent | null>;
+
+  /* Measured quality of each model and prompt version. */
+  recordQuality(record: QualityRecord): Promise<void>;
+  listQuality(filter?: { subjectKey?: string; metric?: QualityRecord['metric']; limit?: number }): Promise<QualityRecord[]>;
+
+  /* Public verification log: who checked which pack, and the verdict. */
+  recordVerification(result: VerificationResult): Promise<void>;
+  listVerifications(filter?: { packId?: string; limit?: number }): Promise<VerificationResult[]>;
 }
 
 /* ------------------------------------------------------- framework import */

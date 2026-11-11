@@ -41,3 +41,6 @@ export { DynamoAuditSink } from './dynamoAudit.ts';
 export { DynamoGateway, itemOf, payloadOf, toDynamoItem } from './dynamoClient.ts';
 export type { DynamoConfig, DynamoItem } from './dynamoKeys.ts';
 export { dynamoConfigFromEnv } from './dynamoKeys.ts';
+
+export { MemoryExtensionStore, createMemoryExtensions } from './extensionsMemory.ts';
+export type { MemoryExtensionStoreOptions } from './extensionsMemory.ts';

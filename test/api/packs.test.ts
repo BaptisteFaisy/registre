@@ -10,6 +10,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import type { Pack } from '../../src/domain/types.ts';
+import { makeManifest, makeSignature } from '../fixtures/builders.ts';
 import { TEST_NOW, makeFramework } from '../fixtures/builders.ts';
 import { makeTestServices } from './fakeServices.ts';
 import { depositPolicy, importDemoFramework } from './fixtures.ts';
@@ -37,6 +38,8 @@ function packFixture(overrides: Partial<Pack> = {}): Pack {
     knownGaps: [],
     archive: { uri: 'memory://packs/pk-fixture/pack.zip#v1', sha256: 'c'.repeat(64), sizeBytes: 4 },
     checksumsVerified: true,
+    manifest: makeManifest(),
+    signature: makeSignature(),
     ...overrides
   };
 }

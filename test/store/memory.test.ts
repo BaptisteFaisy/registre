@@ -5,6 +5,7 @@
 
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { makeManifest, makeSignature } from '../fixtures/builders.ts';
 import { InMemoryStateStore } from '../../src/store/memory.ts';
 import { FixedClock } from '../../src/support/clock.ts';
 import { DEFAULT_SETTINGS } from '../../src/domain/types.ts';
@@ -56,6 +57,8 @@ function makePack(overrides: Partial<Pack> = {}): Pack {
     index: [],
     knownGaps: [],
     archive: { uri: 'vault://packs/pk-1.zip', sha256: 'b'.repeat(64), sizeBytes: 1024 },
+    manifest: makeManifest({ packId: 'pk-1' }),
+    signature: makeSignature(),
     checksumsVerified: true,
     ...overrides
   };
