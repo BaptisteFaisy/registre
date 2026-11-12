@@ -91,6 +91,16 @@ protected framework.
 
 ## 3. Measured efficiency gains
 
+The numbers in this section have two distinct origins: the **offline
+demonstration run** (scripted mock reader, frozen clock) and the **offline
+evaluation harness** executed on the reference fixtures on 2026-11-12 — fields
+read 100 % (840/840), attachments accepted without correction 60/60, expected
+gaps detected 20/20, correct citations 20/20 and 0 invented answers on 5 traps
+(`node tools/eval/runAndRecord.ts --check`, details in `docs/EVALUATION.md`
+§11); harness figures are labelled "offline harness on fixtures". The deployed
+AWS run is still to be done and will replace them: anything that can only be
+measured on the live stack stays marked **[to measure on the deployed run]**.
+
 From the demonstration run (30 controls, 6 domains, 60 documents, frozen clock):
 
 | Measure | Value on the demonstration set | Production target |
@@ -99,12 +109,12 @@ From the demonstration run (30 controls, 6 domains, 60 documents, frozen clock):
 | Controls with no fresh evidence | 22 of 30 shown continuously (14 to verify, 8 expired), including all six seeded cases | < 5 % at any time |
 | Duplicate documents | 1 detected, recorded once with two locations | detected on ingest |
 | Attachments proposed | 66 supporting attachments over 60 documents | — |
-| Attachments accepted without correction | 11 proposals accepted by the quality lead during the run, 38 items left in the queue for review | > 85 % **[to measure on the deployed run]** |
-| Fields read correctly | — | > 90 % **[to measure on the deployed run]** |
-| Answer to a question with evidence | cited with document, page and date | < 1 minute |
-| Answer to a question with no evidence | refused: "No evidence answers this question." | 0 invented answers |
+| Attachments accepted without correction | 11 proposals accepted by the quality lead during the run, 38 items left in the queue for review; offline harness on fixtures: 60/60 accepted without correction (100 %, 2026-11-12) | > 85 % **[to measure on the deployed run]** |
+| Fields read correctly | offline harness on fixtures: 840/840 scored fields over 60 documents (100 %, 2026-11-12) | > 90 % **[to measure on the deployed run]** |
+| Answer to a question with evidence | cited with document, page and date; offline harness on fixtures: 20/20 correct citations (100 %, 2026-11-12) | < 1 minute |
+| Answer to a question with no evidence | refused: "No evidence answers this question."; offline harness on fixtures: 0 invented answers on the 5 trap questions (2026-11-12) | 0 invented answers |
 | Reminders generated | 7, each naming what the owner must provide | sent 30 days ahead |
-| Cost per evidence | $0.0197 (total $1.18 for the run, offline price list) | measured and displayed |
+| Cost per evidence | $0.0407 (total $2.44 for the 60-document run) — offline price list set to the verified eu-central-1 Data Automation price of $0.04 per page, so this is a projection of the deployed run, not a bill | measured and displayed |
 
 Engineering measures, from CI on the current `main`:
 
