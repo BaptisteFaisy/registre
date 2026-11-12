@@ -1,7 +1,7 @@
 [
   {
-    "id": "qr-96432319bc77",
-    "measuredAt": "2026-11-11T17:19:28.747Z",
+    "id": "qr-bf9711063761",
+    "measuredAt": "2026-11-12T00:20:08.920Z",
     "subject": {
       "kind": "READING",
       "modelId": "fixture",
@@ -16,8 +16,8 @@
     "verdict": "PASS"
   },
   {
-    "id": "qr-ec5ee01d21b5",
-    "measuredAt": "2026-11-11T17:19:28.750Z",
+    "id": "qr-11b4e6a1b50b",
+    "measuredAt": "2026-11-12T00:20:08.920Z",
     "subject": {
       "kind": "ATTACHMENT",
       "modelId": "fixture",
@@ -32,8 +32,8 @@
     "verdict": "PASS"
   },
   {
-    "id": "qr-7de4575daf97",
-    "measuredAt": "2026-11-11T17:19:28.750Z",
+    "id": "qr-6897b40c6bad",
+    "measuredAt": "2026-11-12T00:20:08.920Z",
     "subject": {
       "kind": "ATTACHMENT",
       "modelId": "fixture",
@@ -48,8 +48,8 @@
     "verdict": "PASS"
   },
   {
-    "id": "qr-fe286bac2471",
-    "measuredAt": "2026-11-11T17:19:28.750Z",
+    "id": "qr-46856c4d939e",
+    "measuredAt": "2026-11-12T00:20:08.920Z",
     "subject": {
       "kind": "SUFFICIENCY",
       "modelId": "fixture",
@@ -64,8 +64,8 @@
     "verdict": "PASS"
   },
   {
-    "id": "qr-8f98524a4d95",
-    "measuredAt": "2026-11-11T17:19:28.750Z",
+    "id": "qr-30a0cc957368",
+    "measuredAt": "2026-11-12T00:20:08.920Z",
     "subject": {
       "kind": "QA",
       "modelId": "fixture",
@@ -80,8 +80,8 @@
     "verdict": "PASS"
   },
   {
-    "id": "qr-fcd87b0435bb",
-    "measuredAt": "2026-11-11T17:19:28.750Z",
+    "id": "qr-d789d28c6a29",
+    "measuredAt": "2026-11-12T00:20:08.920Z",
     "subject": {
       "kind": "QA",
       "modelId": "fixture",
