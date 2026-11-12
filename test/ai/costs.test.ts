@@ -6,6 +6,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
+  DATA_AUTOMATION_PRICE_PER_PAGE,
   FLEX_DISCOUNT,
   InMemoryCostMeter,
   addCosts,
@@ -31,8 +32,10 @@ test('roundUsd keeps six decimals so accumulation stays exact', () => {
 });
 
 test('a reading is billed per page, at least one page', () => {
-  assert.equal(readingCost('bedrock-data-automation', 3).usd, 0.03);
-  assert.equal(readingCost('bedrock-data-automation', 0).usd, 0.01);
+  // Derived from the verified price constant, not a literal: the list price is
+  // re-checked against the Price List API whenever the region or profile moves.
+  assert.equal(readingCost('bedrock-data-automation', 3).usd, roundUsd(3 * DATA_AUTOMATION_PRICE_PER_PAGE));
+  assert.equal(readingCost('bedrock-data-automation', 0).usd, roundUsd(DATA_AUTOMATION_PRICE_PER_PAGE));
   assert.equal(readingCost('bedrock-data-automation', 2).source, 'bedrock-data-automation');
 });
 

@@ -51,8 +51,17 @@ export const MODEL_PRICES: Readonly<Record<string, TokenPrice>> = {
 /** Discount applied to the standard price when the Flex tier is used. */
 export const FLEX_DISCOUNT = 0.5;
 
-/** Data Automation is billed per page read (EF-LEC-01, spec 17.1). */
-export const DATA_AUTOMATION_PRICE_PER_PAGE = 0.01;
+/**
+ * Data Automation is billed per page read (EF-LEC-01, spec 17.1).
+ *
+ * Standard profile, eu-central-1: 0.04 USD per page processed, verified on
+ * 2026-11-12 through the Price List API (`aws pricing get-products
+ * --service-code AmazonBedrock --region us-east-1`, usage type
+ * `EUC1-DataAutomation-Standard-PagesProcessed`, flat from 0 to Inf). The Custom
+ * profile is priced differently (0.005 USD per image plus 0.0005 USD per add-on
+ * field) and is not what the deployed project uses.
+ */
+export const DATA_AUTOMATION_PRICE_PER_PAGE = 0.04;
 
 /** Knowledge-base retrieval is billed per query. */
 export const KNOWLEDGE_BASE_PRICE_PER_QUERY = 0.0005;
