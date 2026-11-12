@@ -131,6 +131,7 @@ export async function readStep(
   actor: string
 ): Promise<{ evidence: Evidence }> {
   const id = payload.evidenceId ?? makeEvidenceId(payload.sha256 ?? sha256Bytes(payload.bytes ?? new Uint8Array()));
+  const meteredBefore = services.costs.report().count;
   const read = await services.reader.read({
     evidenceId: id,
     contentType: payload.contentType,
@@ -142,7 +143,7 @@ export async function readStep(
   });
   const evidence = assemble(services, id, payload, read);
   await services.state.putEvidence(evidence);
-  await journal(services, actor, evidence, read.cost);
+  await journal(services, actor, evidence, read.cost, services.costs.report().count > meteredBefore);
   return { evidence };
 }
 
@@ -179,7 +180,8 @@ async function journal(
   services: Services,
   actor: string,
   evidence: Evidence,
-  cost: Evidence['cost']
+  cost: Evidence['cost'],
+  meteredByAdapter: boolean
 ): Promise<void> {
   await record(services, actor, 'EVIDENCE_COLLECTED', 'evidence', evidence.id, {
     sha256: evidence.sha256,
@@ -195,7 +197,11 @@ async function journal(
     pages: evidence.textPages.length,
     ...(cost === undefined ? {} : { costUsd: cost.usd, costSource: cost.source })
   });
-  if (cost !== undefined) services.costs.record(cost);
+  // The reading is metered once: adapters that hold the cost meter (the mock and
+  // the Bedrock readers) already recorded it, and recording it a second time here
+  // doubled every displayed cost (ENF-COUT-01). An adapter without a meter still
+  // gets its cost recorded, so the requirement holds for every wiring.
+  if (cost !== undefined && !meteredByAdapter) services.costs.record(cost);
 }
 
 /** Retrieves the candidate controls of one evidence — EF-RAT-01 (spec 13.2 step 1). */
