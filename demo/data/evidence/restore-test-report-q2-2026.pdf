@@ -1,25 +1,92 @@
----
-Title: Restore Test Report, Q2 2026
-Type: REPORT
-Date: 2026-06-28
-Version: 1.0
-Author: Operations Lead
-Approved by: Managing Director
-Approval date: 2026-07-01
-Personal data: no
-Summary: Report of the restore test run on the customer database in June 2026. The restored dataset, the test date, the result and the signatory are recorded; the recovery time was not measured during the exercise.
----
-
-# Restore Test Report, Q2 2026
-
-Report of the restore test run on the customer database in June 2026. The restored dataset, the test date, the result and the signatory are recorded; the recovery time was not measured during the exercise.
-
-## Scope reference ‚Äî CONT-16: Backup restoration tested
-Requirement addressed: Backups of the managed environments are tested by a real restore at a defined interval.
-
-- Test date: 2026-06-28.
-- System or dataset restored: Recorded in EV-033 (Restore Test Report, Q2 2026).
-- Test result: Recorded in EV-033 (Restore Test Report, Q2 2026).
-- Signatory name: Managing Director.
-
-Signed: Managing Director (2026-07-01)
+%PDF-1.4
+‚„œ”
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [4 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+4 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 5 0 R >>
+endobj
+5 0 obj
+<< /Length 1474 >>
+stream
+BT
+/F1 9 Tf
+54 756 Td
+(---) Tj
+0 -11 Td
+(Title: Restore Test Report, Q2 2026) Tj
+0 -11 Td
+(Type: REPORT) Tj
+0 -11 Td
+(Date: 2026-06-28) Tj
+0 -11 Td
+(Version: 1.0) Tj
+0 -11 Td
+(Author: Operations Lead) Tj
+0 -11 Td
+(Approved by: Managing Director) Tj
+0 -11 Td
+(Approval date: 2026-07-01) Tj
+0 -11 Td
+(Personal data: no) Tj
+0 -11 Td
+(Summary: Report of the restore test run on the customer database in June 2026. The restore) Tj
+(d dataset, the test date, the result and the signatory are recorded; the recovery time was) Tj
+( not measured during the exercise.) Tj
+0 -11 Td
+(---) Tj
+0 -11 Td
+() Tj
+0 -11 Td
+(# Restore Test Report, Q2 2026) Tj
+0 -11 Td
+() Tj
+0 -11 Td
+(Report of the restore test run on the customer database in June 2026. The restored dataset) Tj
+(, the test date, the result and the signatory are recorded; the recovery time was not meas) Tj
+(ured during the exercise.) Tj
+0 -11 Td
+() Tj
+0 -11 Td
+(## Scope reference ó CONT-16: Backup restoration tested) Tj
+0 -11 Td
+(Requirement addressed: Backups of the managed environments are tested by a real restore at) Tj
+( a defined interval.) Tj
+0 -11 Td
+() Tj
+0 -11 Td
+(- Test date: 2026-06-28.) Tj
+0 -11 Td
+(- System or dataset restored: Recorded in EV-033 \(Restore Test Report, Q2 2026\).) Tj
+0 -11 Td
+(- Test result: Recorded in EV-033 \(Restore Test Report, Q2 2026\).) Tj
+0 -11 Td
+(- Signatory name: Managing Director.) Tj
+0 -11 Td
+() Tj
+0 -11 Td
+(Signed: Managing Director \(2026-07-01\)) Tj
+0 -11 Td
+() Tj
+ET
+endstream
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000014 00000 n 
+0000000063 00000 n 
+0000000120 00000 n 
+0000000217 00000 n 
+0000000343 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R /ID [<0123456789abcdef0123456789abcdef> <0123456789abcdef0123456789abcdef>] >>
+startxref
+1869
+%%EOF

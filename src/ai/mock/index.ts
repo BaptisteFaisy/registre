@@ -35,6 +35,12 @@ export interface MockAiOptions {
    * instead of composing a weakly grounded answer.
    */
   evidenceMinScore?: number;
+  /**
+   * Offline text twins of the screenshots, keyed by file name. The scripted
+   * reader does no OCR: without a twin a screenshot is reported unreadable
+   * (EF-LEC-04) instead of being guessed.
+   */
+  twins?: ReadonlyMap<string, string> | null;
 }
 
 /**
@@ -45,7 +51,7 @@ export function createMockAi(options: MockAiOptions = {}): AiServices {
   const costs = new InMemoryCostMeter();
   return {
     provider: 'mock',
-    reader: createScriptedReader({ meter: costs }),
+    reader: createScriptedReader({ meter: costs, twins: options.twins ?? null }),
     controlRetriever: createControlRetriever(options.controls ?? []),
     evidenceRetriever: createEvidenceRetriever(options.evidences ?? [], options.evidenceMinScore),
     reasoner: createScriptedReasoner(options.script ?? {}),

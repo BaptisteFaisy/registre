@@ -1,22 +1,84 @@
----
-Title: Change Success Report, Q2 2026
-Type: REPORT
-Date: 2026-07-10
-Period: 2026-04-01..2026-06-30
-Version: 1.0
-Author: Change Manager
-Personal data: no
-Summary: Quarterly report of change volume and failed changes. Rollbacks are mentioned in the narrative but not counted in the tables.
----
-
-# Change Success Report, Q2 2026
-
-Quarterly report of change volume and failed changes. Rollbacks are mentioned in the narrative but not counted in the tables.
-
-## Scope reference ‚Äî CONT-13: Change success measured
-Requirement addressed: The share of successful changes and the number of rollbacks are measured every quarter.
-
-- Reporting period: 2026-04-01 to 2026-06-30.
-- Change count: Recorded in EV-025 (Change Success Report, Q2 2026).
-- Failed change count: Recorded in EV-025 (Change Success Report, Q2 2026).
-
+%PDF-1.4
+‚„œ”
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [4 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+4 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 5 0 R >>
+endobj
+5 0 obj
+<< /Length 1176 >>
+stream
+BT
+/F1 9 Tf
+54 756 Td
+(---) Tj
+0 -11 Td
+(Title: Change Success Report, Q2 2026) Tj
+0 -11 Td
+(Type: REPORT) Tj
+0 -11 Td
+(Date: 2026-07-10) Tj
+0 -11 Td
+(Period: 2026-04-01..2026-06-30) Tj
+0 -11 Td
+(Version: 1.0) Tj
+0 -11 Td
+(Author: Change Manager) Tj
+0 -11 Td
+(Personal data: no) Tj
+0 -11 Td
+(Summary: Quarterly report of change volume and failed changes. Rollbacks are mentioned in ) Tj
+(the narrative but not counted in the tables.) Tj
+0 -11 Td
+(---) Tj
+0 -11 Td
+() Tj
+0 -11 Td
+(# Change Success Report, Q2 2026) Tj
+0 -11 Td
+() Tj
+0 -11 Td
+(Quarterly report of change volume and failed changes. Rollbacks are mentioned in the narra) Tj
+(tive but not counted in the tables.) Tj
+0 -11 Td
+() Tj
+0 -11 Td
+(## Scope reference ó CONT-13: Change success measured) Tj
+0 -11 Td
+(Requirement addressed: The share of successful changes and the number of rollbacks are mea) Tj
+(sured every quarter.) Tj
+0 -11 Td
+() Tj
+0 -11 Td
+(- Reporting period: 2026-04-01 to 2026-06-30.) Tj
+0 -11 Td
+(- Change count: Recorded in EV-025 \(Change Success Report, Q2 2026\).) Tj
+0 -11 Td
+(- Failed change count: Recorded in EV-025 \(Change Success Report, Q2 2026\).) Tj
+0 -11 Td
+() Tj
+0 -11 Td
+() Tj
+ET
+endstream
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000014 00000 n 
+0000000063 00000 n 
+0000000120 00000 n 
+0000000217 00000 n 
+0000000343 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R /ID [<0123456789abcdef0123456789abcdef> <0123456789abcdef0123456789abcdef>] >>
+startxref
+1571
+%%EOF

@@ -1,23 +1,86 @@
----
-Title: Customer Satisfaction Survey, H1 2026
-Type: REPORT
-Date: 2026-07-08
-Period: 2026-01-01..2026-06-30
-Version: 1.0
-Author: Account Manager
-Personal data: no
-Summary: Results of the half-year satisfaction survey: response count, score per customer and the actions opened after the survey.
----
-
-# Customer Satisfaction Survey, H1 2026
-
-Results of the half-year satisfaction survey: response count, score per customer and the actions opened after the survey.
-
-## Scope reference ‚Äî CONT-26: Customer satisfaction measured
-Requirement addressed: Customer satisfaction is measured twice a year and the results lead to recorded actions.
-
-- Survey period: 2026-01-01 to 2026-06-30.
-- Response count: Recorded in EV-053 (Customer Satisfaction Survey, H1 2026).
-- Satisfaction score: Recorded in EV-053 (Customer Satisfaction Survey, H1 2026).
-- Actions taken: Recorded in EV-053 (Customer Satisfaction Survey, H1 2026).
-
+%PDF-1.4
+‚„œ”
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [4 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+4 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 5 0 R >>
+endobj
+5 0 obj
+<< /Length 1296 >>
+stream
+BT
+/F1 9 Tf
+54 756 Td
+(---) Tj
+0 -11 Td
+(Title: Customer Satisfaction Survey, H1 2026) Tj
+0 -11 Td
+(Type: REPORT) Tj
+0 -11 Td
+(Date: 2026-07-08) Tj
+0 -11 Td
+(Period: 2026-01-01..2026-06-30) Tj
+0 -11 Td
+(Version: 1.0) Tj
+0 -11 Td
+(Author: Account Manager) Tj
+0 -11 Td
+(Personal data: no) Tj
+0 -11 Td
+(Summary: Results of the half-year satisfaction survey: response count, score per customer ) Tj
+(and the actions opened after the survey.) Tj
+0 -11 Td
+(---) Tj
+0 -11 Td
+() Tj
+0 -11 Td
+(# Customer Satisfaction Survey, H1 2026) Tj
+0 -11 Td
+() Tj
+0 -11 Td
+(Results of the half-year satisfaction survey: response count, score per customer and the a) Tj
+(ctions opened after the survey.) Tj
+0 -11 Td
+() Tj
+0 -11 Td
+(## Scope reference ó CONT-26: Customer satisfaction measured) Tj
+0 -11 Td
+(Requirement addressed: Customer satisfaction is measured twice a year and the results lead) Tj
+( to recorded actions.) Tj
+0 -11 Td
+() Tj
+0 -11 Td
+(- Survey period: 2026-01-01 to 2026-06-30.) Tj
+0 -11 Td
+(- Response count: Recorded in EV-053 \(Customer Satisfaction Survey, H1 2026\).) Tj
+0 -11 Td
+(- Satisfaction score: Recorded in EV-053 \(Customer Satisfaction Survey, H1 2026\).) Tj
+0 -11 Td
+(- Actions taken: Recorded in EV-053 \(Customer Satisfaction Survey, H1 2026\).) Tj
+0 -11 Td
+() Tj
+0 -11 Td
+() Tj
+ET
+endstream
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000014 00000 n 
+0000000063 00000 n 
+0000000120 00000 n 
+0000000217 00000 n 
+0000000343 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R /ID [<0123456789abcdef0123456789abcdef> <0123456789abcdef0123456789abcdef>] >>
+startxref
+1691
+%%EOF

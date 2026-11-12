@@ -1,25 +1,90 @@
----
-Title: Production Access Procedure
-Type: PROCEDURE
-Date: 2026-04-20
-Version: 1.2
-Author: Platform Lead
-Approved by: Security Officer
-Approval date: 2026-04-24
-Personal data: no
-Summary: Procedure describing how production access is requested, approved and granted, and which roles are kept separate.
----
-
-# Production Access Procedure
-
-Procedure describing how production access is requested, approved and granted, and which roles are kept separate.
-
-## Scope reference ‚Äî CONT-15: Segregation of duties on production access
-Requirement addressed: Requesting, approving and granting production access are performed by different roles.
-
-- Process description: Recorded in EV-027 (Production Access Procedure).
-- Roles separated: Recorded in EV-027 (Production Access Procedure).
-- Review date: 2026-04-20.
-- Approver name: Security Officer.
-
-Signed: Security Officer (2026-04-24)
+%PDF-1.4
+‚„œ”
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [4 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+4 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 5 0 R >>
+endobj
+5 0 obj
+<< /Length 1286 >>
+stream
+BT
+/F1 9 Tf
+54 756 Td
+(---) Tj
+0 -11 Td
+(Title: Production Access Procedure) Tj
+0 -11 Td
+(Type: PROCEDURE) Tj
+0 -11 Td
+(Date: 2026-04-20) Tj
+0 -11 Td
+(Version: 1.2) Tj
+0 -11 Td
+(Author: Platform Lead) Tj
+0 -11 Td
+(Approved by: Security Officer) Tj
+0 -11 Td
+(Approval date: 2026-04-24) Tj
+0 -11 Td
+(Personal data: no) Tj
+0 -11 Td
+(Summary: Procedure describing how production access is requested, approved and granted, an) Tj
+(d which roles are kept separate.) Tj
+0 -11 Td
+(---) Tj
+0 -11 Td
+() Tj
+0 -11 Td
+(# Production Access Procedure) Tj
+0 -11 Td
+() Tj
+0 -11 Td
+(Procedure describing how production access is requested, approved and granted, and which r) Tj
+(oles are kept separate.) Tj
+0 -11 Td
+() Tj
+0 -11 Td
+(## Scope reference ó CONT-15: Segregation of duties on production access) Tj
+0 -11 Td
+(Requirement addressed: Requesting, approving and granting production access are performed ) Tj
+(by different roles.) Tj
+0 -11 Td
+() Tj
+0 -11 Td
+(- Process description: Recorded in EV-027 \(Production Access Procedure\).) Tj
+0 -11 Td
+(- Roles separated: Recorded in EV-027 \(Production Access Procedure\).) Tj
+0 -11 Td
+(- Review date: 2026-04-20.) Tj
+0 -11 Td
+(- Approver name: Security Officer.) Tj
+0 -11 Td
+() Tj
+0 -11 Td
+(Signed: Security Officer \(2026-04-24\)) Tj
+0 -11 Td
+() Tj
+ET
+endstream
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000014 00000 n 
+0000000063 00000 n 
+0000000120 00000 n 
+0000000217 00000 n 
+0000000343 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R /ID [<0123456789abcdef0123456789abcdef> <0123456789abcdef0123456789abcdef>] >>
+startxref
+1681
+%%EOF

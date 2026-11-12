@@ -41,10 +41,11 @@ import type {
 import { QUESTIONS, toFrameworkImport, validateCatalogue } from '../../eval/catalogue.ts';
 import type { CatalogueEvidence } from '../../eval/catalogue/types.ts';
 import { EVIDENCE, findEvidence } from '../../eval/catalogue.ts';
-import { isCsvDocument } from './lib/document.ts';
+import { contentTypeOf, isCsvDocument } from './lib/document.ts';
+import { mimeTypeOf } from '../../src/support/documents/index.ts';
 import { buildReasonerScript } from './lib/script.ts';
 import { machineRuns, withMachineScript } from './extensions.ts';
-import { EVIDENCE_DIR, FRAMEWORK_PATH } from './generate.ts';
+import { EVIDENCE_DIR, FRAMEWORK_PATH, loadTwinManifest } from './generate.ts';
 import { buildFacts, buildReport, type DemoFacts } from './report.ts';
 import {
   exportAndVerifyPack,
@@ -196,7 +197,8 @@ export async function demoServices(
       controls: demoControls(),
       evidences: evidenceIndex,
       script,
-      evidenceMinScore: EVIDENCE_MIN_SCORE
+      evidenceMinScore: EVIDENCE_MIN_SCORE,
+      twins: loadTwinManifest(rootDir)
     },
     vaultRoot
   });
@@ -312,7 +314,7 @@ async function ingestOne(
     services,
     {
       bytes: readFileSync(path),
-      contentType: catalogue && isCsvDocument(catalogue) ? 'text/csv' : 'text/plain',
+      contentType: catalogue ? contentTypeOf(catalogue) : mimeTypeOf(fileName),
       uri: `file://${path}`,
       kind: 'MANUAL',
       fileName,

@@ -8,13 +8,17 @@
 
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { mkdtempSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { EVIDENCE, SEEDED_SITUATIONS, validateCatalogue } from '../../eval/catalogue.ts';
 import {
   checkDemoData,
   planDemoData,
   writeDemoData,
   EVIDENCE_DIR,
-  FRAMEWORK_PATH
+  FRAMEWORK_PATH,
+  TWIN_MANIFEST_PATH
 } from '../../tools/demo/generate.ts';
 import { renderEvidence } from '../../tools/demo/lib/document.ts';
 import { runDemo, writeArtifacts, type DemoResult } from '../../tools/demo/main.ts';
@@ -24,28 +28,35 @@ import { findViolations } from '../../src/domain/vocabulary.ts';
 
 const planned = planDemoData();
 
+/** Scratch root for the generator writes: never the committed `demo/data/`. */
+const scratch = mkdtempSync(join(tmpdir(), 'registre-generate-'));
+
 test('catalogue: the demonstration set validates with no problem', () => {
   assert.deepEqual(validateCatalogue(), []);
 });
 
-test('generator: plans the framework, the readme and the 60 documents', () => {
-  assert.equal(planned.length, EVIDENCE.length + 2);
+test('generator: plans the framework, the readme, the twin manifest and the 60 documents', () => {
+  assert.equal(planned.length, EVIDENCE.length + 3);
   assert.ok(planned.some((file) => file.path.endsWith(FRAMEWORK_PATH)));
+  assert.ok(planned.some((file) => file.path.endsWith(TWIN_MANIFEST_PATH)));
   const evidenceFiles = planned.filter((file) => file.path.includes(`${EVIDENCE_DIR}/`));
   assert.equal(evidenceFiles.length, EVIDENCE.length);
 });
 
 test('generator: writes every document and a second check passes (R1, R2)', () => {
-  writeDemoData();
-  const check = checkDemoData();
+  // Written to a scratch directory: the committed `demo/data/` is read by the
+  // other suites, and the runner executes files concurrently.
+  writeDemoData(scratch);
+  const check = checkDemoData(scratch);
   assert.deepEqual(check.mismatches, []);
   assert.equal(check.ok, true);
 });
 
 test('generator: the written bytes are identical on a second run', () => {
   const before = planned.map((file) => file.sha256);
-  writeDemoData();
-  assert.deepEqual(planDemoData().map((file) => file.sha256), before);
+  writeDemoData(scratch);
+  assert.deepEqual(planDemoData(scratch).map((file) => file.sha256), before);
+  rmSync(scratch, { recursive: true, force: true });
 });
 
 test('renderer: a duplicate renders exactly the bytes of its source (R8)', () => {

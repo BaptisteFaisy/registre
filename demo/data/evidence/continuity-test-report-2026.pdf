@@ -1,24 +1,90 @@
----
-Title: Continuity Test Report 2026
-Type: REPORT
-Date: 2026-09-12
-Version: 1.0
-Author: Operations Lead
-Approved by: Managing Director
-Approval date: 2026-09-16
-Personal data: no
-Summary: Report of the September continuity test on the customer portal. The scenario and the participants are described; the lessons learned section is empty. The test covers failover, not the restore of a backup.
----
-
-# Continuity Test Report 2026
-
-Report of the September continuity test on the customer portal. The scenario and the participants are described; the lessons learned section is empty. The test covers failover, not the restore of a backup.
-
-## Scope reference ‚Äî CONT-20: Continuity exercise run with a customer scenario
-Requirement addressed: A continuity exercise based on a customer scenario is run once a year and its lessons are recorded.
-
-- Exercise date: 2026-09-12.
-- Scenario described: Recorded in EV-041 (Continuity Test Report 2026).
-- Participants: Recorded in EV-041 (Continuity Test Report 2026).
-
-Signed: Managing Director (2026-09-16)
+%PDF-1.4
+‚„œ”
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [4 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+4 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 5 0 R >>
+endobj
+5 0 obj
+<< /Length 1451 >>
+stream
+BT
+/F1 9 Tf
+54 756 Td
+(---) Tj
+0 -11 Td
+(Title: Continuity Test Report 2026) Tj
+0 -11 Td
+(Type: REPORT) Tj
+0 -11 Td
+(Date: 2026-09-12) Tj
+0 -11 Td
+(Version: 1.0) Tj
+0 -11 Td
+(Author: Operations Lead) Tj
+0 -11 Td
+(Approved by: Managing Director) Tj
+0 -11 Td
+(Approval date: 2026-09-16) Tj
+0 -11 Td
+(Personal data: no) Tj
+0 -11 Td
+(Summary: Report of the September continuity test on the customer portal. The scenario and ) Tj
+(the participants are described; the lessons learned section is empty. The test covers fail) Tj
+(over, not the restore of a backup.) Tj
+0 -11 Td
+(---) Tj
+0 -11 Td
+() Tj
+0 -11 Td
+(# Continuity Test Report 2026) Tj
+0 -11 Td
+() Tj
+0 -11 Td
+(Report of the September continuity test on the customer portal. The scenario and the parti) Tj
+(cipants are described; the lessons learned section is empty. The test covers failover, not) Tj
+( the restore of a backup.) Tj
+0 -11 Td
+() Tj
+0 -11 Td
+(## Scope reference ó CONT-20: Continuity exercise run with a customer scenario) Tj
+0 -11 Td
+(Requirement addressed: A continuity exercise based on a customer scenario is run once a ye) Tj
+(ar and its lessons are recorded.) Tj
+0 -11 Td
+() Tj
+0 -11 Td
+(- Exercise date: 2026-09-12.) Tj
+0 -11 Td
+(- Scenario described: Recorded in EV-041 \(Continuity Test Report 2026\).) Tj
+0 -11 Td
+(- Participants: Recorded in EV-041 \(Continuity Test Report 2026\).) Tj
+0 -11 Td
+() Tj
+0 -11 Td
+(Signed: Managing Director \(2026-09-16\)) Tj
+0 -11 Td
+() Tj
+ET
+endstream
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000014 00000 n 
+0000000063 00000 n 
+0000000120 00000 n 
+0000000217 00000 n 
+0000000343 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R /ID [<0123456789abcdef0123456789abcdef> <0123456789abcdef0123456789abcdef>] >>
+startxref
+1846
+%%EOF
