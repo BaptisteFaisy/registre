@@ -287,3 +287,34 @@ budget alert armed, and stop the collectors if no data should be refreshed. The
 portal stays reachable with the five demo accounts so the solution can still be
 judged until 22 January 2027. Do not delete the signing key even when the stacks
 come down: frozen packs handed to judges must stay verifiable (ADR-16).
+
+## 10. Deployed instance (verified 2026-11-11)
+
+Re-verify at any time with a read-only pass — it changes nothing and costs
+nothing: `infra/scripts/inventory.sh` (after `aws login`).
+
+| Item | Value |
+| --- | --- |
+| Account / region | `710332178565` / `eu-central-1` (ENF-DATA-01) |
+| Stacks | `Registre-Vault`, `-Data`, `-Bedrock`, `-Pipeline`, `-Api`, `-Notify`, `-Collectors`, `-Portal`, `-Observability` (+ `CDKToolkit`) — all `CREATE_COMPLETE` / `UPDATE_COMPLETE` |
+| Portal (public URL) | <https://d1sby9k7th0w82.cloudfront.net> |
+| API | <https://p5ajalv02c.execute-api.eu-central-1.amazonaws.com> — `/healthz` answers 200 |
+| Cognito | pool `eu-central-1_elpexf2Ic` (`registre-users`), client `1be7q8l4sirk2pj9lb5q23bej5`; the five demonstration identities are created by `infra/scripts/create-demo-users.sh`, passwords never stored in the repository |
+| Knowledge bases | `ASI1L4FGCM` (`registre-kb-evidence`), `M8MDQICTO7` (`registre-kb-frameworks`) — `MANAGED` type, managed embedding, so no OpenSearch Serverless cluster bills while idle |
+| Data Automation | project `registre-reader` (`745a9aad9e7a`), `LIVE`, asynchronous |
+| Guardrail | `qs59z6uqhmpw` (`registre-guardrail`) |
+| Vault | `registre-vault-710332178565` — **empty**: no corpus ingested yet, so no Data Automation or model call has been billed |
+| Budget | `registre-monthly`, 80 USD per month, actual spend 0.00 USD |
+
+**What bills while nothing runs.** No EC2, no NAT gateway, no OpenSearch
+Serverless, no provisioned concurrency: the only fixed line is the two
+customer-managed KMS keys (vault encryption and pack signing, ~1 USD each per
+month) plus CloudFront/API Gateway/Lambda usage, which is free-tier sized for a
+judged demo. Everything else is per use: a document read by Data Automation, a
+model call, an e-mail.
+
+**Known gap.** The SES identity is the placeholder domain `example.com`
+(`VerifiedForSendingStatus: None`), so reminder e-mails cannot actually leave the
+account until a real verified identity and, in sandbox, verified recipients are
+added. Notifications are therefore exercised through the in-memory notifier, and
+this is stated as such wherever the demo shows a reminder.
