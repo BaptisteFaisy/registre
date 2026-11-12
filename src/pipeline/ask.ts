@@ -124,8 +124,13 @@ async function supportedControls(services: Services, evidenceId: EvidenceId): Pr
 
 /** Composes, checks the anchoring, then masks — spec 13.4, ENF-CONF-02. */
 async function answerFrom(services: Services, question: string, passages: Passage[]): Promise<Answer> {
+  const meteredBefore = services.costs.report().count;
   const draft = await services.composer.compose({ question, passages });
-  if (draft.cost !== undefined) services.costs.record(draft.cost);
+  // Metered once: the composer records its own call when it holds the meter
+  // (ENF-COUT-01); a composer without a meter is recorded here instead.
+  if (draft.cost !== undefined && services.costs.report().count === meteredBefore) {
+    services.costs.record(draft.cost);
+  }
   const anchoring = await services.guardrail.verifyAnchoring({ answer: draft.text, passages });
   const verified = verifiedCitations(draft.citations, passages);
   if (!anchoring.anchored || verified.length === 0) {
