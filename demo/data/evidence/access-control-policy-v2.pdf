@@ -1,33 +1,107 @@
----
-Title: Access Control Policy
-Type: POLICY
-Date: 2026-03-18
-Version: 2.1
-Author: Security Officer
-Approved by: Managing Director
-Approval date: 2026-03-25
-Personal data: no
-Summary: Policy for account creation, privileged access, quarterly review and screening before access is granted.
----
-
-# Access Control Policy
-
-Policy for account creation, privileged access, quarterly review and screening before access is granted.
-
-## Scope reference ‚Äî CONT-21: Privileged access reviewed quarterly
-Requirement addressed: Privileged accounts are reviewed every quarter and unnecessary access is removed.
-
-- Review date: 2026-03-18.
-- Accounts reviewed: Recorded in EV-047 (Access Control Policy).
-- Removals made: Recorded in EV-047 (Access Control Policy).
-- Reviewer name: Recorded in EV-047 (Access Control Policy).
-
-## Scope reference ‚Äî CONT-25: Personnel screened before privileged access
-Requirement addressed: Personnel granted privileged access are screened before the access is granted.
-
-- Screening type: Recorded in EV-047 (Access Control Policy).
-- Role covered: Recorded in EV-047 (Access Control Policy).
-- Completion date: 2026-03-18.
-- Record owner: Recorded in EV-047 (Access Control Policy).
-
-Signed: Managing Director (2026-03-25)
+%PDF-1.4
+‚„œ”
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [4 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+4 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 5 0 R >>
+endobj
+5 0 obj
+<< /Length 1774 >>
+stream
+BT
+/F1 9 Tf
+54 756 Td
+(---) Tj
+0 -11 Td
+(Title: Access Control Policy) Tj
+0 -11 Td
+(Type: POLICY) Tj
+0 -11 Td
+(Date: 2026-03-18) Tj
+0 -11 Td
+(Version: 2.1) Tj
+0 -11 Td
+(Author: Security Officer) Tj
+0 -11 Td
+(Approved by: Managing Director) Tj
+0 -11 Td
+(Approval date: 2026-03-25) Tj
+0 -11 Td
+(Personal data: no) Tj
+0 -11 Td
+(Summary: Policy for account creation, privileged access, quarterly review and screening be) Tj
+(fore access is granted.) Tj
+0 -11 Td
+(---) Tj
+0 -11 Td
+() Tj
+0 -11 Td
+(# Access Control Policy) Tj
+0 -11 Td
+() Tj
+0 -11 Td
+(Policy for account creation, privileged access, quarterly review and screening before acce) Tj
+(ss is granted.) Tj
+0 -11 Td
+() Tj
+0 -11 Td
+(## Scope reference ó CONT-21: Privileged access reviewed quarterly) Tj
+0 -11 Td
+(Requirement addressed: Privileged accounts are reviewed every quarter and unnecessary acce) Tj
+(ss is removed.) Tj
+0 -11 Td
+() Tj
+0 -11 Td
+(- Review date: 2026-03-18.) Tj
+0 -11 Td
+(- Accounts reviewed: Recorded in EV-047 \(Access Control Policy\).) Tj
+0 -11 Td
+(- Removals made: Recorded in EV-047 \(Access Control Policy\).) Tj
+0 -11 Td
+(- Reviewer name: Recorded in EV-047 \(Access Control Policy\).) Tj
+0 -11 Td
+() Tj
+0 -11 Td
+(## Scope reference ó CONT-25: Personnel screened before privileged access) Tj
+0 -11 Td
+(Requirement addressed: Personnel granted privileged access are screened before the access ) Tj
+(is granted.) Tj
+0 -11 Td
+() Tj
+0 -11 Td
+(- Screening type: Recorded in EV-047 \(Access Control Policy\).) Tj
+0 -11 Td
+(- Role covered: Recorded in EV-047 \(Access Control Policy\).) Tj
+0 -11 Td
+(- Completion date: 2026-03-18.) Tj
+0 -11 Td
+(- Record owner: Recorded in EV-047 \(Access Control Policy\).) Tj
+0 -11 Td
+() Tj
+0 -11 Td
+(Signed: Managing Director \(2026-03-25\)) Tj
+0 -11 Td
+() Tj
+ET
+endstream
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000014 00000 n 
+0000000063 00000 n 
+0000000120 00000 n 
+0000000217 00000 n 
+0000000343 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R /ID [<0123456789abcdef0123456789abcdef> <0123456789abcdef0123456789abcdef>] >>
+startxref
+2169
+%%EOF

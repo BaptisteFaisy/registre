@@ -1,29 +1,101 @@
----
-Title: Change Management Procedure
-Type: PROCEDURE
-Date: 2026-04-14
-Version: 2.0
-Author: Change Manager
-Personal data: no
-Summary: Procedure describing how changes are raised, approved, implemented and reviewed. It also states which roles may request and approve production access. The document carries no signature block.
----
-
-# Change Management Procedure
-
-Procedure describing how changes are raised, approved, implemented and reviewed. It also states which roles may request and approve production access. The document carries no signature block.
-
-## Scope reference ‚Äî CONT-11: Changes approved before implementation
-Requirement addressed: Every production change is approved by a named approver before it is implemented.
-
-- Change reference: Recorded in EV-007 (Change Management Procedure).
-- Approval date: 2026-04-14.
-- Implementation date: 2026-04-14.
-
-## Scope reference ‚Äî CONT-15: Segregation of duties on production access
-Requirement addressed: Requesting, approving and granting production access are performed by different roles.
-
-- Process description: Recorded in EV-007 (Change Management Procedure).
-- Roles separated: Recorded in EV-007 (Change Management Procedure).
-- Review date: 2026-04-14.
-- Approver name: verified in meeting record.
-
+%PDF-1.4
+‚„œ”
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [4 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+4 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 5 0 R >>
+endobj
+5 0 obj
+<< /Length 1743 >>
+stream
+BT
+/F1 9 Tf
+54 756 Td
+(---) Tj
+0 -11 Td
+(Title: Change Management Procedure) Tj
+0 -11 Td
+(Type: PROCEDURE) Tj
+0 -11 Td
+(Date: 2026-04-14) Tj
+0 -11 Td
+(Version: 2.0) Tj
+0 -11 Td
+(Author: Change Manager) Tj
+0 -11 Td
+(Personal data: no) Tj
+0 -11 Td
+(Summary: Procedure describing how changes are raised, approved, implemented and reviewed. ) Tj
+(It also states which roles may request and approve production access. The document carries) Tj
+( no signature block.) Tj
+0 -11 Td
+(---) Tj
+0 -11 Td
+() Tj
+0 -11 Td
+(# Change Management Procedure) Tj
+0 -11 Td
+() Tj
+0 -11 Td
+(Procedure describing how changes are raised, approved, implemented and reviewed. It also s) Tj
+(tates which roles may request and approve production access. The document carries no signa) Tj
+(ture block.) Tj
+0 -11 Td
+() Tj
+0 -11 Td
+(## Scope reference ó CONT-11: Changes approved before implementation) Tj
+0 -11 Td
+(Requirement addressed: Every production change is approved by a named approver before it i) Tj
+(s implemented.) Tj
+0 -11 Td
+() Tj
+0 -11 Td
+(- Change reference: Recorded in EV-007 \(Change Management Procedure\).) Tj
+0 -11 Td
+(- Approval date: 2026-04-14.) Tj
+0 -11 Td
+(- Implementation date: 2026-04-14.) Tj
+0 -11 Td
+() Tj
+0 -11 Td
+(## Scope reference ó CONT-15: Segregation of duties on production access) Tj
+0 -11 Td
+(Requirement addressed: Requesting, approving and granting production access are performed ) Tj
+(by different roles.) Tj
+0 -11 Td
+() Tj
+0 -11 Td
+(- Process description: Recorded in EV-007 \(Change Management Procedure\).) Tj
+0 -11 Td
+(- Roles separated: Recorded in EV-007 \(Change Management Procedure\).) Tj
+0 -11 Td
+(- Review date: 2026-04-14.) Tj
+0 -11 Td
+(- Approver name: verified in meeting record.) Tj
+0 -11 Td
+() Tj
+0 -11 Td
+() Tj
+ET
+endstream
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000014 00000 n 
+0000000063 00000 n 
+0000000120 00000 n 
+0000000217 00000 n 
+0000000343 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R /ID [<0123456789abcdef0123456789abcdef> <0123456789abcdef0123456789abcdef>] >>
+startxref
+2138
+%%EOF

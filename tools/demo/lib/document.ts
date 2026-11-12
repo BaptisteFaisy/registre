@@ -1,18 +1,24 @@
 /**
- * Deterministic renderer from a `CatalogueEvidence` entry to text or CSV.
+ * Deterministic renderer from a `CatalogueEvidence` entry to its real document.
  *
- * Notice on formats: catalogue filenames keep their target extension (`.pdf`,
- * `.docx`, `.xlsx`, `.png`), but the offline demo stores a structured UTF-8
- * rendering so the reader needs no binary parser.
+ * The corpus carries genuine binaries: a PDF with extractable text, real DOCX
+ * and XLSX (OOXML in a ZIP), a real PNG for the three screenshots, and CSV for
+ * the exports. All of them carry the same structured text, so the offline
+ * extractor and Bedrock Data Automation read the same Annex B fields.
  */
 
 import { findControl, findEvidence } from '../../../eval/catalogue.ts';
 import type { CatalogueControl, CatalogueEvidence } from '../../../eval/catalogue/types.ts';
+import { csvRows } from '../../../src/ai/mock/scriptedReader.ts';
+import { docxFromText, mimeTypeOf, pdfFromText, pngFromLines, xlsxFromRows } from '../../../src/support/documents/index.ts';
 
 const SAMPLE_PII_LINES = [
   'Point of contact: Claire Martin (claire.martin@northwind-msp.example, +33 6 12 34 56 78)',
   'Payroll / HR ref: employee 2840107512345 42 — FR76 3000 6000 0112 3456 7890 189'
 ];
+
+/** Pixel scale of the generated screenshots: 2 keeps 5x7 glyphs readable on screen. */
+const PNG_SCALE = 2;
 
 export function renderEvidenceText(evidence: CatalogueEvidence): string {
   const source = resolveSource(evidence);
@@ -21,6 +27,61 @@ export function renderEvidenceText(evidence: CatalogueEvidence): string {
 }
 
 export const renderEvidence = renderEvidenceText;
+
+/**
+ * Bytes of the demonstration document, in the format its file name promises
+ * (`.pdf`, `.docx`, `.xlsx`, `.png`, anything else as UTF-8 CSV/text).
+ */
+export function renderEvidenceBytes(evidence: CatalogueEvidence): Uint8Array {
+  const text = renderEvidenceText(evidence);
+  switch (extensionOf(evidence.fileName)) {
+    case 'pdf':
+      return pdfFromText(text);
+    case 'docx':
+      return docxFromText(text);
+    case 'xlsx':
+      // A spreadsheet export becomes a real workbook of the same rows; a
+      // workbook holding prose keeps one line per row, blank lines included.
+      return xlsxFromRows(isSpreadsheetExport(evidence) ? csvRowsOf(text) : proseRowsOf(text));
+    case 'png':
+      // A screenshot becomes a real image of the same text; the offline reader
+      // uses the manifest twin instead of doing OCR. Scale 2 keeps the glyphs
+      // legible when the image is shown full screen in the demonstration video.
+      return pngFromLines(text.replace(/\n$/, '').split('\n'), PNG_SCALE);
+    default:
+      return new TextEncoder().encode(text);
+  }
+}
+
+/** True for the three screenshots, which need an offline text twin. */
+export function needsTextTwin(evidence: CatalogueEvidence): boolean {
+  return extensionOf(evidence.fileName) === 'png';
+}
+
+/**
+ * Content type the offline reader must parse: a spreadsheet export is read as
+ * rows, everything else as the `Key: value` header format. A workbook holding
+ * prose is announced as plain text, because that is what its cells contain.
+ */
+export function contentTypeOf(evidence: CatalogueEvidence): string {
+  if (isSpreadsheetExport(evidence)) return mimeTypeOf(evidence.fileName);
+  return extensionOf(evidence.fileName) === 'xlsx' ? 'text/plain' : mimeTypeOf(evidence.fileName);
+}
+
+/** Rows of a CSV rendering; the trailing newline is kept as an empty row. */
+function csvRowsOf(text: string): string[][] {
+  const rows = csvRows(text);
+  return text.endsWith('\n') ? [...rows, []] : rows;
+}
+
+/** Rows of a prose rendering: one column, one line per row, blank lines kept. */
+function proseRowsOf(text: string): string[][] {
+  return text.split('\n').map((line) => [line]);
+}
+
+function extensionOf(fileName: string): string {
+  return fileName.includes('.') ? (fileName.split('.').pop() ?? '').toLowerCase() : '';
+}
 
 function resolveSource(evidence: CatalogueEvidence): CatalogueEvidence {
   if (!evidence.duplicateOf) return evidence;

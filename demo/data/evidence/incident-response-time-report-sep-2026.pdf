@@ -1,22 +1,85 @@
----
-Title: Incident Response Time Report, September 2026
-Type: REPORT
-Date: 2026-10-03
-Period: 2026-09-01..2026-09-30
-Version: 1.0
-Author: Service Desk Manager
-Personal data: no
-Summary: Monthly report of measured first-response times per severity, with the number of breaches. The committed targets are not reproduced in the report.
----
-
-# Incident Response Time Report, September 2026
-
-Monthly report of measured first-response times per severity, with the number of breaches. The committed targets are not reproduced in the report.
-
-## Scope reference ‚Äî CONT-08: Incident response times measured against targets
-Requirement addressed: Response times are measured monthly against the committed targets and breaches are counted.
-
-- Reporting period: 2026-09-01 to 2026-09-30.
-- Measured response time: Recorded in EV-017 (Incident Response Time Report, September 2026).
-- Breach count: Recorded in EV-017 (Incident Response Time Report, September 2026).
-
+%PDF-1.4
+‚„œ”
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [4 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+4 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 5 0 R >>
+endobj
+5 0 obj
+<< /Length 1322 >>
+stream
+BT
+/F1 9 Tf
+54 756 Td
+(---) Tj
+0 -11 Td
+(Title: Incident Response Time Report, September 2026) Tj
+0 -11 Td
+(Type: REPORT) Tj
+0 -11 Td
+(Date: 2026-10-03) Tj
+0 -11 Td
+(Period: 2026-09-01..2026-09-30) Tj
+0 -11 Td
+(Version: 1.0) Tj
+0 -11 Td
+(Author: Service Desk Manager) Tj
+0 -11 Td
+(Personal data: no) Tj
+0 -11 Td
+(Summary: Monthly report of measured first-response times per severity, with the number of ) Tj
+(breaches. The committed targets are not reproduced in the report.) Tj
+0 -11 Td
+(---) Tj
+0 -11 Td
+() Tj
+0 -11 Td
+(# Incident Response Time Report, September 2026) Tj
+0 -11 Td
+() Tj
+0 -11 Td
+(Monthly report of measured first-response times per severity, with the number of breaches.) Tj
+( The committed targets are not reproduced in the report.) Tj
+0 -11 Td
+() Tj
+0 -11 Td
+(## Scope reference ó CONT-08: Incident response times measured against targets) Tj
+0 -11 Td
+(Requirement addressed: Response times are measured monthly against the committed targets a) Tj
+(nd breaches are counted.) Tj
+0 -11 Td
+() Tj
+0 -11 Td
+(- Reporting period: 2026-09-01 to 2026-09-30.) Tj
+0 -11 Td
+(- Measured response time: Recorded in EV-017 \(Incident Response Time Report, September 202) Tj
+(6\).) Tj
+0 -11 Td
+(- Breach count: Recorded in EV-017 \(Incident Response Time Report, September 2026\).) Tj
+0 -11 Td
+() Tj
+0 -11 Td
+() Tj
+ET
+endstream
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000014 00000 n 
+0000000063 00000 n 
+0000000120 00000 n 
+0000000217 00000 n 
+0000000343 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R /ID [<0123456789abcdef0123456789abcdef> <0123456789abcdef0123456789abcdef>] >>
+startxref
+1717
+%%EOF

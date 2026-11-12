@@ -3,12 +3,13 @@ import { join } from 'node:path';
 import { EVIDENCE, findControl } from '../../../eval/catalogue.ts';
 import { splitHeader } from '../../../src/ai/mock/scriptedReader.ts';
 import { bestSentence } from '../../../src/ai/textMatch.ts';
+import { extractText } from '../../../src/support/documents/index.ts';
 import type { ReasonerScript } from '../../../src/ai/mock/scriptedReasoner.ts';
 import type { ProposedAttachment } from '../../../src/ports/index.ts';
 import type { SufficiencyElement } from '../../../src/domain/types.ts';
 import { evidenceId } from '../../../src/support/ids.ts';
 import { sha256Bytes } from '../../../src/support/hash.ts';
-import { EVIDENCE_DIR } from '../generate.ts';
+import { EVIDENCE_DIR, loadTwinManifest } from '../generate.ts';
 
 /** Confidence above the default 0.85 threshold: the attachment is applied. */
 export const SCRIPTED_CONFIDENCE = 0.93;
@@ -34,10 +35,11 @@ export function searchableText(raw: string, csv: boolean): string {
 export function buildReasonerScript(rootDir: string, isCsv: (fileName: string) => boolean): ReasonerScript {
   const attachments = new Map<string, readonly ProposedAttachment[]>();
   const sufficiency = new Map<string, readonly SufficiencyElement[]>();
+  const twins = loadTwinManifest(rootDir);
 
   for (const [index, item] of EVIDENCE.entries()) {
     const bytes = readFileSync(join(rootDir, EVIDENCE_DIR, item.fileName));
-    const raw = new TextDecoder().decode(bytes);
+    const raw = extractText(bytes, { fileName: item.fileName, twins });
     const text = searchableText(raw, isCsv(item.fileName));
     const id = demoEvidenceId(bytes);
 

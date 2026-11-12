@@ -1,23 +1,86 @@
----
-Title: Emergency Change Report, Q1 2026
-Type: REPORT
-Date: 2026-04-08
-Period: 2026-01-01..2026-03-31
-Version: 1.0
-Author: Change Manager
-Personal data: no
-Summary: Quarterly report of emergency changes with their justification and the date of the post-implementation review.
----
-
-# Emergency Change Report, Q1 2026
-
-Quarterly report of emergency changes with their justification and the date of the post-implementation review.
-
-## Scope reference ‚Äî CONT-12: Emergency changes reviewed afterwards
-Requirement addressed: Emergency changes are justified when raised and reviewed by a second person after implementation.
-
-- Emergency change reference: Recorded in EV-030 (Emergency Change Report, Q1 2026).
-- Justification: Recorded in EV-030 (Emergency Change Report, Q1 2026).
-- Post-implementation review date: 2026-04-08.
-- Reviewer name: Recorded in EV-030 (Emergency Change Report, Q1 2026).
-
+%PDF-1.4
+‚„œ”
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [4 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+4 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 5 0 R >>
+endobj
+5 0 obj
+<< /Length 1275 >>
+stream
+BT
+/F1 9 Tf
+54 756 Td
+(---) Tj
+0 -11 Td
+(Title: Emergency Change Report, Q1 2026) Tj
+0 -11 Td
+(Type: REPORT) Tj
+0 -11 Td
+(Date: 2026-04-08) Tj
+0 -11 Td
+(Period: 2026-01-01..2026-03-31) Tj
+0 -11 Td
+(Version: 1.0) Tj
+0 -11 Td
+(Author: Change Manager) Tj
+0 -11 Td
+(Personal data: no) Tj
+0 -11 Td
+(Summary: Quarterly report of emergency changes with their justification and the date of th) Tj
+(e post-implementation review.) Tj
+0 -11 Td
+(---) Tj
+0 -11 Td
+() Tj
+0 -11 Td
+(# Emergency Change Report, Q1 2026) Tj
+0 -11 Td
+() Tj
+0 -11 Td
+(Quarterly report of emergency changes with their justification and the date of the post-im) Tj
+(plementation review.) Tj
+0 -11 Td
+() Tj
+0 -11 Td
+(## Scope reference ó CONT-12: Emergency changes reviewed afterwards) Tj
+0 -11 Td
+(Requirement addressed: Emergency changes are justified when raised and reviewed by a secon) Tj
+(d person after implementation.) Tj
+0 -11 Td
+() Tj
+0 -11 Td
+(- Emergency change reference: Recorded in EV-030 \(Emergency Change Report, Q1 2026\).) Tj
+0 -11 Td
+(- Justification: Recorded in EV-030 \(Emergency Change Report, Q1 2026\).) Tj
+0 -11 Td
+(- Post-implementation review date: 2026-04-08.) Tj
+0 -11 Td
+(- Reviewer name: Recorded in EV-030 \(Emergency Change Report, Q1 2026\).) Tj
+0 -11 Td
+() Tj
+0 -11 Td
+() Tj
+ET
+endstream
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000014 00000 n 
+0000000063 00000 n 
+0000000120 00000 n 
+0000000217 00000 n 
+0000000343 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R /ID [<0123456789abcdef0123456789abcdef> <0123456789abcdef0123456789abcdef>] >>
+startxref
+1670
+%%EOF

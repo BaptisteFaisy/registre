@@ -38,6 +38,7 @@
 import type { CostMeter, EvidenceReader, ReadInput, ReadResult } from '../../ports/index.ts';
 import type { EvidenceFields, EvidencePeriod } from '../../domain/types.ts';
 import { unreadable } from '../../support/errors.ts';
+import { extractText, fileNameFromUri } from '../../support/documents/index.ts';
 import { readFileSync } from 'node:fs';
 import { buildPeriod, buildReadFlags, inferAccessLevel, joinPages, normaliseEvidenceType, safeDate, splitPages, summarise } from '../reading.ts';
 import { readingCost, recordCost } from '../bedrock/costs.ts';
@@ -173,6 +174,11 @@ export interface ScriptedReaderOptions {
   contentType?: string;
   /** Shared meter; the reading cost is recorded there (ENF-COUT-01). */
   meter?: CostMeter;
+  /**
+   * Offline text twins of the screenshots, keyed by file name. The scripted
+   * reader does no OCR: a screenshot without a twin is reported unreadable.
+   */
+  twins?: ReadonlyMap<string, string> | null;
 }
 
 /**
@@ -204,12 +210,21 @@ export class ScriptedReader implements EvidenceReader {
     return { fields, flags, textPages, accessLevel, cost };
   }
 
-  /** Reads the raw text from bytes or from a local file URI. */
+  /** Reads the document text, whatever its real format (PDF, DOCX, XLSX, PNG). */
   private loadText(input: ReadInput): string {
-    if (input.bytes) return new TextDecoder().decode(input.bytes);
+    const bytes = input.bytes ?? this.readBytes(input);
+    return extractText(bytes, {
+      fileName: fileNameFromUri(input.uri),
+      contentType: this.options.contentType ?? input.contentType,
+      twins: this.options.twins ?? null
+    });
+  }
+
+  /** Raw bytes of a local file, or an unreadable error naming the document. */
+  private readBytes(input: ReadInput): Uint8Array {
     const path = input.uri.replace(/^file:\/\//, '');
     try {
-      return readFileSync(path, 'utf8');
+      return readFileSync(path);
     } catch (error) {
       throw unreadable(`scripted reader cannot open ${input.uri}: ${(error as Error).message}`, {
         evidenceId: input.evidenceId

@@ -1,25 +1,90 @@
----
-Title: Information Security Policy
-Type: POLICY
-Date: 2025-05-12
-Version: 4.0
-Author: Quality Lead
-Approved by: Chief Executive Officer
-Approval date: 2025-05-20
-Personal data: no
-Summary: Information security policy of the fictional managed service provider. The document sets principles for access, data handling and incident reporting.
----
-
-# Information Security Policy
-
-Information security policy of the fictional managed service provider. The document sets principles for access, data handling and incident reporting.
-
-## Scope reference ‚Äî CONT-01: Information security policy reviewed annually
-Requirement addressed: The information security policy is reviewed, updated where needed and approved at least once a year.
-
-- Policy title: Recorded in EV-001 (Information Security Policy).
-- Review date: 2025-05-12.
-- Approver name: Chief Executive Officer.
-- Version: 4.0.
-
-Signed: Chief Executive Officer (2025-05-20)
+%PDF-1.4
+‚„œ”
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [4 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+4 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 5 0 R >>
+endobj
+5 0 obj
+<< /Length 1330 >>
+stream
+BT
+/F1 9 Tf
+54 756 Td
+(---) Tj
+0 -11 Td
+(Title: Information Security Policy) Tj
+0 -11 Td
+(Type: POLICY) Tj
+0 -11 Td
+(Date: 2025-05-12) Tj
+0 -11 Td
+(Version: 4.0) Tj
+0 -11 Td
+(Author: Quality Lead) Tj
+0 -11 Td
+(Approved by: Chief Executive Officer) Tj
+0 -11 Td
+(Approval date: 2025-05-20) Tj
+0 -11 Td
+(Personal data: no) Tj
+0 -11 Td
+(Summary: Information security policy of the fictional managed service provider. The docume) Tj
+(nt sets principles for access, data handling and incident reporting.) Tj
+0 -11 Td
+(---) Tj
+0 -11 Td
+() Tj
+0 -11 Td
+(# Information Security Policy) Tj
+0 -11 Td
+() Tj
+0 -11 Td
+(Information security policy of the fictional managed service provider. The document sets p) Tj
+(rinciples for access, data handling and incident reporting.) Tj
+0 -11 Td
+() Tj
+0 -11 Td
+(## Scope reference ó CONT-01: Information security policy reviewed annually) Tj
+0 -11 Td
+(Requirement addressed: The information security policy is reviewed, updated where needed a) Tj
+(nd approved at least once a year.) Tj
+0 -11 Td
+() Tj
+0 -11 Td
+(- Policy title: Recorded in EV-001 \(Information Security Policy\).) Tj
+0 -11 Td
+(- Review date: 2025-05-12.) Tj
+0 -11 Td
+(- Approver name: Chief Executive Officer.) Tj
+0 -11 Td
+(- Version: 4.0.) Tj
+0 -11 Td
+() Tj
+0 -11 Td
+(Signed: Chief Executive Officer \(2025-05-20\)) Tj
+0 -11 Td
+() Tj
+ET
+endstream
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000014 00000 n 
+0000000063 00000 n 
+0000000120 00000 n 
+0000000217 00000 n 
+0000000343 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R /ID [<0123456789abcdef0123456789abcdef> <0123456789abcdef0123456789abcdef>] >>
+startxref
+1725
+%%EOF

@@ -1,25 +1,90 @@
----
-Title: Encryption Attestation 2026
-Type: ATTESTATION
-Date: 2026-06-30
-Version: 1.0
-Author: Platform Lead
-Approved by: Security Officer
-Approval date: 2026-07-03
-Personal data: no
-Summary: Attestation describing encryption at rest and in transit for the managed services, the key management choice and the services covered.
----
-
-# Encryption Attestation 2026
-
-Attestation describing encryption at rest and in transit for the managed services, the key management choice and the services covered.
-
-## Scope reference ‚Äî CONT-24: Data encrypted at rest and in transit
-Requirement addressed: Data at rest and in transit is encrypted with managed keys, and the control is described and approved.
-
-- Control description: Recorded in EV-046 (Encryption Attestation 2026).
-- Services covered: Recorded in EV-046 (Encryption Attestation 2026).
-- Key management detail: Recorded in EV-046 (Encryption Attestation 2026).
-- Approver name: Security Officer.
-
-Signed: Security Officer (2026-07-03)
+%PDF-1.4
+‚„œ”
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [4 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+4 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 5 0 R >>
+endobj
+5 0 obj
+<< /Length 1392 >>
+stream
+BT
+/F1 9 Tf
+54 756 Td
+(---) Tj
+0 -11 Td
+(Title: Encryption Attestation 2026) Tj
+0 -11 Td
+(Type: ATTESTATION) Tj
+0 -11 Td
+(Date: 2026-06-30) Tj
+0 -11 Td
+(Version: 1.0) Tj
+0 -11 Td
+(Author: Platform Lead) Tj
+0 -11 Td
+(Approved by: Security Officer) Tj
+0 -11 Td
+(Approval date: 2026-07-03) Tj
+0 -11 Td
+(Personal data: no) Tj
+0 -11 Td
+(Summary: Attestation describing encryption at rest and in transit for the managed services) Tj
+(, the key management choice and the services covered.) Tj
+0 -11 Td
+(---) Tj
+0 -11 Td
+() Tj
+0 -11 Td
+(# Encryption Attestation 2026) Tj
+0 -11 Td
+() Tj
+0 -11 Td
+(Attestation describing encryption at rest and in transit for the managed services, the key) Tj
+( management choice and the services covered.) Tj
+0 -11 Td
+() Tj
+0 -11 Td
+(## Scope reference ó CONT-24: Data encrypted at rest and in transit) Tj
+0 -11 Td
+(Requirement addressed: Data at rest and in transit is encrypted with managed keys, and the) Tj
+( control is described and approved.) Tj
+0 -11 Td
+() Tj
+0 -11 Td
+(- Control description: Recorded in EV-046 \(Encryption Attestation 2026\).) Tj
+0 -11 Td
+(- Services covered: Recorded in EV-046 \(Encryption Attestation 2026\).) Tj
+0 -11 Td
+(- Key management detail: Recorded in EV-046 \(Encryption Attestation 2026\).) Tj
+0 -11 Td
+(- Approver name: Security Officer.) Tj
+0 -11 Td
+() Tj
+0 -11 Td
+(Signed: Security Officer \(2026-07-03\)) Tj
+0 -11 Td
+() Tj
+ET
+endstream
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000014 00000 n 
+0000000063 00000 n 
+0000000120 00000 n 
+0000000217 00000 n 
+0000000343 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R /ID [<0123456789abcdef0123456789abcdef> <0123456789abcdef0123456789abcdef>] >>
+startxref
+1787
+%%EOF
