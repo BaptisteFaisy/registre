@@ -65,13 +65,22 @@ export async function requestHandler(timeoutMs = DEFAULT_REQUEST_TIMEOUT_MS): Pr
   return new NodeHttpHandler({ requestTimeout: timeoutMs, connectionTimeout: 5_000 });
 }
 
+/** Attempts of one model call: throttling on a new account needs more than the default. */
+export const RUNTIME_MAX_ATTEMPTS = 8;
+
 /** Lazily loads the runtime client (Converse, Guardrails, async invoke). */
 export async function createRuntimeClient(
   settings: Settings,
   options: ClientOptions = {}
 ): Promise<BedrockRuntimeClient> {
   const { BedrockRuntimeClient } = await import('@aws-sdk/client-bedrock-runtime');
-  return new BedrockRuntimeClient({ ...clientConfig(settings, options), requestHandler: await requestHandler() });
+  return new BedrockRuntimeClient({
+    ...clientConfig(settings, { maxAttempts: RUNTIME_MAX_ATTEMPTS, ...options }),
+    // Adaptive: a throttled call slows the client down instead of failing the
+    // step (a new account's Converse quota was hit on the real run).
+    retryMode: 'adaptive',
+    requestHandler: await requestHandler()
+  });
 }
 
 /** Lazily loads the Data Automation runtime client (document reading). */

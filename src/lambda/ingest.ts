@@ -88,6 +88,10 @@ export async function fromVaultObject(services: Services, raw: Record<string, un
   const existing = await services.state.findEvidenceByHash(sha256);
   const fileName = fileNameOf(objectKey);
   const evidenceId = existing?.id ?? makeEvidenceId(sha256);
+  // `reprocess: true` (operator replay of an execution that failed mid-chain)
+  // reads and attaches the stored evidence again instead of skipping it as a
+  // duplicate; every later step writes by deterministic ids, so nothing doubles.
+  const duplicate = existing !== null && raw.reprocess !== true;
   const payload: PipelinePayload = {
     uri,
     storedUri: uri,
@@ -98,9 +102,9 @@ export async function fromVaultObject(services: Services, raw: Record<string, un
     suggestedControlId: null,
     sha256,
     evidenceId,
-    duplicate: existing !== null
+    duplicate
   };
-  return { output: { evidenceId, sha256, duplicate: existing !== null }, payload: chainPayload(payload) };
+  return { output: { evidenceId, sha256, duplicate }, payload: chainPayload(payload) };
 }
 
 export const handler = defineHandler(async (raw) => {
