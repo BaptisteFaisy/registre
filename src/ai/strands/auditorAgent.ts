@@ -21,6 +21,7 @@ import { upstream } from '../../support/errors.ts';
 import { parseDraftAnswer } from '../schemas.ts';
 import { recordCost, tokenCost } from '../bedrock/costs.ts';
 import { createComposer } from '../bedrock/composer.ts';
+import { RUNTIME_MAX_ATTEMPTS } from '../bedrock/client.ts';
 import { checkQuote, evidenceCards, readEvidence, searchPassages } from './tools.ts';
 import { QUOTE_IN_TEXT_RULE } from '../prompts/answer.ts';
 
@@ -128,7 +129,10 @@ export async function runStrandsAgent(input: AgentRunInput): Promise<AgentRun> {
     region: input.region,
     modelId: input.modelId,
     maxTokens: input.maxTokens,
-    temperature: 0
+    temperature: 0,
+    // Same policy as the other model calls: a new account allows 10 Claude
+    // requests a minute, and one answer takes several agent turns.
+    clientConfig: { maxAttempts: RUNTIME_MAX_ATTEMPTS, retryMode: 'adaptive' }
   });
   const schema = z.object({
     text: z.string(),
