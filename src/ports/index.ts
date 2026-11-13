@@ -168,7 +168,8 @@ export interface RedactionResult {
 /** Bedrock Guardrails: PII redaction + grounding check (ENF-CONF-02, ENF-IA-02). */
 export interface Guardrail {
   readonly id: string;
-  verifyAnchoring(input: { answer: string; passages: Passage[] }): Promise<AnchoringResult>;
+  /** `question` is the user query the contextual-grounding check scores relevance against. */
+  verifyAnchoring(input: { answer: string; passages: Passage[]; question?: string }): Promise<AnchoringResult>;
   redact(text: string): Promise<RedactionResult>;
 }
 

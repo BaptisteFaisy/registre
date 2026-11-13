@@ -131,7 +131,7 @@ async function answerFrom(services: Services, question: string, passages: Passag
   if (draft.cost !== undefined && services.costs.report().count === meteredBefore) {
     services.costs.record(draft.cost);
   }
-  const anchoring = await services.guardrail.verifyAnchoring({ answer: draft.text, passages });
+  const anchoring = await services.guardrail.verifyAnchoring({ answer: draft.text, passages, question });
   const verified = verifiedCitations(draft.citations, passages);
   if (!anchoring.anchored || verified.length === 0) {
     return withCost(noEvidence(question, passages.length), draft.cost);
