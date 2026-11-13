@@ -14,7 +14,8 @@
 import type { S3Client } from '@aws-sdk/client-s3';
 import type { CostMeter, ReadInput, ReadResult } from '../../ports/index.ts';
 import { upstream } from '../../support/errors.ts';
-import { createScriptedReader } from '../mock/scriptedReader.ts';
+import { createScriptedReader, splitHeader } from '../mock/scriptedReader.ts';
+import { extractText, fileNameFromUri } from '../../support/documents/index.ts';
 import { recordCost } from './costs.ts';
 import { parseS3Uri } from './dataAutomationApi.ts';
 
@@ -49,6 +50,11 @@ export async function readObjectBytes(client: S3Client, s3Uri: string): Promise<
   }
 }
 
+/** True when the text opens with a front-matter block of `Key: value` lines. */
+export function hasHeaderBlock(text: string): boolean {
+  return Object.keys(splitHeader(text).headers).length > 0;
+}
+
 /** Reads a structured evidence by code; its cost is recorded at zero (ENF-COUT-01). */
 export async function readLocally(
   input: ReadInput,
@@ -56,7 +62,11 @@ export async function readLocally(
   meter?: CostMeter
 ): Promise<ReadResult> {
   const bytes = input.bytes ?? (await loadBytes());
-  const result = await createScriptedReader({ id: LOCAL_EXTRACTION_ID }).read({ ...input, bytes });
+  // A workbook that opens with a `Key: value` block (title, date, author…) is a
+  // document, not a raw export: read its header instead of counting rows.
+  const headed = hasHeaderBlock(extractText(bytes, { fileName: fileNameFromUri(input.uri), contentType: input.contentType }));
+  const reader = createScriptedReader({ id: LOCAL_EXTRACTION_ID, ...(headed ? { contentType: 'text/plain' } : {}) });
+  const result = await reader.read({ ...input, bytes });
   const cost = recordCost(meter, { usd: 0, tokensIn: 0, tokensOut: 0, source: LOCAL_EXTRACTION_ID });
   return { ...result, cost };
 }

@@ -31,3 +31,17 @@ test('EF-LEC-01 a CSV export is read by code at zero cost, without fetching byte
   assert.equal(result.cost?.source, LOCAL_EXTRACTION_ID);
   assert.ok(result.textPages.map((page) => page.text).join('').includes('INC-2'));
 });
+
+test('EF-LEC-01 a workbook with a header block is read from its header, not counted as rows', async () => {
+  const { readFileSync } = await import('node:fs');
+  const bytes = new Uint8Array(readFileSync('demo/data/evidence/roles-and-responsibilities-matrix.xlsx'));
+  const xlsx = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+  const result = await readLocally(
+    { evidenceId: 'ev-2', contentType: xlsx, sizeBytes: bytes.length, uri: 's3://vault/e/roles-and-responsibilities-matrix.xlsx', bytes },
+    async () => bytes
+  );
+  assert.equal(result.fields.type, 'LIST');
+  assert.equal(result.fields.title, 'Roles and Responsibilities Matrix');
+  assert.equal(result.fields.documentDate, '2026-02-10');
+  assert.equal(result.fields.author, 'Quality Lead');
+});
