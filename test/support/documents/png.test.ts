@@ -8,7 +8,7 @@
 
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { crc32, inflate } from '../../../src/support/documents/bits.ts';
+import { crc32, zlibInflate } from '../../../src/support/documents/bits.ts';
 import { pngFromLines, pngSize } from '../../../src/support/documents/png.ts';
 
 const SIGNATURE = [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a];
@@ -64,7 +64,9 @@ function decode(bytes: Uint8Array): Decoded {
   const ihdr = chunks.find((c) => c.type === 'IHDR');
   assert.ok(ihdr, 'IHDR chunk missing');
   const idat = chunks.filter((c) => c.type === 'IDAT');
-  const raw = inflate(concat(idat.map((c) => c.data)));
+  // A PNG IDAT is a zlib stream (RFC 1950), not raw DEFLATE: decoding it as
+  // raw once hid that every generated screenshot was undecodable.
+  const raw = zlibInflate(concat(idat.map((c) => c.data)));
   return { width: readU32BE(ihdr.data, 0), height: readU32BE(ihdr.data, 4), raw, chunks };
 }
 

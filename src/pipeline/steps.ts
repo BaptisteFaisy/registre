@@ -136,9 +136,11 @@ export async function readStep(
     evidenceId: id,
     contentType: payload.contentType,
     sizeBytes: payload.bytes?.byteLength ?? 0,
-    // The reader gets the vault copy: on AWS, Data Automation can only read an
+    // On AWS the reader gets the vault copy: Data Automation can only read an
     // S3 object, and a manual deposit's own URI (`manual://…`) is not one.
-    uri: payload.storedUri ?? payload.uri,
+    // Offline, the deposit URI stays: it carries the file name the readers key
+    // their text twins on (a vault key like `v1.png#v1` does not).
+    uri: payload.storedUri?.startsWith('s3://') ? payload.storedUri : payload.uri,
     ...(payload.bytes === undefined ? {} : { bytes: payload.bytes }),
     fileDate: payload.fileDate ?? null,
     suggestedControlId: payload.suggestedControlId ?? null

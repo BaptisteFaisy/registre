@@ -21,6 +21,7 @@ import {
   readinessOverviewView
 } from '../views.ts';
 import { requireFramework } from './shared.ts';
+import { controlDocument, feedKnowledgeBase, frameworksTarget } from '../../ai/bedrock/knowledgeSync.ts';
 
 /** Roles that may import a framework (EF-REF-01). */
 const IMPORT_ROLES: readonly Role[] = ['QUALITY_LEAD', 'ADMIN'];
@@ -36,9 +37,27 @@ async function importFramework(context: ApiContext): Promise<ApiResponse> {
   await requireRole(context.services, context.principal, IMPORT_ROLES, 'framework', 'new');
   const input = frameworkImportFrom(context.json());
   const result = await context.pipeline.importFramework(context.services, input, context.principal);
+  await feedControls(context, result.framework.id);
   // Bare framework: the portal client is typed `Promise<Framework>`. The version
   // diff is journalled and served by `GET /v1/frameworks/{id}/diff` (EF-REF-05).
   return json(201, frameworkView(result.framework));
+}
+
+/**
+ * On AWS, the imported controls feed the frameworks knowledge base, which
+ * proposes the controls an evidence may support (EF-RAT-01). The register is
+ * the source of truth: a feed failure is logged, the import stands.
+ */
+async function feedControls(context: ApiContext, frameworkId: string): Promise<void> {
+  const target = frameworksTarget(process.env);
+  if (target === null) return;
+  try {
+    const controls = await context.services.state.listControls(frameworkId);
+    const fed = await feedKnowledgeBase(target, controls.map((control) => controlDocument(control, target.prefix)));
+    console.info(`[api] frameworks knowledge base: ${fed.written} control(s) written, sync ${fed.sync.join(', ') || 'not requested'}`);
+  } catch (error) {
+    console.error(`[api] frameworks knowledge base feed failed: ${(error as Error).message}`);
+  }
 }
 
 /** True when the principal may see a framework of this confidentiality (ENF-CONF-03). */

@@ -143,3 +143,33 @@ export function blueprintCoversAnnexB(blueprint: EvidenceBlueprint = evidenceBlu
   if (names.length !== EVIDENCE_FIELD_NAMES.length) return false;
   return EVIDENCE_FIELD_NAMES.every((name, index) => names[index] === name);
 }
+
+/** Fields the model reads off the page; the others are judged from the whole document. */
+const INFERRED_FIELDS: ReadonlySet<string> = new Set(['evidenceType', 'summary', 'personalData']);
+
+/** One property of a Data Automation document blueprint. */
+function dataAutomationProperty(field: BlueprintField): Record<string, string> {
+  const closedList = field.values ? ` One of: ${field.values.join(', ')}.` : '';
+  return {
+    type: field.type === 'boolean' ? 'boolean' : 'string',
+    inferenceType: INFERRED_FIELDS.has(field.name) ? 'inferred' : 'explicit',
+    instruction: `${field.instruction}${closedList}`
+  };
+}
+
+/**
+ * The plan in the schema format of a Data Automation document blueprint
+ * (`AWS::Bedrock::Blueprint`, type DOCUMENT) — EF-LEC-01. The deployment reads
+ * the committed copy (`infra/blueprints/evidence.schema.json`); a test keeps the
+ * two equal, so the field plan has one source.
+ */
+export function dataAutomationBlueprintSchema(blueprint: EvidenceBlueprint = evidenceBlueprint()): Record<string, unknown> {
+  return {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    description: blueprint.instructions,
+    class: 'Audit evidence',
+    type: 'object',
+    definitions: {},
+    properties: Object.fromEntries(blueprint.fields.map((field) => [field.name, dataAutomationProperty(field)]))
+  };
+}

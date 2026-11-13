@@ -2,18 +2,22 @@
  * Bedrock Data Automation — the ONLY module naming its API (EF-LEC-01).
  *
  * Why isolated: the Data Automation invocation surface moves faster than the
- * rest of Bedrock (model id vs. project ARN, `modelInput` sub-objects). When it
- * changes, exactly one small file changes; the reader keeps its orchestration.
+ * rest of Bedrock. When it changes, exactly one small file changes; the reader
+ * keeps its orchestration.
  *
- * Shapes implemented here and to be confirmed against the console on the first
- * real deployment (see the open points in the module report):
- *  - `StartAsyncInvoke(modelId = <project ARN | bedrock-data-automation>)`
- *  - `modelInput = { inputConfiguration, dataAutomationConfiguration,
- *    blueprintConfiguration, outputConfiguration }`
- *  - `GetAsyncInvoke(invocationArn)` polled until `Completed` / `Failed`.
+ * Shapes confirmed on the first real deployment (eu-central-1, 2026-11-13):
+ *  - `InvokeDataAutomationAsync` (bedrock-data-automation-runtime) with the
+ *    project ARN, a data-automation profile (`<geo>.data-automation-v1`), the
+ *    input object and an output prefix;
+ *  - `GetDataAutomationStatus(invocationArn)` polled until `Success` or an
+ *    error status; its output URI is the job metadata (`job_metadata.json`),
+ *    which points at the standard (and custom) output of each segment.
  */
 
-import type { BedrockRuntimeClient, StartAsyncInvokeCommandInput } from '@aws-sdk/client-bedrock-runtime';
+import type {
+  BedrockDataAutomationRuntimeClient,
+  InvokeDataAutomationAsyncCommandInput
+} from '@aws-sdk/client-bedrock-data-automation-runtime';
 import type { S3Client } from '@aws-sdk/client-s3';
 import { upstream } from '../../support/errors.ts';
 
@@ -33,6 +37,8 @@ export interface DataAutomationTarget {
   blueprintArn: string;
   /** S3 prefix where Data Automation writes its JSON result. */
   outputS3Uri: string;
+  /** Data-automation profile ARN (cross-region profile of the geography). */
+  profileArn?: string;
 }
 
 /** Reads the Data Automation target from the environment (config, not code). */
@@ -40,11 +46,26 @@ export function dataAutomationTarget(
   env: NodeJS.ProcessEnv,
   fallbackModelId = DATA_AUTOMATION_MODEL_ID
 ): DataAutomationTarget {
+  const modelId = env.REGISTRE_BDA_PROJECT_ARN ?? fallbackModelId;
+  const profileArn = env.REGISTRE_BDA_PROFILE_ARN ?? profileArnFor(modelId);
   return {
-    modelId: env.REGISTRE_BDA_PROJECT_ARN ?? fallbackModelId,
+    modelId,
     blueprintArn: env.REGISTRE_BDA_BLUEPRINT_ARN ?? '',
-    outputS3Uri: env.REGISTRE_BDA_OUTPUT_URI ?? ''
+    outputS3Uri: env.REGISTRE_BDA_OUTPUT_URI ?? '',
+    ...(profileArn === null ? {} : { profileArn })
   };
+}
+
+/**
+ * The profile of the project's geography, derived from the project ARN:
+ * `arn:aws:bedrock:<region>:<account>:data-automation-profile/<geo>.data-automation-v1`.
+ */
+export function profileArnFor(projectArn: string): string | null {
+  const match = /^arn:aws:bedrock:([a-z0-9-]+):(\d{12}):data-automation-project\//.exec(projectArn);
+  if (!match) return null;
+  const region = match[1]!;
+  const geo = region.startsWith('eu-') ? 'eu' : region.startsWith('us-') ? 'us' : region.split('-')[0]!;
+  return `arn:aws:bedrock:${region}:${match[2]}:data-automation-profile/${geo}.data-automation-v1`;
 }
 
 /** Body of one asynchronous invocation, built from the target and the input. */
@@ -67,30 +88,38 @@ export function requireOutputUri(target: DataAutomationTarget): string {
   return target.outputS3Uri;
 }
 
-/** Request body of one reading, built once so it can be asserted in review. */
+/** `InvokeDataAutomationAsync` request of one reading (EF-LEC-01). */
 export function startInvocationInput(input: {
   inputS3Uri: string;
   target: DataAutomationTarget;
   token?: string;
-}): StartAsyncInvokeCommandInput {
+}): InvokeDataAutomationAsyncCommandInput {
+  const { target } = input;
+  if (!target.profileArn) {
+    throw upstream('Data Automation: no profile ARN (set REGISTRE_BDA_PROJECT_ARN or REGISTRE_BDA_PROFILE_ARN)', {
+      modelId: target.modelId
+    });
+  }
   return {
-    modelId: input.target.modelId,
-    modelInput: invocationInput(input.inputS3Uri, input.target) as unknown as NonNullable<
-      StartAsyncInvokeCommandInput['modelInput']
-    >,
-    outputDataConfig: { s3OutputDataConfig: { s3Uri: requireOutputUri(input.target) } },
-    ...(input.token ? { clientRequestToken: input.token } : {})
+    inputConfiguration: { s3Uri: input.inputS3Uri },
+    outputConfiguration: { s3Uri: requireOutputUri(target) },
+    dataAutomationProfileArn: target.profileArn,
+    ...(target.modelId.startsWith('arn:')
+      ? { dataAutomationConfiguration: { dataAutomationProjectArn: target.modelId, stage: 'LIVE' } }
+      : {}),
+    ...(target.blueprintArn ? { blueprints: [{ blueprintArn: target.blueprintArn }] } : {}),
+    ...(input.token ? { clientToken: input.token } : {})
   };
 }
 
-/** Starts one reading task and returns its invocation ARN. */
+/** Starts one reading and returns its invocation ARN. */
 export async function startInvocation(
-  client: BedrockRuntimeClient,
+  client: BedrockDataAutomationRuntimeClient,
   input: { inputS3Uri: string; target: DataAutomationTarget; token?: string }
 ): Promise<string> {
-  const { StartAsyncInvokeCommand } = await import('@aws-sdk/client-bedrock-runtime');
+  const { InvokeDataAutomationAsyncCommand } = await import('@aws-sdk/client-bedrock-data-automation-runtime');
   try {
-    const response = await client.send(new StartAsyncInvokeCommand(startInvocationInput(input)));
+    const response = await client.send(new InvokeDataAutomationAsyncCommand(startInvocationInput(input)));
     if (!response.invocationArn) throw upstream('Data Automation: no invocation ARN returned');
     return response.invocationArn;
   } catch (error) {
@@ -101,38 +130,44 @@ export async function startInvocation(
 export interface InvocationState {
   status: 'Completed' | 'Failed' | 'InProgress';
   failureMessage: string | null;
+  /** The job metadata (`job_metadata.json`) once the reading succeeded. */
   outputS3Uri: string | null;
 }
 
-/** Reads the state of one invocation, without waiting. */
+/** Maps the service status onto the three states the reader knows. */
+export function stateOfStatus(status: string | undefined): InvocationState['status'] {
+  if (status === 'Success') return 'Completed';
+  if (status === 'ServiceError' || status === 'ClientError') return 'Failed';
+  return 'InProgress';
+}
+
+/** One status read of an invocation. */
 export async function getInvocationState(
-  client: BedrockRuntimeClient,
+  client: BedrockDataAutomationRuntimeClient,
   invocationArn: string
 ): Promise<InvocationState> {
-  const { GetAsyncInvokeCommand } = await import('@aws-sdk/client-bedrock-runtime');
+  const { GetDataAutomationStatusCommand } = await import('@aws-sdk/client-bedrock-data-automation-runtime');
   try {
-    const response = await client.send(new GetAsyncInvokeCommand({ invocationArn }));
-    const status = response.status ?? 'InProgress';
-    const output = response.outputDataConfig?.s3OutputDataConfig?.s3Uri ?? null;
-    return { status, failureMessage: response.failureMessage ?? null, outputS3Uri: output };
+    const response = await client.send(new GetDataAutomationStatusCommand({ invocationArn }));
+    return {
+      status: stateOfStatus(response.status),
+      failureMessage: response.errorMessage ?? response.errorType ?? null,
+      outputS3Uri: response.outputConfiguration?.s3Uri ?? null
+    };
   } catch (error) {
     throw upstream(`Data Automation: status failed: ${(error as Error).message}`, { invocationArn });
   }
 }
 
-/** Resolves after `ms` milliseconds (polling only, never in tests). */
 export function delay(ms: number): Promise<void> {
   return new Promise((resolve) => {
     setTimeout(resolve, ms);
   });
 }
 
-/**
- * Polls one invocation until it completes or the deadline passes
- * (bounded wait: a reading never blocks the pipeline forever, ENF-PERF-01).
- */
+/** Polls until the reading ends, or times out (ENF-PERF-01). */
 export async function waitForInvocation(
-  client: BedrockRuntimeClient,
+  client: BedrockDataAutomationRuntimeClient,
   invocationArn: string,
   timeoutMs = POLL_TIMEOUT_MS
 ): Promise<InvocationState> {
@@ -145,7 +180,7 @@ export async function waitForInvocation(
   throw upstream('Data Automation: reading timed out', { invocationArn, timeoutMs });
 }
 
-/** Fetches the JSON result object written by Data Automation. */
+/** Reads one JSON object from S3. */
 export async function readResultObject(client: S3Client, s3Uri: string): Promise<unknown> {
   const { GetObjectCommand } = await import('@aws-sdk/client-s3');
   const { bucket, key } = parseS3Uri(s3Uri);
@@ -159,9 +194,35 @@ export async function readResultObject(client: S3Client, s3Uri: string): Promise
   }
 }
 
+/** Where the job metadata says the outputs of the first segment are. */
+export function outputPathsOf(metadata: unknown): { standard: string | null; custom: string | null } {
+  const root = (metadata ?? {}) as { output_metadata?: Array<{ segment_metadata?: Array<Record<string, unknown>> }> };
+  const segment = root.output_metadata?.[0]?.segment_metadata?.[0] ?? {};
+  const standard = typeof segment.standard_output_path === 'string' ? segment.standard_output_path : null;
+  const custom = typeof segment.custom_output_path === 'string' ? segment.custom_output_path : null;
+  return { standard, custom };
+}
+
+/**
+ * The document result of one reading: the standard output (text, pages), with
+ * the custom output's inference result under `custom_output` when a blueprint
+ * ran. A metadata file with no output path is returned as is.
+ */
+export async function readDocumentOutput(client: S3Client, jobMetadataUri: string): Promise<unknown> {
+  const metadata = await readResultObject(client, jobMetadataUri);
+  const paths = outputPathsOf(metadata);
+  if (paths.standard === null) return metadata;
+  const standard = (await readResultObject(client, paths.standard)) as Record<string, unknown>;
+  if (paths.custom === null) return standard;
+  const custom = (await readResultObject(client, paths.custom)) as Record<string, unknown>;
+  return { ...standard, custom_output: [custom.inference_result ?? custom] };
+}
+
 /** Splits `s3://bucket/key` into its two parts. */
 export function parseS3Uri(s3Uri: string): { bucket: string; key: string } {
-  const match = /^s3:\/\/([^/]+)\/(.+)$/.exec(s3Uri);
+  // The vault suffixes its URIs with `#<versionId>`; Data Automation takes a
+  // plain object URI, so the version fragment is not part of the key.
+  const match = /^s3:\/\/([^/]+)\/([^#]+)(?:#.*)?$/.exec(s3Uri);
   if (!match) throw upstream(`invalid S3 URI: ${s3Uri}`, { s3Uri });
   return { bucket: match[1]!, key: match[2]! };
 }

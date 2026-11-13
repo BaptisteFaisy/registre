@@ -56,7 +56,8 @@ export function mimeTypeOf(fileName: string): string {
 export function fileNameFromUri(uri: string | null | undefined): string | null {
   if (!uri) return null;
   const withoutQuery = uri.split('?')[0] ?? uri;
-  const last = withoutQuery.split('/').filter((part) => part.length > 0).pop();
+  // Both separators: a local deposit on Windows is a backslash path.
+  const last = withoutQuery.split(/[\\/]/).filter((part) => part.length > 0).pop();
   return last ?? null;
 }
 

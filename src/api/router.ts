@@ -221,7 +221,8 @@ export class Router {
   private failure(error: unknown): ApiResponse {
     const description = describeError(error);
     if (description.status >= 500) {
-      console.error(`[api] ${description.status} ${description.code}: ${description.message}`);
+      // The cause goes to the logs only, never to the client.
+      console.error(`[api] ${description.status} ${description.code}: ${description.message}`, JSON.stringify(description.detail));
       return text(500, 'unexpected server error');
     }
     return json(description.status, errorBody(description));

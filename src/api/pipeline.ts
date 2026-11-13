@@ -49,6 +49,17 @@ export interface IngestOutcome {
   duplicate: boolean;
 }
 
+/**
+ * Result of an asynchronous deposit (deployed): the document is in the vault and
+ * the Step Functions chain reads it; `evidence` is set only for a duplicate.
+ */
+export interface StoreOutcome {
+  evidenceId: string;
+  sha256: string;
+  duplicate: boolean;
+  evidence: Evidence | null;
+}
+
 /** States, readiness and history of one framework (EF-FRA-02..04). */
 export interface FrameworkRecompute {
   statuses: ControlStatus[];
@@ -72,6 +83,8 @@ export interface DecisionOutcome {
 /** The pipeline surface the API calls — the eight functions of the contract. */
 export interface PipelineApi {
   ingestEvidence(services: Services, request: IngestRequest, actor: Principal): Promise<IngestOutcome>;
+  /** Fingerprint and vault only; the S3 rule starts the chain (deployed, EF-COL-05). */
+  storeEvidence?(services: Services, request: IngestRequest, actor: Principal): Promise<StoreOutcome>;
   importFramework(services: Services, input: FrameworkImport, actor: Principal): Promise<ImportResult>;
   recomputeFramework(services: Services, frameworkId: FrameworkId): Promise<FrameworkRecompute>;
   listValidationQueue(services: Services): Promise<ValidationItem[]>;
@@ -103,6 +116,12 @@ export const defaultPipeline: PipelineApi = {
   async ingestEvidence(services, request, actor) {
     const result = await pipeline.ingestEvidence(services, ingestInput(request), actor.id);
     return { evidence: result.evidence, duplicate: result.duplicateOf !== null };
+  },
+  async storeEvidence(services, request, actor) {
+    const input = ingestInput(request);
+    const stored = await pipeline.fingerprintStep(services, { ...input, fileDate: input.fileDate ?? null, suggestedControlId: input.suggestedControlId ?? null }, actor.id);
+    const evidence = stored.duplicate ? await services.state.getEvidence(stored.evidenceId) : null;
+    return { evidenceId: stored.evidenceId, sha256: stored.sha256, duplicate: stored.duplicate, evidence };
   },
   importFramework: (services, input, actor) => pipeline.importFramework(services, input, actor.id),
   async recomputeFramework(services, frameworkId) {
