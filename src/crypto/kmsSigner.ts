@@ -15,6 +15,7 @@
  * must be visible, never silently produce an unsigned pack.
  */
 
+import { createHash } from 'node:crypto';
 import type { Signer, SignerOutput } from '../ports/index.ts';
 import { configError, upstream } from '../support/errors.ts';
 
@@ -32,6 +33,17 @@ export interface KmsSignerOptions {
   keyId?: string;
   region?: string;
   env?: NodeJS.ProcessEnv;
+}
+
+/**
+ * SHA-256 of the payload, the message KMS signs. KMS refuses a RAW message over
+ * 4 096 bytes (a real pack manifest is larger: seen on the real run); with
+ * ECDSA_SHA_256 a RAW message is hashed with SHA-256 anyway, so signing the
+ * digest yields the same signature and an offline ECDSA-SHA256 check of the
+ * manifest still verifies.
+ */
+export function digestOf(payload: Uint8Array): Uint8Array {
+  return new Uint8Array(createHash('sha256').update(payload).digest());
 }
 
 export class KmsSigner implements Signer {
@@ -62,8 +74,8 @@ export class KmsSigner implements Signer {
       const response = await client.send(
         new SignCommand({
           KeyId: this.keyId,
-          Message: input.payload,
-          MessageType: 'RAW',
+          Message: digestOf(input.payload),
+          MessageType: 'DIGEST',
           SigningAlgorithm: KMS_SIGNING_ALGORITHM
         })
       );
@@ -97,8 +109,8 @@ export class KmsSigner implements Signer {
       const response = await client.send(
         new VerifyCommand({
           KeyId: this.keyId,
-          Message: input.payload,
-          MessageType: 'RAW',
+          Message: digestOf(input.payload),
+          MessageType: 'DIGEST',
           Signature: fromBase64(input.signature),
           SigningAlgorithm: KMS_SIGNING_ALGORITHM
         })
