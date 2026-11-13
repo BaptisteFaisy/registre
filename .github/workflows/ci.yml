@@ -26,16 +26,18 @@ permissions:
 jobs:
   typecheck:
     name: typecheck
-    runs-on: [self-hosted, linux, x64, registre-worker]
+    runs-on: ubuntu-latest
     timeout-minutes: 5
-    env:
-      PATH: /home/baptiste/.local/node22/bin:/home/baptiste/.local/bin:/usr/local/bin:/usr/bin:/bin
     steps:
       - uses: actions/checkout@v5
         with:
           fetch-depth: 1
           persist-credentials: false
           clean: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.18'
+          cache: npm
       - name: Clean workspace (keep node_modules)
         shell: bash
         run: git clean -ffdx -e /node_modules -e '*/node_modules' -e /portal/node_modules -e /infra/node_modules -e .tsbuildinfo
@@ -60,16 +62,18 @@ jobs:
 
   tests:
     name: tests
-    runs-on: [self-hosted, linux, x64, registre-worker]
+    runs-on: ubuntu-latest
     timeout-minutes: 5
-    env:
-      PATH: /home/baptiste/.local/node22/bin:/home/baptiste/.local/bin:/usr/local/bin:/usr/bin:/bin
     steps:
       - uses: actions/checkout@v5
         with:
           fetch-depth: 1
           persist-credentials: false
           clean: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.18'
+          cache: npm
       - name: Clean workspace (keep node_modules)
         shell: bash
         run: git clean -ffdx -e /node_modules -e '*/node_modules' -e /portal/node_modules -e /infra/node_modules -e .tsbuildinfo
@@ -98,7 +102,7 @@ jobs:
 
   guards:
     name: guards
-    runs-on: [self-hosted, linux, x64, registre-worker]
+    runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v5
@@ -117,16 +121,18 @@ jobs:
 
   portal:
     name: portal
-    runs-on: [self-hosted, linux, x64, registre-worker]
+    runs-on: ubuntu-latest
     timeout-minutes: 5
-    env:
-      PATH: /home/baptiste/.local/node22/bin:/home/baptiste/.local/bin:/usr/local/bin:/usr/bin:/bin
     steps:
       - uses: actions/checkout@v5
         with:
           fetch-depth: 1
           persist-credentials: false
           clean: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.18'
+          cache: npm
       - name: Changed areas (path-gated steps)
         id: paths
         env:
@@ -144,16 +150,18 @@ jobs:
 
   infra:
     name: infra
-    runs-on: [self-hosted, linux, x64, registre-worker]
+    runs-on: ubuntu-latest
     timeout-minutes: 5
-    env:
-      PATH: /home/baptiste/.local/node22/bin:/home/baptiste/.local/bin:/usr/local/bin:/usr/bin:/bin
     steps:
       - uses: actions/checkout@v5
         with:
           fetch-depth: 1
           persist-credentials: false
           clean: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.18'
+          cache: npm
       - name: Changed areas (path-gated steps)
         id: paths
         env:
@@ -183,7 +191,7 @@ jobs:
 
   ci:
     name: ci
-    runs-on: [self-hosted, linux, x64, registre-worker]
+    runs-on: ubuntu-latest
     timeout-minutes: 5
     needs: [typecheck, tests, guards, portal, infra]
     if: always()
