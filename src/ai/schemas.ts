@@ -31,7 +31,9 @@ export const ATTACHMENT_JSON_SCHEMA = JSON.stringify({
     properties: {
       controlId: { type: 'string' },
       supports: { type: 'boolean' },
-      confidence: { type: 'number', minimum: 0, maximum: 1 },
+      // No `minimum`/`maximum`: Claude structured output refuses number bounds
+      // (seen on the real run). The range is enforced by `normaliseConfidence`.
+      confidence: { type: 'number', description: 'Between 0 and 1.' },
       quote: { type: 'string' },
       page: { type: ['integer', 'null'] },
       reason: { type: 'string' }
