@@ -28,7 +28,7 @@ import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as sfn from 'aws-cdk-lib/aws-stepfunctions';
 import * as tasks from 'aws-cdk-lib/aws-stepfunctions-tasks';
 import type { Construct } from 'constructs';
-import { bedrockPolicyStatements } from './bedrock-stack';
+import { EVIDENCE_KB_PREFIX, bedrockPolicyStatements } from './bedrock-stack';
 import { resourceName, type HandlerKey, type RegistreConfig } from './config';
 import { createHandler, grantBucket } from './handlers';
 
@@ -85,6 +85,7 @@ export class PipelineStack extends cdk.Stack {
       REGISTRE_VAULT_BUCKET: props.vaultBucket.bucketName,
       REGISTRE_KB_FRAMEWORKS_ID: props.frameworksKnowledgeBaseId,
       REGISTRE_KB_EVIDENCE_ID: props.evidenceKnowledgeBaseId,
+      REGISTRE_KB_EVIDENCE_PREFIX: EVIDENCE_KB_PREFIX,
       REGISTRE_GUARDRAIL_ID: props.guardrailId,
       REGISTRE_BDA_PROJECT_ARN: props.dataAutomationProjectArn,
       REGISTRE_BDA_OUTPUT_URI: `s3://${props.vaultBucket.bucketName}/data-automation/`,
@@ -113,7 +114,11 @@ export class PipelineStack extends cdk.Stack {
       });
       props.table.grantReadWriteData(fn);
       props.key.grantDecrypt(fn);
-      grantBucket(fn, props.vaultBucket.bucketArn, key !== 'read');
+      // The reader writes too: Data Automation puts its result under
+      // `data-automation/` with the caller's rights, encrypted by the vault key.
+      grantBucket(fn, props.vaultBucket.bucketArn, true);
+      // The reader and the indexer write encrypted objects (results, knowledge-base pages).
+      if (key === 'read' || key === 'index') props.key.grantEncryptDecrypt(fn);
       return fn;
     };
     return {
@@ -129,12 +134,23 @@ export class PipelineStack extends cdk.Stack {
 
   /** Wraps one Lambda into a Step Functions task with shared retry policy. */
   private task(id: string, fn: lambda.IFunction): tasks.LambdaInvoke {
-    return new tasks.LambdaInvoke(this, id, {
+    const step = new tasks.LambdaInvoke(this, id, {
       lambdaFunction: fn,
       payloadResponseOnly: true,
       retryOnServiceExceptions: true,
       taskTimeout: sfn.Timeout.duration(Duration.minutes(15))
     });
+    // A burst of deposits can exceed the account's Lambda concurrency (10 on a
+    // new account): a throttled step waits and retries instead of failing the
+    // evidence.
+    step.addRetry({
+      errors: ['Lambda.TooManyRequestsException'],
+      interval: Duration.seconds(10),
+      backoffRate: 2,
+      maxAttempts: 8,
+      jitterStrategy: sfn.JitterType.FULL
+    });
+    return step;
   }
 
   /** fingerprint → dedupe choice → read → candidates → attach → sufficiency → states → index. */
@@ -150,12 +166,24 @@ export class PipelineStack extends cdk.Stack {
     const duplicate = new sfn.Succeed(this, 'DuplicateShortCircuit', {
       comment: 'Content already stored: location recorded, no model call (R8)'
     });
+    // A task reports a failure as `ok: false` (src/lambda/shared.ts) instead of
+    // throwing; without this guard the chain would carry on with an empty payload
+    // and the execution would end "succeeded" with nothing read.
+    const failed = new sfn.Fail(this, 'StepFailed', { errorPath: '$.error.code', causePath: '$.error.message' });
+    const guard = (id: string, next: sfn.IChainable): sfn.Choice =>
+      new sfn.Choice(this, `${id}Ok`).when(sfn.Condition.booleanEquals('$.ok', false), failed).otherwise(next);
+
     const decide = new sfn.Choice(this, 'AlreadyStored')
       .when(sfn.Condition.booleanEquals('$.duplicate', true), duplicate)
       .otherwise(read);
 
-    const chain = fingerprint.next(decide);
-    read.next(candidates).next(attach).next(sufficiency).next(states).next(index);
+    const chain = fingerprint.next(guard('Fingerprint', decide));
+    read.next(guard('Read', candidates));
+    candidates.next(guard('Candidates', attach));
+    attach.next(guard('Attach', sufficiency));
+    sufficiency.next(guard('Sufficiency', states));
+    states.next(guard('States', index));
+    index.next(guard('Index', new sfn.Succeed(this, 'Indexed')));
 
     return new sfn.StateMachine(this, 'Pipeline', {
       stateMachineName: resourceName(props.config, 'pipeline'),

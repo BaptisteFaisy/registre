@@ -12,8 +12,11 @@ import {
   DATA_AUTOMATION_MODEL_ID,
   invocationInput,
   parseS3Uri,
+  outputPathsOf,
+  profileArnFor,
   requireOutputUri,
-  startInvocationInput
+  startInvocationInput,
+  stateOfStatus
 } from '../../src/ai/bedrock/dataAutomationApi.ts';
 import { customOutput, extractText, fieldsFromOutput } from '../../src/ai/bedrock/dataAutomationReader.ts';
 import { combineFilters, accessFilter } from '../../src/ai/bedrock/knowledgeBase.ts';
@@ -59,10 +62,27 @@ test('the Data Automation invocation carries the blueprint and the output locati
   assert.deepEqual(modelInput.blueprintConfiguration, { blueprintArn: target.blueprintArn });
   assert.deepEqual(modelInput.outputConfiguration, { s3Uri: 's3://vault-bda/out/' });
 
-  const request = startInvocationInput({ inputS3Uri: 's3://vault/ev-1/policy.pdf', target, token: 'ev-1' });
-  assert.equal(request.modelId, DATA_AUTOMATION_MODEL_ID);
-  assert.equal(request.clientRequestToken, 'ev-1');
-  assert.deepEqual(request.outputDataConfig, { s3OutputDataConfig: { s3Uri: 's3://vault-bda/out/' } });
+  const project = 'arn:aws:bedrock:eu-central-1:123456789012:data-automation-project/abc';
+  const request = startInvocationInput({
+    inputS3Uri: 's3://vault/ev-1/policy.pdf',
+    target: { ...target, modelId: project, profileArn: profileArnFor(project) ?? '' },
+    token: 'ev-1'
+  });
+  assert.equal(request.dataAutomationProfileArn, 'arn:aws:bedrock:eu-central-1:123456789012:data-automation-profile/eu.data-automation-v1');
+  assert.deepEqual(request.dataAutomationConfiguration, { dataAutomationProjectArn: project, stage: 'LIVE' });
+  assert.equal(request.clientToken, 'ev-1');
+  assert.deepEqual(request.outputConfiguration, { s3Uri: 's3://vault-bda/out/' });
+  assert.deepEqual(request.blueprints, [{ blueprintArn: target.blueprintArn }]);
+});
+
+test('the Data Automation status and job metadata are read as the service writes them', () => {
+  assert.equal(stateOfStatus('Success'), 'Completed');
+  assert.equal(stateOfStatus('ClientError'), 'Failed');
+  assert.equal(stateOfStatus('InProgress'), 'InProgress');
+  const metadata = { output_metadata: [{ segment_metadata: [{ standard_output_path: 's3://b/out/standard.json' }] }] };
+  assert.deepEqual(outputPathsOf(metadata), { standard: 's3://b/out/standard.json', custom: null });
+  assert.equal(parseS3Uri('s3://b/evidence/ev-1/v1.pdf#ver123').key, 'evidence/ev-1/v1.pdf');
+  assert.equal(extractText({ pages: [{ representation: { text: 'page one' } }, { representation: { markdown: 'page two' } }] }), 'page onepage two');
 });
 
 test('a missing Data Automation output location is a hard error', () => {

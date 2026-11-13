@@ -1,0 +1,69 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "Extract the fields below from one audit evidence. Copy values as written; never infer a date that is not printed. Return null for a field the document does not contain. Never state whether a control is covered: you only read the document.",
+  "class": "Audit evidence",
+  "type": "object",
+  "definitions": {},
+  "properties": {
+    "evidenceType": {
+      "type": "string",
+      "inferenceType": "inferred",
+      "instruction": "Nature of the document. Pick one value of the closed list, never invent one. One of: POLICY, PROCEDURE, MINUTES, REPORT, EXPORT, SCREENSHOT, LIST, ATTESTATION."
+    },
+    "title": {
+      "type": "string",
+      "inferenceType": "explicit",
+      "instruction": "Title as printed on the document."
+    },
+    "documentDate": {
+      "type": "string",
+      "inferenceType": "explicit",
+      "instruction": "Date printed on the document, ISO-8601 (YYYY-MM-DD). Null when absent."
+    },
+    "periodStart": {
+      "type": "string",
+      "inferenceType": "explicit",
+      "instruction": "First day covered by the document, for a report or an export. Null otherwise."
+    },
+    "periodEnd": {
+      "type": "string",
+      "inferenceType": "explicit",
+      "instruction": "Last day covered by the document, for a report or an export. Null otherwise."
+    },
+    "version": {
+      "type": "string",
+      "inferenceType": "explicit",
+      "instruction": "Version label as printed."
+    },
+    "author": {
+      "type": "string",
+      "inferenceType": "explicit",
+      "instruction": "Author or owner named on the document."
+    },
+    "approver": {
+      "type": "string",
+      "inferenceType": "explicit",
+      "instruction": "Signatory or approver. Null when unsigned."
+    },
+    "approvalDate": {
+      "type": "string",
+      "inferenceType": "explicit",
+      "instruction": "Date of approval or signature, ISO-8601. Null when unsigned."
+    },
+    "client": {
+      "type": "string",
+      "inferenceType": "explicit",
+      "instruction": "Customer the evidence is about. Null when the evidence is internal."
+    },
+    "summary": {
+      "type": "string",
+      "inferenceType": "inferred",
+      "instruction": "At most 3 sentences, factual, no judgement about any control."
+    },
+    "personalData": {
+      "type": "boolean",
+      "inferenceType": "inferred",
+      "instruction": "True when the document names people (staff, customers) or carries personal data."
+    }
+  }
+}

@@ -7,7 +7,7 @@
  * for CRC-32 and DEFLATE (available on Node 22+).
  */
 
-import { crc32 as zlibCrc32, deflateRawSync, inflateRawSync } from 'node:zlib';
+import { crc32 as zlibCrc32, deflateRawSync, deflateSync, inflateRawSync, inflateSync } from 'node:zlib';
 
 /** Concatenates byte arrays (or plain number arrays) into one. */
 export function concatBytes(...parts: Array<Uint8Array | number[]>): Uint8Array {
@@ -32,9 +32,23 @@ export function crc32(bytes: Uint8Array): number {
   return zlibCrc32(Buffer.from(bytes)) >>> 0;
 }
 
-/** Raw DEFLATE (RFC 1951), shared by PNG IDAT and ZIP method 8 entries. */
+/** Raw DEFLATE (RFC 1951), for ZIP method 8 entries. */
 export function deflate(bytes: Uint8Array): Uint8Array {
   return new Uint8Array(deflateRawSync(Buffer.from(bytes)));
+}
+
+/**
+ * zlib-wrapped DEFLATE (RFC 1950), the only form a PNG IDAT accepts: a raw
+ * stream there makes the image undecodable ("broken data stream"), which is
+ * what Bedrock Data Automation reported on the first real run.
+ */
+export function zlibDeflate(bytes: Uint8Array): Uint8Array {
+  return new Uint8Array(deflateSync(Buffer.from(bytes)));
+}
+
+/** Inverse of {@link zlibDeflate}. */
+export function zlibInflate(bytes: Uint8Array): Uint8Array {
+  return new Uint8Array(inflateSync(Buffer.from(bytes)));
 }
 
 /** Inverse of {@link deflate}. */

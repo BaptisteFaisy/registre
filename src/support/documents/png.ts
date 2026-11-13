@@ -19,7 +19,7 @@
  * must not re-implement any of those.
  */
 
-import { bytesOf, concatBytes, crc32, deflate } from './bits.ts';
+import { bytesOf, concatBytes, crc32, zlibDeflate } from './bits.ts';
 
 /** Glyph geometry and layout margins (see module header for the rationale). */
 const GLYPH_W = 5;
@@ -254,7 +254,7 @@ export function pngFromLines(lines: string[], scale = 1): Uint8Array {
   const factor = Math.max(1, Math.floor(scale));
   const bitmap = renderBitmap(lines);
   const scanlines = toScanlines(bitmap, factor);
-  return buildPng(bitmap.width * factor, bitmap.height * factor, deflate(scanlines));
+  return buildPng(bitmap.width * factor, bitmap.height * factor, zlibDeflate(scanlines));
 }
 
 /**

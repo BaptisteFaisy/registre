@@ -60,6 +60,8 @@ export interface ApiStackProps extends cdk.StackProps {
   readonly stateMachine: sfn.IStateMachine;
   readonly evidenceKnowledgeBaseId: string;
   readonly frameworksKnowledgeBaseId: string;
+  /** Source bucket of the frameworks knowledge base: an import writes its controls there. */
+  readonly frameworksBucket: s3.IBucket;
   readonly guardrailId: string;
   /** Asymmetric key that signs audit-pack manifests. */
   readonly signingKey: kms.IKey;
@@ -138,6 +140,7 @@ export class ApiStack extends cdk.Stack {
         REGISTRE_VAULT_BUCKET: props.vaultBucket.bucketName,
         REGISTRE_KB_EVIDENCE_ID: props.evidenceKnowledgeBaseId,
         REGISTRE_KB_FRAMEWORKS_ID: props.frameworksKnowledgeBaseId,
+        REGISTRE_FRAMEWORKS_BUCKET: props.frameworksBucket.bucketName,
         REGISTRE_GUARDRAIL_ID: props.guardrailId,
         REGISTRE_CONFIDENCE_THRESHOLD: String(config.confidenceThreshold),
         REGISTRE_RETENTION_MONTHS: String(config.retentionMonths),
@@ -148,6 +151,8 @@ export class ApiStack extends cdk.Stack {
         USER_POOL_ID: this.userPool.userPoolId,
         // The session route signs in with Cognito on AWS (src/api/cognitoSession.ts).
         REGISTRE_COGNITO_CLIENT_ID: this.userPoolClient.userPoolClientId,
+        // Deposits are vaulted, then read by the Step Functions chain (API Gateway waits 30 s at most).
+        REGISTRE_ASYNC_INGEST: '1',
         // Pack signing goes through KMS in production; the local Ed25519 signer
         // is what the offline demo and the tests use.
         REGISTRE_SIGNER: 'kms',
@@ -156,9 +161,11 @@ export class ApiStack extends cdk.Stack {
       policies: bedrockPolicyStatements(config)
     });
     props.table.grantReadWriteData(fn);
-    props.key.grantDecrypt(fn);
+    // Encrypt too: a deposit writes the document into the vault (SSE-KMS).
+    props.key.grantEncryptDecrypt(fn);
     props.signingKey.grant(fn, 'kms:Sign', 'kms:GetPublicKey');
     grantBucket(fn, props.vaultBucket.bucketArn, true);
+    grantBucket(fn, props.frameworksBucket.bucketArn, true);
     props.stateMachine.grantStartExecution(fn);
     return fn;
   }

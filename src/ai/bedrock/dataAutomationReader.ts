@@ -6,6 +6,9 @@
  * S3. Sensitive-data detection is enabled by the blueprint, so the access level
  * is derived from the extracted fields by `reading.ts` (ENF-CONF-01).
  *
+ * Spreadsheets, CSV and plain text, which Data Automation refuses, are read by
+ * code instead (`localExtraction.ts`).
+ *
  * The API surface lives in `dataAutomationApi.ts`; this file only orchestrates
  * and maps the result onto `EvidenceFields` (Annex B).
  */
@@ -14,9 +17,10 @@ import type { CostMeter, EvidenceReader, ReadInput, ReadResult } from '../../por
 import type { EvidenceFields, Settings } from '../../domain/types.ts';
 import { upstream } from '../../support/errors.ts';
 import { buildPeriod, buildReadFlags, inferAccessLevel, joinPages, normaliseEvidenceType, safeDate, splitPages, summarise } from '../reading.ts';
-import { createRuntimeClient, createS3Client } from './client.ts';
-import { POLL_TIMEOUT_MS, dataAutomationTarget, readResultObject, startInvocation, waitForInvocation } from './dataAutomationApi.ts';
+import { createDataAutomationClient, createS3Client } from './client.ts';
+import { POLL_TIMEOUT_MS, dataAutomationTarget, readDocumentOutput, startInvocation, waitForInvocation } from './dataAutomationApi.ts';
 import { readingCost, recordCost } from './costs.ts';
+import { needsLocalExtraction, readLocally, readObjectBytes } from './localExtraction.ts';
 
 /** Log prefix shared by every Bedrock adapter (ENF-OBS-01). */
 export const LOG_PREFIX = '[ai:bedrock]';
@@ -43,6 +47,28 @@ function asText(value: unknown): string | null {
   return null;
 }
 
+/**
+ * Text of a Data Automation standard output: the document representation, or
+ * its pages joined with form feeds (one page per ``).
+ */
+function standardOutputText(payload: unknown): string {
+  if (!payload || typeof payload !== 'object') return '';
+  const root = payload as { pages?: unknown; document?: { representation?: Record<string, unknown> } };
+  if (Array.isArray(root.pages)) {
+    const pages = root.pages
+      .map((page) => representationText((page as { representation?: Record<string, unknown> })?.representation))
+      .filter((value): value is string => value !== null);
+    if (pages.length > 0) return pages.join('');
+  }
+  return representationText(root.document?.representation) ?? '';
+}
+
+/** Plain text of one representation block (text, else markdown). */
+function representationText(representation: Record<string, unknown> | undefined): string | null {
+  if (!representation) return null;
+  return asText(pick(representation, ['text', 'markdown']));
+}
+
 /** Finds the custom-output block of a Data Automation result, tolerantly. */
 export function customOutput(payload: unknown): Record<string, unknown> {
   if (!payload || typeof payload !== 'object') return {};
@@ -54,6 +80,8 @@ export function customOutput(payload: unknown): Record<string, unknown> {
 
 /** Extracted plain text of the document, when the result carries it. */
 export function extractText(payload: unknown): string {
+  const standard = standardOutputText(payload);
+  if (standard) return standard;
   const block = customOutput(payload);
   const direct = asText(pick(block, ['text', 'content', 'transcript', 'markdown']));
   if (direct) return direct;
@@ -114,9 +142,13 @@ export class DataAutomationReader implements EvidenceReader {
         uri: input.uri
       });
     }
+    if (needsLocalExtraction(input.contentType, input.uri)) {
+      const s3 = await createS3Client(this.settings);
+      return readLocally(input, () => readObjectBytes(s3, input.uri), this.options.meter);
+    }
     const env = this.options.env ?? process.env;
     const target = dataAutomationTarget(env, this.settings.readerModel);
-    const runtime = await createRuntimeClient(this.settings);
+    const runtime = await createDataAutomationClient(this.settings);
     const arn = await startInvocation(runtime, { inputS3Uri: input.uri, target, token: input.evidenceId });
     const state = await waitForInvocation(runtime, arn, this.options.timeoutMs ?? POLL_TIMEOUT_MS);
     if (state.status === 'Failed') {
@@ -127,7 +159,7 @@ export class DataAutomationReader implements EvidenceReader {
       });
     }
     const outputUri = state.outputS3Uri ?? joinOutputUri(target.outputS3Uri, arn);
-    const payload = await readResultObject(await createS3Client(this.settings), outputUri);
+    const payload = await readDocumentOutput(await createS3Client(this.settings), outputUri);
     return this.toResult(input, payload);
   }
 
@@ -153,7 +185,7 @@ export class DataAutomationReader implements EvidenceReader {
 /** Last-resort output location when the service returns none. */
 function joinOutputUri(base: string, arn: string): string {
   const leaf = arn.split('/').pop() ?? 'result';
-  return `${base.replace(/\/$/, '')}/${leaf}/job_manifest.json`;
+  return `${base.replace(/\/$/, '')}/${leaf}/0/job_metadata.json`;
 }
 
 /** Factory used by `createBedrockAi` (EF-LEC-01). */

@@ -2,10 +2,10 @@
  * Service resolution: where the `Services` bundle comes from at runtime.
  *
  * The pilot owns `src/bootstrap.ts` (the composition root: mock or Bedrock
- * provider, storage adapters, clock). It is loaded lazily, by URL, so this
- * module compiles and runs whether or not that file exists yet: without it, the
- * offline demonstration bundle of `demoServices.ts` is used and the API still
- * answers.
+ * provider, storage adapters, clock). It is loaded lazily, with a literal
+ * specifier the Lambda bundler can follow; if it fails to load or exposes no
+ * factory, the offline demonstration bundle of `demoServices.ts` is used and
+ * the API still answers.
  *
  * Resolution happens once per process (`servicesSingleton` caches its promise),
  * which is what the Lambda handlers need: a cold start builds the bundle, warm
@@ -32,10 +32,6 @@ export interface ResolvedServices {
   source: ServicesSource;
 }
 
-/** URL of the pilot-owned bootstrap module. */
-function bootstrapUrl(): string {
-  return new URL('../bootstrap.ts', import.meta.url).href;
-}
 
 /** True when the value carries a `Services` bundle. */
 function isServices(value: unknown): value is Services {
@@ -58,8 +54,12 @@ function unwrap(value: unknown): Services | null {
 async function fromBootstrap(): Promise<Services | null> {
   let module: BootstrapModule;
   try {
-    module = (await import(bootstrapUrl())) as BootstrapModule;
-  } catch {
+    // A literal specifier, so the Lambda bundler (esbuild) ships the module: a
+    // computed URL is left out of the bundle and the import fails at runtime,
+    // which silently fell back to the offline demonstration bundle on AWS.
+    module = (await import('../bootstrap.ts')) as BootstrapModule;
+  } catch (error) {
+    console.error('[services] bootstrap did not load, using the offline bundle:', (error as Error).message);
     return null;
   }
   if (typeof module.createServices === 'function') return unwrap(await module.createServices());

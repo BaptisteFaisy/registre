@@ -79,11 +79,28 @@ function fromBinary(context: ApiContext): IngestRequest {
 }
 
 /** `POST /v1/evidence` — manual deposit, 201 when new, 200 when duplicate. */
+/**
+ * Deployed deposit — EF-COL-02. Reading a document with Data Automation takes
+ * longer than API Gateway waits (30 s), so the API only fingerprints and vaults
+ * it; the S3 rule starts the Step Functions chain that reads and attaches it.
+ * A new document answers `202` with its id; a duplicate answers `200` as before.
+ */
+async function depositAsync(context: ApiContext, request: IngestRequest): Promise<ApiResponse> {
+  const stored = await context.pipeline.storeEvidence!(context.services, request, context.principal);
+  if (stored.duplicate && stored.evidence !== null) {
+    return json(200, { ...evidenceView(stored.evidence, context.principal), duplicate: true });
+  }
+  return json(202, { id: stored.evidenceId, sha256: stored.sha256, duplicate: stored.duplicate, status: 'PROCESSING' });
+}
+
 async function depositEvidence(context: ApiContext): Promise<ApiResponse> {
   await requireRole(context.services, context.principal, DEPOSIT_ROLES, 'evidence', 'new');
   const request = isJsonEnvelope(context) ? fromEnvelope(context) : fromBinary(context);
   if (request.suggestedControlId !== undefined) {
     await requireControlOwnership(context.services, context.principal, request.suggestedControlId);
+  }
+  if (process.env.REGISTRE_ASYNC_INGEST === '1' && context.pipeline.storeEvidence) {
+    return depositAsync(context, request);
   }
   const result = await context.pipeline.ingestEvidence(context.services, request, context.principal);
   const { evidence, duplicate } = result;

@@ -16,6 +16,8 @@
 
 import { safeName } from '../collectors/index.ts';
 import { bytesOf, defineHandler, lambdaServices, optionalString } from './shared.ts';
+import { evidenceDocuments, evidenceTarget, feedKnowledgeBase } from '../ai/bedrock/knowledgeSync.ts';
+import type { KnowledgeTarget } from '../ai/bedrock/knowledgeSync.ts';
 
 /** Why nothing was indexed when the deployment has no knowledge-base source. */
 export const NOT_CONFIGURED_REASON = 'knowledge-base ingestion is driven by the data source';
@@ -37,12 +39,27 @@ function keyOf(prefix: string, raw: Record<string, unknown>, contentType: string
   return `${prefix.replace(/\/+$/, '')}/${safeName(id)}.${safeName(extension)}`;
 }
 
+/**
+ * Deployed path: the pages of the read evidence, with the metadata retrieval
+ * filters on (`evidenceId`, `accessLevel`, `page`), then a sync request.
+ */
+async function feedEvidence(target: KnowledgeTarget, raw: Record<string, unknown>) {
+  const evidenceId = optionalString(raw, 'evidenceId');
+  const services = await lambdaServices();
+  const evidence = evidenceId ? await services.state.getEvidence(evidenceId) : null;
+  if (evidence === null) return report({ reason: 'no read evidence in the event: nothing to index' }, raw);
+  const fed = await feedKnowledgeBase(target, evidenceDocuments(evidence, target.prefix));
+  return report({ deposited: fed.written > 0, pages: fed.written, sync: fed.sync, reason: DEPOSITED_REASON }, raw);
+}
+
 /** One report of this step: never a success it cannot vouch for. */
 function report(fields: Record<string, unknown>, raw: Record<string, unknown>) {
   return { output: { indexed: false, ...fields }, payload: { ...raw, indexed: false, ...fields } };
 }
 
 export const handler = defineHandler(async (raw) => {
+  const target = evidenceTarget(process.env);
+  if (target !== null) return feedEvidence(target, raw);
   const prefix = (process.env[KB_SOURCE_PREFIX_ENV] ?? '').trim();
   if (prefix.length === 0) return report({ reason: NOT_CONFIGURED_REASON }, raw);
 

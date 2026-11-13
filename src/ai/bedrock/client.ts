@@ -11,6 +11,7 @@
  * Every adapter of `src/ai/bedrock/` builds its client through this file.
  */
 
+import type { BedrockDataAutomationRuntimeClient } from '@aws-sdk/client-bedrock-data-automation-runtime';
 import type { BedrockRuntimeClient } from '@aws-sdk/client-bedrock-runtime';
 import type { BedrockAgentRuntimeClient } from '@aws-sdk/client-bedrock-agent-runtime';
 import type { S3Client } from '@aws-sdk/client-s3';
@@ -71,6 +72,17 @@ export async function createRuntimeClient(
 ): Promise<BedrockRuntimeClient> {
   const { BedrockRuntimeClient } = await import('@aws-sdk/client-bedrock-runtime');
   return new BedrockRuntimeClient({ ...clientConfig(settings, options), requestHandler: await requestHandler() });
+}
+
+/** Lazily loads the Data Automation runtime client (document reading). */
+export async function createDataAutomationClient(
+  settings: Settings,
+  options: ClientOptions = {}
+): Promise<BedrockDataAutomationRuntimeClient> {
+  const { BedrockDataAutomationRuntimeClient } = await import('@aws-sdk/client-bedrock-data-automation-runtime');
+  // Default request handler: this client ships newer smithy types than the shared
+  // one, and each status call is short (the polling loop bounds the reading).
+  return new BedrockDataAutomationRuntimeClient(clientConfig(settings, options));
 }
 
 /** Lazily loads the agent-runtime client (knowledge bases: Retrieve). */

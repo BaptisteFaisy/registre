@@ -17,15 +17,16 @@
  *    managed knowledge base documentation; the fallback is a post-filter in
  *    `src/ai/**`, which is what the offline mock already does.
  *  - The custom field plan of Annex B is attached to a Data Automation project
- *    through a blueprint (`AWS::Bedrock::Blueprint`). The blueprint schema is
- *    generated from `src/ai/reader-plan.json` by the deployment script; the
- *    stack creates the project with the standard output configuration and a
- *    comment where the blueprint ARN is injected.
+ *    through a blueprint (`AWS::Bedrock::Blueprint`). Its schema is generated
+ *    from `src/ai/prompts/readerBlueprint.ts` and committed under
+ *    `infra/blueprints/`; the stack creates it and attaches it to the project.
  *  - Guardrail PII entity coverage and contextual-grounding thresholds are
  *    documented per language; French documents may need `FR` added to the
  *    PII entity list.
  */
 
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import * as cdk from 'aws-cdk-lib';
 import { Duration } from 'aws-cdk-lib';
 import * as bedrock from 'aws-cdk-lib/aws-bedrock';
@@ -56,6 +57,8 @@ export function bedrockPolicyStatements(config: RegistreConfig): iam.PolicyState
         'bedrock:StartIngestionJob',
         'bedrock:GetIngestionJob',
         'bedrock:ListIngestionJobs',
+        // The feed finds the data source of a knowledge base before syncing it.
+        'bedrock:ListDataSources',
         'bedrock:InvokeDataAutomationAsync',
         'bedrock:GetDataAutomationStatus'
       ],
@@ -63,12 +66,19 @@ export function bedrockPolicyStatements(config: RegistreConfig): iam.PolicyState
         `arn:aws:bedrock:${config.region}:${config.account}:knowledge-base/*`,
         `arn:aws:bedrock:${config.region}:${config.account}:guardrail/*`,
         `arn:aws:bedrock:${config.region}:${config.account}:data-automation-project/*`,
+        // Data Automation runs through the geography's cross-region profile
+        // (eu.data-automation-v1), and its status is read per invocation.
+        `arn:aws:bedrock:*:${config.account}:data-automation-profile/*`,
+        `arn:aws:bedrock:${config.region}:${config.account}:data-automation-invocation/*`,
         `arn:aws:bedrock:${config.region}:${config.account}:inference-profile/*`,
         `arn:aws:bedrock:*::foundation-model/*`
       ]
     })
   ];
 }
+
+/** Vault prefix the evidence knowledge base indexes (pages + metadata sidecars). */
+export const EVIDENCE_KB_PREFIX = 'kb-evidence/';
 
 export interface BedrockStackProps extends cdk.StackProps {
   readonly config: RegistreConfig;
@@ -108,7 +118,9 @@ export class BedrockStack extends cdk.Stack {
       kbRole
     );
     this.createDataSource('FrameworksSource', this.frameworksKnowledgeBaseId, this.frameworksBucket, ['controls/'], kbRole, config);
-    this.createDataSource('EvidenceSource', this.evidenceKnowledgeBaseId, vaultBucket, ['evidence/'], kbRole, config);
+    // The pages of read evidence with their metadata (`src/ai/bedrock/knowledgeSync.ts`),
+    // not the raw uploads: retrieval filters on `accessLevel`, which only the sidecars carry.
+    this.createDataSource('EvidenceSource', this.evidenceKnowledgeBaseId, vaultBucket, [EVIDENCE_KB_PREFIX], kbRole, config);
 
     const guardrail = this.createGuardrail(config, key);
     this.guardrailId = guardrail.attrGuardrailId;
@@ -271,6 +283,7 @@ export class BedrockStack extends cdk.Stack {
           'Deploy in eu-central-1 or eu-west-1, or set REGISTRE_DATA_AUTOMATION=off to use the multimodal fallback.'
       );
     }
+    const blueprint = this.createEvidenceBlueprint(config);
     const project = new bedrock.CfnDataAutomationProject(this, 'ReaderProject', {
       projectName: resourceName(config, 'reader'),
       projectDescription: 'Registre evidence reader - Annex B field extraction',
@@ -296,9 +309,27 @@ export class BedrockStack extends cdk.Stack {
           },
           generativeField: { state: 'ENABLED', types: ['IMAGE_SUMMARY'] }
         }
-      }
+      },
+      // Screenshots are evidence pages, read with the same Annex B document
+      // blueprint: routed to the image modality, Bedrock refused them on a real
+      // run ("Image format is invalid or not supported").
+      overrideConfiguration: { modalityRouting: { png: 'DOCUMENT', jpeg: 'DOCUMENT' } },
+      customOutputConfiguration: { blueprints: [{ blueprintArn: blueprint.attrBlueprintArn, blueprintStage: 'LIVE' }] }
     });
     return project.attrProjectArn;
+  }
+
+  /**
+   * The Annex B field plan, generated from `src/ai/prompts/readerBlueprint.ts`
+   * (a test keeps the committed schema equal to the plan). Without it, Data
+   * Automation returns the text only and no evidence carries a date or an author.
+   */
+  private createEvidenceBlueprint(config: RegistreConfig): bedrock.CfnBlueprint {
+    return new bedrock.CfnBlueprint(this, 'EvidenceBlueprint', {
+      blueprintName: resourceName(config, 'evidence'),
+      type: 'DOCUMENT',
+      schema: JSON.parse(readFileSync(join(__dirname, '..', 'blueprints', 'evidence.schema.json'), 'utf8')) as unknown
+    });
   }
 
   /** Least-privilege role used by every pipeline and API Lambda that calls Bedrock. */
