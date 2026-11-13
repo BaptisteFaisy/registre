@@ -59,7 +59,7 @@ test('createAi builds the Bedrock services without loading the SDK', () => {
   assert.equal(services.controlRetriever.id, 'bedrock-kb-frameworks');
   assert.equal(services.evidenceRetriever.id, 'bedrock-kb-evidence');
   assert.equal(services.reasoner.id, 'bedrock-structured-reasoner');
-  assert.equal(services.composer.id, 'bedrock-composer');
+  assert.equal(services.composer.id, 'strands-auditor-agent');
   assert.equal(services.guardrail.id, 'bedrock-guardrail');
 });
 

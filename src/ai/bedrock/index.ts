@@ -19,6 +19,7 @@ import { createControlRetriever, createEvidenceRetriever, knowledgeBaseIds } fro
 import { createStructuredReasoner } from './structuredReasoner.ts';
 import { createGuardrail } from './guardrails.ts';
 import { createComposer } from './composer.ts';
+import { createAnswerComposer } from '../strands/auditorAgent.ts';
 import { createCostMeter } from './costs.ts';
 
 export interface BedrockAiOptions {
@@ -63,7 +64,7 @@ export function createBedrockAi(
       meter: costs,
       ...(options.reasoningModelId ? { modelId: options.reasoningModelId } : {})
     }),
-    composer: createComposer(settings, { meter: costs }),
+    composer: createAnswerComposer(env, settings, { meter: costs }),
     guardrail: createGuardrail(settings, {
       guardrailId,
       meter: costs,
