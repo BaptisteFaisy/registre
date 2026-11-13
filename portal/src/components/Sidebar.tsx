@@ -1,5 +1,6 @@
 /* Sidebar navigation, filtered by the capabilities of the signed-in role. */
 
+import { BrandMark } from './BrandMark.tsx';
 import { useApp } from '../state/app.tsx';
 import { useApiData } from '../state/useData.ts';
 import { can } from '../lib/access.ts';
@@ -46,7 +47,7 @@ export function Sidebar({ route }: { route: Route }) {
   return (
     <aside className="sidebar">
       <div className="brand">
-        <span className="brand-mark">R</span>
+        <BrandMark />
         <span>
           <span className="brand-name">Registre</span>
           <br />

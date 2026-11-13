@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import type { DemoAccount } from '../mocks/principals.ts';
+import { BrandMark } from '../components/BrandMark.tsx';
 import { useApp } from '../state/app.tsx';
 import { Button, Field, TextInput } from '../components/Form.tsx';
 import { Card, CardBody, CardHeader, Notice } from '../components/Card.tsx';
@@ -33,7 +34,7 @@ function LoginPitch() {
   return (
     <section className="login-pitch">
       <div className="brand">
-        <span className="brand-mark">R</span>
+        <BrandMark />
         <span>
           <span className="brand-name">Registre</span>
           <span className="brand-sub"> audit evidence register</span>
