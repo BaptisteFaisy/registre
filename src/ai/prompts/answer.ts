@@ -20,12 +20,23 @@ export const PASSAGE_MAX_CHARS = 1200;
 /** Keys of one citation object in the answer payload. */
 export const ANSWER_CITATION_KEYS = ['evidenceId', 'quote', 'page'] as const;
 
+/**
+ * How the answer text carries its evidence: every fact taken from a passage is
+ * written between double quotes, copied verbatim. The anchoring check
+ * (`src/ai/anchoring.ts`) then verifies those quoted spans literally; an answer
+ * with no quote at all is checked sentence by sentence, which a paraphrase
+ * never passes (seen on the real run).
+ */
+export const QUOTE_IN_TEXT_RULE =
+  'In "text", write every fact you take from a passage between double quotes, copied verbatim from that passage; keep your own words outside the quotes short.';
+
 /** The strict JSON contract of the answer prompt. */
 export const ANSWER_JSON_CONTRACT = [
   'Return one JSON object and nothing else: no prose, no markdown fence.',
   'Shape: {"text": string, "citations": [{"evidenceId": string, "quote": string, "page": integer or null}]}.',
   'Write the answer only from the passages above; never add outside knowledge.',
   'Every factual sentence must be backed by one citation quoting the passage it uses.',
+  QUOTE_IN_TEXT_RULE,
   'The quote of a citation is copied verbatim from the passage, at least 8 characters long.',
   `When no passage answers the question, set "text" to exactly: ${NO_EVIDENCE_ANSWER}`,
   'and return an empty citations array. Never guess an answer.',
