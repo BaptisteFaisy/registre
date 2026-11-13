@@ -136,7 +136,9 @@ export async function readStep(
     evidenceId: id,
     contentType: payload.contentType,
     sizeBytes: payload.bytes?.byteLength ?? 0,
-    uri: payload.uri,
+    // The reader gets the vault copy: on AWS, Data Automation can only read an
+    // S3 object, and a manual deposit's own URI (`manual://…`) is not one.
+    uri: payload.storedUri ?? payload.uri,
     ...(payload.bytes === undefined ? {} : { bytes: payload.bytes }),
     fileDate: payload.fileDate ?? null,
     suggestedControlId: payload.suggestedControlId ?? null
