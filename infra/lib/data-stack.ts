@@ -45,7 +45,10 @@ export class DataStack extends cdk.Stack {
     super(scope, id, props);
     const { config, key } = props;
 
-    this.table = new dynamodb.Table(this, 'State', {
+    // Legacy table, kept only so the stacks that still import its outputs can
+    // move to the new table in the same deployment; it never held data (its
+    // key names did not match `src/store/dynamoKeys.ts`). Remove once unused.
+    const legacy = new dynamodb.Table(this, 'State', {
       tableName: resourceName(config, 'state'),
       partitionKey: { name: 'pk', type: dynamodb.AttributeType.STRING },
       sortKey: { name: 'sk', type: dynamodb.AttributeType.STRING },
@@ -57,19 +60,45 @@ export class DataStack extends cdk.Stack {
       removalPolicy: cdk.RemovalPolicy.RETAIN
     });
 
-    this.table.addGlobalSecondaryIndex({
+    legacy.addGlobalSecondaryIndex({
       indexName: 'gsi1',
       partitionKey: { name: 'gsi1pk', type: dynamodb.AttributeType.STRING },
       sortKey: { name: 'gsi1sk', type: dynamodb.AttributeType.STRING },
       projectionType: dynamodb.ProjectionType.INCLUDE,
       nonKeyAttributes: ['sha256', 'frameworkId', 'controlId', 'status', 'accessLevel']
     });
-    this.table.addGlobalSecondaryIndex({
+    legacy.addGlobalSecondaryIndex({
       indexName: 'gsi2',
       partitionKey: { name: 'gsi2pk', type: dynamodb.AttributeType.STRING },
       sortKey: { name: 'gsi2sk', type: dynamodb.AttributeType.STRING },
       projectionType: dynamodb.ProjectionType.KEYS_ONLY
     });
+
+    // The state table, with the key and index names the store code uses
+    // (`ATTRS` and `INDEX_NAMES` in src/store/dynamoKeys.ts): PK/SK and three
+    // overloaded indexes, fully projected so a query never needs a second read.
+    this.table = new dynamodb.Table(this, 'Store', {
+      tableName: resourceName(config, 'store'),
+      partitionKey: { name: 'PK', type: dynamodb.AttributeType.STRING },
+      sortKey: { name: 'SK', type: dynamodb.AttributeType.STRING },
+      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
+      encryption: dynamodb.TableEncryption.CUSTOMER_MANAGED,
+      encryptionKey: key,
+      pointInTimeRecoverySpecification: { pointInTimeRecoveryEnabled: true },
+      deletionProtection: true,
+      removalPolicy: cdk.RemovalPolicy.RETAIN
+    });
+    for (const [indexName, n] of [['gsi1', 1], ['gsi2', 2], ['gsi3', 3]] as const) {
+      this.table.addGlobalSecondaryIndex({
+        indexName,
+        partitionKey: { name: `GSI${n}PK`, type: dynamodb.AttributeType.STRING },
+        sortKey: { name: `GSI${n}SK`, type: dynamodb.AttributeType.STRING },
+        projectionType: dynamodb.ProjectionType.ALL
+      });
+    }
+    new cdk.CfnOutput(this, 'LegacyStateTableName', { value: legacy.tableName });
+    this.exportValue(legacy.tableName);
+    this.exportValue(legacy.tableArn);
 
     new cdk.CfnOutput(this, 'StateTableName', { value: this.table.tableName });
     new cdk.CfnOutput(this, 'StateTableArn', { value: this.table.tableArn });

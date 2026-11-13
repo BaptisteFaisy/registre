@@ -74,7 +74,9 @@ export function stripGatewayHeaders(headers: Record<string, string>): Record<str
 export function groupsOf(claims: CognitoClaims): string[] {
   const raw = claims['cognito:groups'];
   if (raw === undefined) return [];
-  const list = Array.isArray(raw) ? raw : raw.split(',');
+  // API Gateway HTTP APIs flatten an array claim into "[A B]": brackets and
+  // spaces are separators too, or a deployed caller would have no role at all.
+  const list = Array.isArray(raw) ? raw : raw.replace(/^\[|\]$/g, '').split(/[\s,]+/);
   return list.map((group) => String(group).trim()).filter((group) => group.length > 0);
 }
 

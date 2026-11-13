@@ -146,6 +146,8 @@ export class ApiStack extends cdk.Stack {
         REGISTRE_NIGHTLY_TIER: 'STANDARD',
         STATE_MACHINE_ARN: props.stateMachine.stateMachineArn,
         USER_POOL_ID: this.userPool.userPoolId,
+        // The session route signs in with Cognito on AWS (src/api/cognitoSession.ts).
+        REGISTRE_COGNITO_CLIENT_ID: this.userPoolClient.userPoolClientId,
         // Pack signing goes through KMS in production; the local Ed25519 signer
         // is what the offline demo and the tests use.
         REGISTRE_SIGNER: 'kms',

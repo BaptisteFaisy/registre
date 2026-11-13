@@ -19,6 +19,7 @@ import { SESSION_COOKIE, demoToken } from '../auth.ts';
 import { requiredString } from '../validate.ts';
 import { principalView } from '../views.ts';
 import { bodyObject } from './shared.ts';
+import { cognitoSignInFromEnv, signInWithCognito } from '../cognitoSession.ts';
 
 /** Cookie attributes shared by the session and its removal. */
 const COOKIE_ATTRIBUTES = 'Path=/; HttpOnly; SameSite=Lax';
@@ -38,6 +39,12 @@ async function createSession(context: ApiContext): Promise<ApiResponse> {
   const body = bodyObject(context);
   const login = requiredString(body, 'login');
   const password = requiredString(body, 'password');
+  const deployed = cognitoSignInFromEnv(process.env);
+  if (deployed !== null) {
+    const session = await signInWithCognito(deployed, login, password);
+    if (session === null) throw unauthorized('unknown login or password', { reason: 'INVALID_CREDENTIALS' });
+    return json(200, { token: session.token, principal: principalView(session.principal) }, { 'set-cookie': sessionCookie(session.token) });
+  }
   const token = demoToken(login, password);
   const principal = context.directory.authenticate(token);
   if (principal === null) {
