@@ -60,14 +60,22 @@ export class BedrockGuardrail implements Guardrail {
   }
 
   /** Checks that every citation of the answer exists in the passages. */
-  async verifyAnchoring(input: { answer: string; passages: readonly Passage[] }): Promise<AnchoringResult> {
+  async verifyAnchoring(input: {
+    answer: string;
+    passages: readonly Passage[];
+    question?: string;
+  }): Promise<AnchoringResult> {
     const unsupported = unsupportedSpans(input.answer, input.passages);
-    if (!this.enabled()) {
-      console.warn('[ai:bedrock] no guardrail id configured: literal anchoring check only');
+    // Contextual grounding needs the three parts — source, query and the
+    // content to guard; without the query Bedrock rejects the call (seen on
+    // the real run), so a caller with no question gets the literal check.
+    if (!this.enabled() || !input.question) {
+      if (!this.enabled()) console.warn('[ai:bedrock] no guardrail id configured: literal anchoring check only');
       return { anchored: unsupported.length === 0 && input.passages.length > 0, unsupported };
     }
     const result = await this.apply('OUTPUT', [
       { text: { text: passagesText(input.passages), qualifiers: ['grounding_source'] } },
+      { text: { text: input.question, qualifiers: ['query'] } },
       { text: { text: input.answer, qualifiers: ['guard_content'] } }
     ]);
     return { anchored: !result.blocked && unsupported.length === 0, unsupported };

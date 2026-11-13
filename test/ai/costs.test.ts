@@ -128,3 +128,13 @@ test('the guardrail only bills when it actually calls the service', async () => 
   assert.equal(outcome.redacted, true);
   assert.equal(meter.report().count, 0, 'the local PII pass costs nothing');
 });
+
+test('without the user question, the grounding check stays literal and never calls the service', async () => {
+  const meter = new InMemoryCostMeter();
+  // A configured guardrail: a service call here would need the network.
+  const guardrail = createGuardrail(makeSettings({ guardrailId: 'gr-1' }), { guardrailId: 'gr-1', meter });
+  const passages = [{ evidenceId: 'ev-1', page: 1, text: 'Approved on 2025-05-20.' }] as never;
+  const outcome = await guardrail.verifyAnchoring({ answer: 'Approved on 2025-05-20.', passages });
+  assert.equal(outcome.anchored, true);
+  assert.equal(meter.report().count, 0);
+});
